@@ -347,13 +347,16 @@ def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_d
     gstack_for_vertex = gstack[gstack_vert_mask] # Get list of PDG IDs for particles associated with vertex
     gstack_pi0_mask = gstack_for_vertex['part_pdg']==111
     gstack_pi0_traj = gstack_for_vertex[gstack_pi0_mask]['traj_id'] #
-    print("Pi0 Trajectories:", gstack_pi0_traj)
+    #print("Pi0 Trajectories:", gstack_pi0_traj)
     pi0_traj_mask = final_states['traj_id']==gstack_pi0_traj
     fs_pi0s = final_states[pi0_traj_mask] # Get list of pi0s associated with vertex
     pi0_start_mom = fs_pi0s['pxyz_start']
+    pi0_end_process = fs_pi0s['end_process']
+    pi0_end_subprocess = fs_pi0s['end_subprocess']
     if len(pi0_start_mom) > 1:
         print("Multiple start momenta found for pi0 trajectory ID:", gstack_pi0_traj)
     else:
+        print("Pi0 Start Momentum:", pi0_start_mom)
         pi0_start_mom = pi0_start_mom[0]
     pi0_end_loc = fs_pi0s['xyz_end']
     if len(pi0_end_loc) > 1:
@@ -448,6 +451,7 @@ def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_d
         child_start_pxyz.append(start_pxyz)
 
     if len(child_pdg) < 2: 
+        print("Spill ID:", spill_id)
         too_few_by = 2 - len(child_pdg)
         for i in range(too_few_by):
             child_pdg.append(0)
@@ -485,6 +489,8 @@ def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_d
         pi0_start_mom = [float(i) for i in pi0_start_mom],
         pi0_end_loc = [float(i) for i in pi0_end_loc],
         pi0_start_loc = [float(i) for i in pi0_start_loc],
+        pi0_end_process = [int(i) for i in pi0_end_process],
+        pi0_end_subprocess = [int(i) for i in pi0_end_subprocess],
         child_pdg=[int(pdg) for pdg in child_pdg],
         nu_pdg = int(nu_pdg), 
         child_total_edep=[float(total_edep) for total_edep in child_total_edep],

@@ -50,6 +50,7 @@ def main(sim_dir, input_type, n_files_processed):
 
         if test_count ==int(n_files_processed) : break
         test_count+=1
+        #if test_count <369: continue
 
         if (test_count % 5 == 0):
             print("Processing file: ", str(test_count), "/", str(n_files_processed))
@@ -63,6 +64,7 @@ def main(sim_dir, input_type, n_files_processed):
 
         ### partition file by spill
         unique_spill = np.unique(sim_h5['trajectories'][event_spill_id])
+        print("Number of unique spills in file:", len(unique_spill))
         for spill_id in unique_spill:
 
             ghdr, gstack, traj, vert, seg = file_parsing.get_spill_data(sim_h5, spill_id, input_type)
@@ -88,6 +90,9 @@ def main(sim_dir, input_type, n_files_processed):
 
                 ### REQUIRE: (A) nu_mu(_bar), (B) CC interaction, (C) NO final state mesons, (D) final state particle start point in FV
                 if nu_mu==True and is_cc==True and no_charged_mesons==True and one_pi0==True and fv_particle_origin==True:
+                    print("Sim file: ", sim_file)
+                    print("Spill ID: ", spill_id)
+                    print("Spill ID index:", np.where(unique_spill==spill_id))
                     dict_defs.pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict)
                     dict_defs.muon_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, muon_dict)
                     dict_defs.hadron_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, kinematics.threshold, hadron_dict)

@@ -37,6 +37,11 @@ neutral_hadron_pdg_dict ={2112:'n',
                           3212:r'$\Sigma^0$',
                           4112:r'$\Sigma_c^0$'} 
 
+pi0_decay_prod_pdg_dict = {22:r'$\gamma$',
+                           11:r'$e^-$',
+                           -11:r'$e^+$',
+                           0:''}
+
 
 ####---------------- PDG ID/PARTICLE PROPERTY DICTIONARIES -----------------####
 
