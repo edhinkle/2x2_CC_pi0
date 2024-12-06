@@ -87,6 +87,14 @@ def fv_edep_charged_e(traj_id, vert_id, seg_full):
             contained_e+=sg['dE']
     return contained_e
 
+def fv_edep_e(traj_id, vert_id, seg_full):
+    seg_vert_mask = seg_full['vertex_id']==vert_id
+    seg = seg_full[seg_vert_mask]
+    seg_id_mask=seg['traj_id']==traj_id
+    contained_e=0.
+    for sg in seg[seg_id_mask]: contained_e+=sg['dE']
+    return contained_e
+
 
 def fv_edep_neutral_e(traj_id, traj, vert_id, seg):
     flag=True; daughter_track_ids=set()
@@ -123,7 +131,14 @@ def total_edep_charged_e(traj_id, vert_id, seg_full):
     total_e=0.
     for sg in seg[seg_id_mask]: total_e+=sg['dE']
     return total_e
-
+    
+def total_edep_e_start(traj_id, vert_id, seg_full):
+    seg_vert_mask = seg_full['vertex_id']==vert_id
+    seg = seg_full[seg_vert_mask]
+    seg_id_mask=seg['traj_id']==traj_id
+    total_e=0.
+    for sg in seg[seg_id_mask]: total_e+=sg['dE']
+    return total_e
 
 def total_edep_neutral_e(traj_id, traj, vert_id, seg):
     flag=True; daughter_track_ids=set()
@@ -167,6 +182,18 @@ def fv_edep_charged_length(traj_id, vert_id, seg_full):
                                        (sg['z_start']-sg['z_end'])**2. )
     return contained_length
 
+def fv_edep_length(traj_id, vert_id, seg_full):
+    seg_vert_mask = seg_full['vertex_id']==vert_id
+    seg = seg_full[seg_vert_mask]
+    seg_id_mask=seg['traj_id']==traj_id
+    contained_length=0.
+    for sg in seg[seg_id_mask]:
+            contained_length+=np.sqrt( (sg['x_start']-sg['x_end'])**2+
+                                       (sg['y_start']-sg['y_end'])**2.+
+                                       (sg['z_start']-sg['z_end'])**2. )
+    return contained_length
+
+
 
 def fv_contained_length(pdg, traj_id, vert_id, seg):
     if pdg in particlePDG_defs.neutral_pdg: return 0.
@@ -177,6 +204,17 @@ def fv_contained_length(pdg, traj_id, vert_id, seg):
 
 
 def total_edep_charged_length(traj_id, vert_id, seg_full):
+    seg_vert_mask = seg_full['vertex_id']==vert_id
+    seg = seg_full[seg_vert_mask]
+    seg_id_mask=seg['traj_id']==traj_id
+    contained_length=0.
+    for sg in seg[seg_id_mask]:
+            contained_length+=np.sqrt( (sg['x_start']-sg['x_end'])**2+
+                                       (sg['y_start']-sg['y_end'])**2.+
+                                       (sg['z_start']-sg['z_end'])**2. )
+    return contained_length
+
+def total_edep_length(traj_id, vert_id, seg_full):
     seg_vert_mask = seg_full['vertex_id']==vert_id
     seg = seg_full[seg_vert_mask]
     seg_id_mask=seg['traj_id']==traj_id

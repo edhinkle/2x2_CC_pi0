@@ -46,4 +46,6 @@ pi0_decay_prod_pdg_dict = {22:r'$\gamma$',
 ####---------------- PDG ID/PARTICLE PROPERTY DICTIONARIES -----------------####
 
 rest_mass_dict ={2212: 938.27208816,
-                   13: 105.6583755  }  # Masses in MeV (from PDG)
+                   13: 105.6583755  ,
+                   11: 0.51099895000,
+                  111: 134.9768}  # Masses in MeV (from PDG)

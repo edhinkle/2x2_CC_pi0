@@ -90,7 +90,7 @@ def find_parent_pdg(parent_id, vertex_id, traj, ghdr):
         ghdr_mask = ghdr['vertex_id']==vertex_id
         parent_pdg=ghdr[ghdr_mask]['nu_pdg']
     else:
-        parent_mask = traj['traj_id']==parent_id
-        parent_pdg = traj[parent_mask]['pdg_id']
+        parent_mask = vertex_assoc_traj['traj_id']==parent_id
+        parent_pdg = vertex_assoc_traj[parent_mask]['pdg_id']
     #if len(parent_pdg)==0: parent_pdg=[0]
     return parent_pdg

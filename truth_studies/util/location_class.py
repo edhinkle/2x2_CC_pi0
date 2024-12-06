@@ -84,13 +84,29 @@ def minerva_vertex(vert_pos):
 
 ####------------------ PARTICLE CONTAINMENT / ENDPOINTS --------------------####
 
-def particle_containment(traj, traj_id):
+def particle_containment_single_particle(traj, traj_id):
     mask = traj['traj_id']==traj_id
     start=fiducialized_vertex(traj[mask]['xyz_start'][0].tolist())
     end=fiducialized_vertex(traj[mask]['xyz_end'][0].tolist())
     if start==True and end==True: return 'fc' # fully contained
     elif (start==True and end==False) or (start==False and end==True): return 'pc' # partially contained
     else: return 'tg' # through going
+
+def particle_containment_traj_set_fraction(vertex_assoc_traj, traj_id_set):
+    total_traj = len(traj_id_set)
+    traj_contained = 0.
+    for traj_id in traj_id_set:
+        mask = vertex_assoc_traj['traj_id']==traj_id
+        start=fiducialized_vertex(vertex_assoc_traj[mask]['xyz_start'][0].tolist())
+        end=fiducialized_vertex(vertex_assoc_traj[mask]['xyz_end'][0].tolist())
+        if start==True and end==True:
+            traj_contained += 1.
+        elif (start==True and end==False) or (start==False and end==True): 
+            traj_contained += 0.5 # FIX ME: make a better estimate
+        else: continue
+
+    return traj_contained/total_traj
+
 
 
 ''' Inputs: ([x,y,z] vector) particle trajectory start point

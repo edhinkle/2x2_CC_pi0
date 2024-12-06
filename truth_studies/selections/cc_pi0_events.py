@@ -25,9 +25,9 @@ def main(sim_dir, input_type, n_files_processed):
 
     ### NOTE: Current POT scaling is based on MiniRun4 larnd file situation
     if int(n_files_processed) < 1024.: 
-        scale_factor = (1./(int(n_files_processed)/1024.))*1.2
+        scale_factor = (1./(int(n_files_processed)/1024.))*1.05
     else:
-        scale_factor = 1.2
+        scale_factor = (1./(1023./1024.))*1.05
 
     pi0_dict = dict() # Initialize muon dictionary
     muon_dict = dict() # Initialize muon dictionary
@@ -50,7 +50,10 @@ def main(sim_dir, input_type, n_files_processed):
 
         if test_count ==int(n_files_processed) : break
         test_count+=1
-        #if test_count <369: continue
+        #if test_count <440: continue
+        if sim_file.find('0000912') != -1: 
+            print("---------------SKIPPING PROBLEM FILE---------------")
+            continue # Skip MiniRun 5 file 0000912 due to bug (for now)
 
         if (test_count % 5 == 0):
             print("Processing file: ", str(test_count), "/", str(n_files_processed))
@@ -64,7 +67,7 @@ def main(sim_dir, input_type, n_files_processed):
 
         ### partition file by spill
         unique_spill = np.unique(sim_h5['trajectories'][event_spill_id])
-        print("Number of unique spills in file:", len(unique_spill))
+        #print("Number of unique spills in file:", len(unique_spill))
         for spill_id in unique_spill:
 
             ghdr, gstack, traj, vert, seg = file_parsing.get_spill_data(sim_h5, spill_id, input_type)
@@ -90,10 +93,10 @@ def main(sim_dir, input_type, n_files_processed):
 
                 ### REQUIRE: (A) nu_mu(_bar), (B) CC interaction, (C) NO final state mesons, (D) final state particle start point in FV
                 if nu_mu==True and is_cc==True and no_charged_mesons==True and one_pi0==True and fv_particle_origin==True:
-                    print("Sim file: ", sim_file)
-                    print("Spill ID: ", spill_id)
-                    print("Spill ID index:", np.where(unique_spill==spill_id))
-                    dict_defs.pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict)
+                    #print("Sim file: ", sim_file)
+                    #print("Spill ID: ", spill_id)
+                    #print("Spill ID index:", np.where(unique_spill==spill_id))
+                    dict_defs.pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict, sim_file)
                     dict_defs.muon_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, muon_dict)
                     dict_defs.hadron_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, kinematics.threshold, hadron_dict)
                     dict_defs.get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict)
