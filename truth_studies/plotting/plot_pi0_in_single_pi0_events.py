@@ -417,6 +417,12 @@ def plot_pi0s(d, scale_factor, sig_bkg = 0):
         plt.tight_layout()
         output.savefig(fig)
         plt.close(fig)
+        print("Mean lead photon conversion distance: ", np.mean(gg_pi0_lead_gamma_conv_dist))
+        print("Mean sublead photon conversion distance: ", np.mean(gg_pi0_sublead_gamma_conv_dist))
+        print("Overall mean photon conversion distance: ", np.mean(np.concatenate((gg_pi0_lead_gamma_conv_dist, gg_pi0_sublead_gamma_conv_dist))))
+        print("Mean lead photon available energy: ", np.mean(gg_pi0_lead_gamma_available_energy))
+        print("Mean sublead photon available energy: ", np.mean(gg_pi0_sublead_gamma_available_energy))
+        print("Overall mean photon available energy: ", np.mean(np.concatenate((gg_pi0_lead_gamma_available_energy, gg_pi0_sublead_gamma_available_energy))))
 
         # PLOT: pi0 containment fraction scatter
         fig, ax = plt.subplots(figsize=(6,4))
@@ -438,6 +444,18 @@ def plot_pi0s(d, scale_factor, sig_bkg = 0):
         print("No energy deposited in subleading photon: ", np.count_nonzero(sublead_gamma_no_edep_mask))
         greq_0p2_lead_gamma_cont_frac = gg_pi0_lead_gamma_containment_fraction[~no_edep_mask]
         greq_0p2_sublead_gamma_cont_frac = gg_pi0_sublead_gamma_containment_fraction[~no_edep_mask]
+
+        greq_0p2_lead_avail_energy = gg_pi0_lead_gamma_available_energy[~no_edep_mask]
+        greq_0p2_sublead_avail_energy = gg_pi0_sublead_gamma_available_energy[~no_edep_mask]
+        greq0p2_lead_conv_dist = gg_pi0_lead_gamma_conv_dist[~no_edep_mask]
+        greq0p2_sublead_conv_dist = gg_pi0_sublead_gamma_conv_dist[~no_edep_mask]
+        print("[With >=0.2 cont] Mean lead photon conversion distance: ", np.mean(greq0p2_lead_conv_dist))
+        print("[With >=0.2 cont] Mean sublead photon conversion distance: ", np.mean(greq0p2_sublead_conv_dist))
+        print("[With >=0.2 cont] Overall mean photon conversion distance: ", np.mean(np.concatenate((greq0p2_lead_conv_dist, greq0p2_sublead_conv_dist))))
+        print("[With >=0.2 cont] Mean lead photon available energy: ", np.mean(greq_0p2_lead_avail_energy))
+        print("[With >=0.2 cont] Mean sublead photon available energy: ", np.mean(greq_0p2_sublead_avail_energy))
+        print("[With >=0.2 cont] Overall mean photon available energy: ", np.mean(np.concatenate((greq_0p2_lead_avail_energy, greq_0p2_sublead_avail_energy))))
+        
 
         # PLOT: pi0 containment fraction 2d hist only if some energy contained
         fig, ax = plt.subplots(figsize=(6,4))
@@ -486,7 +504,7 @@ def plot_pi0s(d, scale_factor, sig_bkg = 0):
         ## Location of vertex for low edep events
         gg_pi0_end_low_edep = gg_pi0_end[no_edep_mask]
         gg_pi0_start_low_edep = gg_pi0_start[no_edep_mask]
-        fig = plt.figure(figsize=(28,8))
+        fig = plt.figure(figsize=(32,8))
         # First subplot -- ZX
         ax1 = fig.add_subplot(131)
         sc1 = ax1.scatter(gg_pi0_end_low_edep[:,2], gg_pi0_end_low_edep[:,0], c=gg_pi0_end_low_edep[:,1], cmap=cmr.wildfire, marker='o', label=r'$\gamma\gamma$')
