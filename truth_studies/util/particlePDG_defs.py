@@ -48,4 +48,5 @@ pi0_decay_prod_pdg_dict = {22:r'$\gamma$',
 rest_mass_dict ={2212: 938.27208816,
                    13: 105.6583755  ,
                    11: 0.51099895000,
-                  111: 134.9768}  # Masses in MeV (from PDG)
+                  111: 134.9768, 
+                  221: 547.862}  # Masses in MeV (from PDG)

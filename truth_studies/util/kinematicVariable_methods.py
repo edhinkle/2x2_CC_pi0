@@ -22,6 +22,7 @@ import truth_studies.util.singleParticleAssociation_methods as particle_assoc
 ####--------- DEFINITIONS RELATED TO FINDING KINEMATIC VARIABLES -----------####
 
 threshold = 1.2 # stand-in threshold in cm (~3 pixels)
+beam_direction = np.array([0, -0.05836, 1.0]) # beam direction in z-axis (almost, but a bit downward in y-axis)
 
 
 ####----------------- TRUTH PRIMARY PARTICLE KINEMATICS --------------------####

@@ -19,7 +19,7 @@ import truth_studies.util.truth_ixn_methods as truth
 import truth_studies.util.kinematicVariable_methods as kinematics
 import truth_studies.util.dictionary_defs as dict_defs
 
-def main(sim_dir, input_type, n_files_processed):
+def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dune/www/data/2x2/simulation/productions/MiniRun6.1_1E19_RHC/MiniRun6.1_1E19_RHC.flow/FLOW/'):
 
     test_count = 0
 
@@ -35,6 +35,7 @@ def main(sim_dir, input_type, n_files_processed):
 
     # Dictionaries for combining with other background explorations
     signal_dict = dict() # Initialize dictionary for signal muons for full comparison
+    sig_bkg_dict = dict() # Initialize dictionary for signal and w.s. bkg muons for full comparison
     
     file_ext = '' ## Changes based on input type
     event_spill_id = '' ## Changes based on input type
@@ -50,8 +51,11 @@ def main(sim_dir, input_type, n_files_processed):
 
         if test_count ==int(n_files_processed) : break
         test_count+=1
-        #if test_count <440: continue
+        #if test_count <44: continue
         if sim_file.find('0000912') != -1: 
+            print("---------------SKIPPING PROBLEM FILE---------------")
+            continue # Skip MiniRun 5 file 0000912 due to bug (for now)
+        if sim_file.find('0000216') != -1: 
             print("---------------SKIPPING PROBLEM FILE---------------")
             continue # Skip MiniRun 5 file 0000912 due to bug (for now)
 
@@ -65,9 +69,22 @@ def main(sim_dir, input_type, n_files_processed):
             continue
         #print(sim_h5.keys(),'\n')
 
+        # Get flow event information
+        file_number = sim_file.split("/")[-1].split(".")[-3]
+        file_number_int = int(file_number)
+        flow_file = glob.glob(flow_dir+'000*000/MiniRun6.1_1E19_RHC.flow.'+file_number+'.FLOW.hdf5')[0]
+        f = h5py.File(flow_file, 'r')
+
+        events = f['charge/events/data']
+        mc_truth_ixns = f['mc_truth/interactions/data']
+        raw_events = f['charge/raw_events/data']
+        raw_events_ref = f['charge/raw_events/ref/charge/events/ref']
+        raw_events_region = f['charge/raw_events/ref/charge/events/ref_region']
+        mc_truth_ixn_ref = f['charge/raw_events/ref/mc_truth/interactions/ref']
+
         ### partition file by spill
         unique_spill = np.unique(sim_h5['trajectories'][event_spill_id])
-        print("Unique spill IDs in file:", unique_spill)
+        #print("Unique spill IDs in file:", unique_spill)
         #print("Number of unique spills in file:", len(unique_spill))
         for spill_id in unique_spill:
 
@@ -85,7 +102,6 @@ def main(sim_dir, input_type, n_files_processed):
                     continue
 
                 vert_id = vert['vertex_id'][v_i]
-
                 nu_mu = truth.signal_nu_pdg(ghdr, vert_id) # nu_mu OR nu_mu_bar
                 is_cc = truth.signal_cc(ghdr, vert_id)
                 no_charged_mesons = truth.non_pi0_meson_status(gstack, vert_id)
@@ -94,20 +110,57 @@ def main(sim_dir, input_type, n_files_processed):
 
                 ### REQUIRE: (A) nu_mu(_bar), (B) CC interaction, (C) NO final state mesons, (D) final state particle start point in FV
                 if nu_mu==True and is_cc==True and no_charged_mesons==True and one_pi0==True and fv_particle_origin==True:
-                    print("Sim file: ", sim_file)
-                    print("Spill ID: ", spill_id)
-                    print("Spill ID index:", np.where(unique_spill==spill_id))
-                    print("Length of unique spill array:", np.shape(unique_spill))
-                    dict_defs.pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict, sim_file)
-                    dict_defs.muon_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, muon_dict)
-                    dict_defs.hadron_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, kinematics.threshold, hadron_dict)
-                    dict_defs.get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict)
+                    sig_or_bkg = True
+                else:
+                    sig_or_bkg = False
+
+                #print("Signal or Background: ", sig_or_bkg)
+
+                #print("Sim file: ", sim_file)
+                #print("Spill ID: ", spill_id)
+                #print("Spill ID index:", np.where(unique_spill==spill_id))
+                #print("Length of unique spill array:", np.shape(unique_spill))
+                
+                # Get flow event id information
+                truth_ev_id = spill_id
+                #print("Truth Event ID: ",truth_ev_id)
+                mc_truth_ev_id_idx = np.where(mc_truth_ixns['event_id'] == truth_ev_id)[0]
+                #print("MC Truth Event ID Index: ",mc_truth_ev_id_idx)
+                mc_truth_ixn_ref_for_ixn = []#np.zeros(len(mc_truth_ev_id_idx), dtype=int)
+                raw_event_ref_from_mc_truth = []#np.zeros(len(mc_truth_ev_id_idx), dtype=int)
+                for i in range(len(mc_truth_ev_id_idx)):
+    
+                    ev_id_idx = mc_truth_ev_id_idx[i]
+                    mc_truth_ixn_ref_values = mc_truth_ixn_ref[mc_truth_ixn_ref[:,1] == ev_id_idx,  1]
+                    if len(mc_truth_ixn_ref_values) > 0:
+                        mc_truth_ixn_ref_for_ixn.append(mc_truth_ixn_ref_values[0])
+                        raw_event_ref_from_mc_truth.append(mc_truth_ixn_ref[mc_truth_ixn_ref[:,1] == ev_id_idx, 0])
+                    else: continue
+                raw_event_ref_from_mc_truth = np.unique(np.array(raw_event_ref_from_mc_truth))
+                #print("Raw event ref from MC Truth: ",raw_event_ref_from_mc_truth)
+                mc_truth_ixn_id = mc_truth_ixns[mc_truth_ixn_ref_for_ixn]['event_id']
+                #print("MC Truth Interaction ID: ",mc_truth_ixn_id)
+                raw_event_id = raw_events[raw_event_ref_from_mc_truth]['id'][0]
+                #print("Raw Event ID: ",raw_event_id)
+
+                raw_event_ref = raw_events_ref[raw_events_region[raw_event_id,'start']:raw_events_region[raw_event_id,'stop']]
+                raw_event_ref_for_raw_event = np.sort(raw_event_ref[raw_event_ref[:,0] == raw_event_id, 1])
+                raw_event_ref_for_event = np.sort(raw_event_ref[raw_event_ref[:,0] == raw_event_id, 0])
+                event_id = events[raw_event_ref_for_raw_event]['id'][0]
+                #print("Event ID: ",event_id)
+
+                dict_defs.get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig_bkg_dict, sim_file, event_id, sig_or_bkg, is_cc)
+                #dict_defs.pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict, sim_file, event_id)
+                #dict_defs.muon_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, muon_dict)
+                #dict_defs.hadron_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, kinematics.threshold, hadron_dict)
+                #dict_defs.get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict)
 
     # Save all Python dictionaries to JSON files
     file_parsing.save_dict_to_json(signal_dict, "signal_dict", True)
     file_parsing.save_dict_to_json(pi0_dict, "pi0_dict", True)
     file_parsing.save_dict_to_json(muon_dict, "muon_dict", True)
     file_parsing.save_dict_to_json(hadron_dict, "hadron_dict", True)
+    file_parsing.save_dict_to_json(sig_bkg_dict, "sig_bkg_dict", True)
 
     # Save full signal and w.s. bkg counts to TXT file
     signal_count = len(signal_dict)*scale_factor
@@ -127,5 +180,7 @@ if __name__=='__main__':
                         help='''string corresponding to the output file type: edep or larnd''')
     parser.add_argument('-n', '--n_files_processed', default=1, required=True, type=int, \
                         help='''File count of number of files processed in production sample''')
+    parser.add_argument('-f', '--flow_dir', default='/global/cfs/cdirs/dune/www/data/2x2/simulation/productions/MiniRun6.1_1E19_RHC/MiniRun6.1_1E19_RHC.flow/FLOW/', type=str, \
+                        help='''string corresponding to the path of the directory containing flow files''')
     args = parser.parse_args()
     main(**vars(args))

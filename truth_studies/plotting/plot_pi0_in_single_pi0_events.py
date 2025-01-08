@@ -538,6 +538,19 @@ def plot_pi0s(d, scale_factor, sig_bkg = 0):
         output.savefig(fig)
         plt.close(fig)
 
+        # Plot: containment fraction vs. available energy
+        fig, ax = plt.subplots(figsize=(8,6))
+        all_photon_available_energy = np.concatenate((gg_pi0_lead_gamma_available_energy, gg_pi0_sublead_gamma_available_energy))
+        all_photon_containment_fraction = np.concatenate((gg_pi0_lead_gamma_containment_fraction, gg_pi0_sublead_gamma_containment_fraction))
+        #ax.scatter(all_photon_containment_fraction, all_photon_available_energy, c='navy', marker='o', s=2, alpha=0.5, label='All Photons')
+        ax.hist2d(all_photon_containment_fraction, all_photon_available_energy, bins=(np.linspace(0,1,11), np.logspace(0,4,51)), cmap='Blues', cmin=1)
+        ax.set_ylabel(r"Photon Starting Energy [MeV]")
+        ax.set_xlabel(r"Photon Deposited Energy Fraction")
+        ax.set_title(r"Photon Deposited Energy Fraction vs. Starting Energy")
+        ax.set_yscale('log')
+        output.savefig(fig)
+        plt.close(fig)
+
 
 
 

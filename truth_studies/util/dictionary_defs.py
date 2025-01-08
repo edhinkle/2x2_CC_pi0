@@ -70,6 +70,389 @@ def get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict
         vtx_z = float(vtx_z))
     return
 
+''' Purpose: Fill Python dictionary with overall truth-level information
+             and 
+    Inputs : Spill ID (INT), Vertex ID (INT), genie_hdr dataset (HDF5 DATASET), 
+             genie_stack dataset (HDF5 DATASET), edep-sim trajectories dataset (HDF5 DATASET), 
+             vertex dataset (HDF5 DATASET), edep-sim segements dataset (HDF5 DATASET), 
+             empty Python dictionary (DICT)
+    Outputs: Nothing returned, but signal_dict (DICT) is full after
+             method runs'''
+def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig_bkg_dict, sim_file, flow_event_id, sig_or_bkg, is_cc):
+
+    # Truth level summary information
+    ghdr_vert_mask = ghdr['vertex_id']==vert_id
+    truth_level_summ = ghdr[ghdr_vert_mask]
+
+    nu_energy = truth_level_summ['Enu'] # Truth-level neutrino energy
+    q2 = truth_level_summ['Q2'] # Truth-level interaction 4-momentum squared
+    nu_pdg = truth_level_summ['nu_pdg']
+    nu_int_type = truth.nu_int_type(ghdr, vert_id) # Neutrino interaction mechanism
+
+    try:
+        vtx = truth_level_summ['vertex'] # Truth-level vertex information
+        vtx_x = vtx[0][0]
+        vtx_y = vtx[0][1]
+        vtx_z = vtx[0][2]
+    except:
+        vtx_x = truth_level_summ['x_vert']
+        vtx_y = truth_level_summ['y_vert']
+        vtx_z = truth_level_summ['z_vert']
+
+    if (abs(nu_pdg) == 14):
+        muon_momentum = truth_level_summ['lep_mom']
+        muon_angle = truth_level_summ['lep_ang'] *np.pi / 180. # Truth-level muon angle with beam
+    else:
+        muon_momentum = -99999999. # Initialization; will change once we go through final states
+        muon_angle = -99999999. # Initialization; will change once we go through final states
+
+    # Get primary particles associated with vertex
+    gstack_vert_mask = gstack['vertex_id']==vert_id
+    gstack_vert = gstack[gstack_vert_mask] # Particle ID information associated with vertex
+
+    # Get final state particles associated with vertex and their multiplicities
+    gstack_vert_fs_mask = gstack_vert['part_status']==1 # Excludes initial state particles
+    gstack_vert_fs = gstack_vert[gstack_vert_fs_mask]['part_pdg'] # Final state particle PDG IDs
+    gstack_vert_fs_traj = gstack_vert[gstack_vert_fs_mask]['traj_id'] # Final state particle trajectory IDs
+    gstack_vert_fs_abs = [abs(fsp) for fsp in gstack_vert_fs] # Absolute value of final state particle PDG IDs
+    muon_mult = gstack_vert_fs_abs.count(13) # Muon multiplicity
+    pi0_mult = gstack_vert_fs_abs.count(111) # Pi0 multiplicity
+    primary_photon_mult = gstack_vert_fs_abs.count(22) # Photon multiplicity
+    primary_electron_mult = gstack_vert_fs_abs.count(11) # Electron multiplicity
+    primary_proton_mult = gstack_vert_fs_abs.count(2212) # Proton multiplicity
+    primary_charged_pion_mult = gstack_vert_fs_abs.count(211) # Charged pion multiplicity
+    primary_neutron_mult = gstack_vert_fs_abs.count(2112) # Neutron multiplicity
+    primary_charged_kaon_mult = gstack_vert_fs_abs.count(321) # Charged kaon multiplicity
+    primary_eta_mult = gstack_vert_fs_abs.count(221) # Eta multiplicity
+
+    # Get trajectories associated with vertex
+    traj_vert_mask = traj['vertex_id']==vert_id 
+    final_states = traj[traj_vert_mask] # Get trajectories associated with vertex
+
+    # Get primary pi0 and eta information
+    gstack_pi0_mask = gstack_vert['part_pdg']==111
+    gstack_pi0_traj = gstack_vert[gstack_pi0_mask]['traj_id']
+    if len(gstack_pi0_traj) > 0:
+        pi0_traj_mask = np.where(np.isin(final_states['traj_id'], gstack_pi0_traj))
+        fs_pi0s = final_states[pi0_traj_mask] # Get list of pi0s associated with vertex
+        pi0_start_momentum = fs_pi0s['pxyz_start']
+        pi0_start_location = fs_pi0s['xyz_start']
+        pi0_ke = fs_pi0s['E_start'] - pdg_defs.rest_mass_dict[111]
+    else:
+        pi0_start_momentum = []
+        pi0_start_location = []
+        pi0_ke = []
+
+    gstack_eta_mask = gstack_vert['part_pdg']==221
+    gstack_eta_traj = gstack_vert[gstack_eta_mask]['traj_id']
+    if len(gstack_eta_traj) > 0:
+        eta_traj_mask = final_states['traj_id']==gstack_eta_traj
+        fs_etas = final_states[eta_traj_mask] # Get list of etas associated with vertex
+        eta_start_momentum = fs_etas['pxyz_start']
+        eta_start_location = fs_etas['xyz_start']
+        eta_ke = fs_etas['E_start'] - pdg_defs.rest_mass_dict[221]
+    else:
+        eta_start_momentum = []
+        eta_start_location = []
+        eta_ke = []
+
+    # Initialize lists for pi0 and eta children, primary showers
+    pi0_child_pdg = [[] for i in range(pi0_mult)]
+    pi0_child_edep = [[] for i in range(pi0_mult)]
+    pi0_child_available_energy = [[] for i in range(pi0_mult)]
+    pi0_child_start_location = [[] for i in range(pi0_mult)]
+    pi0_child_end_location = [[] for i in range(pi0_mult)]
+    pi0_child_start_pxyz = [[] for i in range(pi0_mult)]
+    pi0_child_conv_dist = [[] for i in range(pi0_mult)]
+
+    eta_child_pdg = [[] for i in range(primary_eta_mult)]
+    eta_child_edep = [[] for i in range(primary_eta_mult)]
+    eta_child_available_energy = [[] for i in range(primary_eta_mult)]
+    eta_child_start_location = [[] for i in range(primary_eta_mult)]
+    eta_child_end_location = [[] for i in range(primary_eta_mult)]
+    eta_child_start_pxyz = [[] for i in range(primary_eta_mult)]
+    eta_child_conv_dist = [[] for i in range(primary_eta_mult)]
+
+    primary_shower_pdg = []
+    primary_shower_edep = []
+    primary_shower_available_energy = []
+    primary_shower_start_location = []
+    primary_shower_end_location = []
+    primary_shower_start_pxyz = []
+    primary_shower_conv_dist = []
+
+
+    exclude_track_ids = set(gstack_pi0_traj) | set(gstack_eta_traj) # Create set of track IDs to exclude to eliminate redundancies
+
+    # Loop through final states to get relevant information
+    for fs in final_states:
+        
+        # Get track id/figure out if it is excluded
+        track_id = fs['traj_id']
+        if track_id in exclude_track_ids: continue
+        else: 
+            start_tid = fs['traj_id']
+
+        # Figure out track PDG and figure out what to do next accordingly
+        pdg = fs['pdg_id'] # *** pdg ***   
+
+        # If the track is a muon, get its momentum, and endpoint containment
+        if abs(pdg) == 13:
+
+            # Get track ID set associated with muon
+            track_id_set = particle_assoc.same_pdg_connected_trajectories(pdg, start_tid, final_states, traj, ghdr)
+            exclude_track_ids.update(track_id_set)
+
+            # Make sure the muon is a primary particle
+            is_primary = truth.is_primary_particle(track_id_set, final_states, traj, ghdr)
+            if is_primary == False: continue
+
+            if abs(nu_pdg) == 12:
+
+                # Get muon momentum and angle for electron neutrino interactions
+                tid_at_vertex = particle_assoc.find_trajectory_at_vertex(track_id_set, final_states, traj, ghdr)
+                tid_at_vertex_mask = final_states['traj_id'] == tid_at_vertex
+                fs_at_vertex = final_states[tid_at_vertex_mask]
+                muon_momentum_three_vector = fs_at_vertex['pxyz_start']
+                muon_momentum = np.linalg.norm(muon_momentum_three_vector)
+                muon_angle = np.arccos(np.dot(kinematics.beam_direction, muon_momentum_three_vector) / muon_momentum)
+
+            # Characterize Muon Endpoint/Containment
+            if len(track_id_set)>1:
+                start_tid = particle_assoc.find_trajectory_at_vertex(track_id_set, final_states,traj, ghdr)
+                start_tid_mask = final_states['traj_id']==start_tid
+                muon_start_traj = final_states[start_tid_mask]
+                start_pt = muon_start_traj['xyz_start']
+
+                end_tid = particle_assoc.find_forward_primary_particle_end_trajectory(track_id_set, final_states,traj, ghdr)
+                end_tid_mask = final_states['traj_id']==end_tid
+                muon_end_traj = final_states[end_tid_mask]
+                end_pt = muon_end_traj['xyz_end']
+            else:
+                end_pt = fs['xyz_end']
+                start_pt = fs['xyz_start']
+            muon_end_pt_loc = loc_class.particle_end_loc(start_pt, end_pt)
+
+        # If the track is a shower particle (photon or electron/positron)
+        elif abs(pdg) == 11 or pdg == 22:
+
+            # Primary shower particles
+            if start_tid in gstack_vert_fs_traj:
+
+                primary_shower_pdg.append(pdg)
+
+                # Get track ID set associated with primary shower particle
+                initial_track_id_set = particle_assoc.same_pdg_connected_trajectories(pdg, start_tid, final_states, traj, ghdr)
+                track_id_set = particle_assoc.connect_shower_traj(pdg, track_id, final_states, traj, ghdr)
+                exclude_track_ids.update(track_id_set) # Exclude track IDs associated with same particle from future counting
+
+                if pdg == 22:
+                    total_edep = fs['E_start'] # total available energy at start of shower
+                elif abs(pdg) == 11:
+                    total_edep = fs['E_start'] - pdg_defs.rest_mass_dict[abs(pdg)] # total available energy at start of shower
+                primary_shower_available_energy.append(total_edep)
+        
+                contained_edep = 0.
+                for tid in track_id_set:
+                
+                    contained_edep+= kinematics.fv_edep_e(tid, vert_id, seg)
+                
+                primary_shower_edep.append(contained_edep)
+        
+                # Characterize shower endpoints
+                if len(initial_track_id_set)>1:
+                    start_tid_mask = final_states['traj_id']==start_tid
+                    start_traj = final_states[start_tid_mask]
+                    start_pt = start_traj['xyz_start']
+                    start_pxyz = start_traj['pxyz_start']
+                    if len(start_pt) > 1:
+                        print("Multiple start points found for trajectory ID:", start_tid)
+                    else:
+                        start_pt = start_pt[0]
+                        start_pxyz = start_pxyz[0]
+                    
+                    end_tid = particle_assoc.find_secondary_particle_end_trajectory(initial_track_id_set, final_states,start_tid)
+                    end_tid_mask = final_states['traj_id']==end_tid
+                    end_traj = final_states[end_tid_mask]
+                    end_pt = end_traj['xyz_end']
+                    if len(end_pt) > 1:
+                        print("Multiple end points found for trajectory ID:", end_tid)
+                    else:
+                        end_pt = end_pt[0]
+                else:
+                    end_tid = start_tid
+                    end_pt = fs['xyz_end']
+                    start_pt = fs['xyz_start']
+                    start_pxyz = fs['pxyz_start']
+
+                primary_shower_conv_dist.append(particle_assoc.distance_between_points(start_pt, end_pt))
+                primary_shower_start_location.append(start_pt)
+                primary_shower_end_location.append(end_pt)
+                primary_shower_start_pxyz.append(start_pxyz)
+
+            # Particle is potentially a pi0 child
+            else:
+
+                # Choose trajectories associated with pi0s as parents
+                if (fs['parent_id'] in gstack_pi0_traj):
+
+                    fs_parent_id = fs['parent_id']
+                    pi0_idx = np.argwhere(gstack_pi0_traj == fs_parent_id)[0][0]
+
+                    pi0_child_pdg[pi0_idx].append(pdg)   
+
+                    initial_child_track_id_set = particle_assoc.same_pdg_connected_trajectories(pdg, start_tid, final_states, traj, ghdr)
+
+                    track_id_set = particle_assoc.connect_shower_traj(pdg, track_id, final_states, traj, ghdr)
+                    exclude_track_ids.update(track_id_set) # Exclude track IDs associated with same particle from future counting
+
+                    if pdg == 22:
+                        total_edep = fs['E_start'] # total available energy at start of shower
+                    elif abs(pdg) == 11:
+                        total_edep = fs['E_start'] - pdg_defs.rest_mass_dict[abs(pdg)] # total available energy at start of shower
+
+                    contained_edep = 0.
+                    for tid in track_id_set:
+                    
+                        contained_edep+= kinematics.fv_edep_e(tid, vert_id, seg)
+
+                    pi0_child_edep[pi0_idx].append(contained_edep)
+                    pi0_child_available_energy[pi0_idx].append(total_edep)
+
+                    # Characterize pi0 decay product Endpoints/Containments
+                    if len(initial_child_track_id_set)>1:
+                        start_tid_mask = final_states['traj_id']==start_tid
+                        child_start_traj = final_states[start_tid_mask]
+                        start_pt = child_start_traj['xyz_start']
+                        start_pxyz = child_start_traj['pxyz_start']
+                        if len(start_pt) > 1:
+                            print("Multiple start points found for trajectory ID:", start_tid)
+                        else:
+                            start_pt = start_pt[0]
+                            start_pxyz = start_pxyz[0]
+
+                        end_tid = particle_assoc.find_secondary_particle_end_trajectory(track_id_set, final_states,start_tid)
+                        end_tid_mask = final_states['traj_id']==end_tid
+                        child_end_traj = final_states[end_tid_mask]
+                        end_pt = child_end_traj['xyz_end']
+                        if len(end_pt) > 1:
+                            print("Multiple end points found for trajectory ID:", end_tid)
+                        else:
+                            end_pt = end_pt[0]
+                    else:
+                        end_tid = start_tid
+                        end_pt = fs['xyz_end']
+                        start_pt = fs['xyz_start']
+                        start_pxyz = fs['pxyz_start']
+
+                    pi0_child_conv_dist[pi0_idx].append(particle_assoc.distance_between_points(start_pt, end_pt))
+                    pi0_child_start_location[pi0_idx].append(start_pt)
+                    pi0_child_end_location[pi0_idx].append(end_pt)
+                    pi0_child_start_pxyz[pi0_idx].append(start_pxyz)
+
+        # Choose trajectories associated with etas as parents
+        if (fs['parent_id'] in gstack_eta_traj):
+
+            fs_parent_id = fs['parent_id']
+            eta_idx = np.argwhere(gstack_eta_traj == fs_parent_id)[0][0]
+
+            eta_child_pdg[eta_idx].append(pdg)
+            print("Eta Child PDG:", pdg)
+        
+
+    if sig_or_bkg == 1:
+        sig_bkg_label = r"$\nu_{\mu}$ CC 1$\pi^0$, 0$\pi^{\pm}$"
+    else:
+        if is_cc == 1 and abs(nu_pdg) == 14:
+            if pi0_mult == 0:
+                if primary_photon_mult == 1:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 0$\pi^0$, 1$\gamma$"
+                elif primary_photon_mult == 2:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 0$\pi^0$, 2$\gamma$"
+                elif primary_photon_mult > 2:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 0$\pi^0$, >2$\gamma$"
+                else:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 0$\pi^0$, 0$\gamma$"
+            elif pi0_mult == 1:
+                if primary_charged_pion_mult > 0:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 1$\pi^0$, N$\pi^{\pm}$"
+                else:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 1$\pi^0$, 0$\pi^{\pm}$, OTHER"
+            elif pi0_mult == 2:
+                if primary_charged_pion_mult == 0:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 2$\pi^0$, 0$\pi^{\pm}$"
+                elif primary_charged_pion_mult >= 1:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC 2$\pi^0$, N$\pi^{\pm}$"
+            elif pi0_mult > 2:
+                if primary_charged_pion_mult == 0:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC >2$\pi^0$, 0$\pi^{\pm}$"
+                elif primary_charged_pion_mult >= 1:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC >2$\pi^0$, N$\pi^{\pm}$"
+            else:
+                if primary_charged_pion_mult == 0:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC >2$\pi^0$, 0$\pi^{\pm}$"
+                elif primary_charged_pion_mult >= 1:
+                    sig_bkg_label = r"$\nu_{\mu}$ CC >2$\pi^0$, N$\pi^{\pm}$"
+        elif is_cc == 1 and abs(nu_pdg) == 12:
+            sig_bkg_label = r"$\nu_{e}$ CC"      
+        else:
+            sig_bkg_label = "NC Background"
+                                                                                            
+    sig_bkg_dict[(spill_id,vert_id)]=dict(
+        sig = bool(sig_or_bkg),
+        sig_bkg_label = str(sig_bkg_label),
+        is_cc = bool(is_cc),
+        nu_pdg = int(nu_pdg),
+        muon_angle = float(muon_angle),
+        muon_momentum = float(muon_momentum),
+        muon_end_pt_loc = str(muon_end_pt_loc),
+        nu_int_type = str(nu_int_type),
+        muon_mult = int(muon_mult),
+        pi0_mult = int(pi0_mult),
+        primary_photon_mult = int(primary_photon_mult),
+        primary_electron_mult = int(primary_electron_mult),
+        primary_proton_mult = int(primary_proton_mult),
+        primary_charged_pion_mult = int(primary_charged_pion_mult),
+        primary_neutron_mult = int(primary_neutron_mult),
+        primary_charged_kaon_mult = int(primary_charged_kaon_mult),
+        primary_eta_mult = int(primary_eta_mult),
+        pi0_start_momentum = [[float(j) for j in pi0_start_momentum[i]] for i in range(len(pi0_start_momentum))],
+        pi0_start_location = [[float(j) for j in pi0_start_location[i]] for i in range(len(pi0_start_location))],
+        pi0_ke = [float(i) for i in pi0_ke],
+        eta_start_momentum = [[float(j) for j in eta_start_momentum[i]] for i in range(len(eta_start_momentum))],
+        eta_start_location = [[float(j) for j in eta_start_location[i]] for i in range(len(eta_start_location))],
+        eta_ke = [float(i) for i in eta_ke],
+        pi0_child_pdg = [[int(j) for j in pi0_child_pdg[i]] for i in range(len(pi0_child_pdg))],
+        pi0_child_edep = [[float(j) for j in pi0_child_edep[i]] for i in range(len(pi0_child_edep))],
+        pi0_child_available_energy = [[float(j) for j in pi0_child_available_energy[i]] for i in range(len(pi0_child_available_energy))],
+        pi0_child_start_location = [[[float(k) for k in j] for j in pi0_child_start_location[i]] for i in range(len(pi0_child_start_location))],
+        pi0_child_end_location = [[[float(k) for k in j] for j in pi0_child_end_location[i]] for i in range(len(pi0_child_end_location))],
+        pi0_child_start_pxyz = [[[float(k) for k in j] for j in pi0_child_start_pxyz[i]] for i in range(len(pi0_child_start_pxyz))],
+        pi0_child_conv_dist = [[float(j) for j in pi0_child_conv_dist[i]] for i in range(len(pi0_child_conv_dist))],
+        eta_child_pdg = [[int(j) for j in eta_child_pdg[i]] for i in range(len(eta_child_pdg))],
+        #eta_child_edep = [[float(j) for j in eta_child_edep[i]] for i in range(len(eta_child_edep))],
+        #eta_child_available_energy = [[float(j) for j in eta_child_available_energy[i]] for i in range(len(eta_child_available_energy))],
+        #eta_child_start_location = [[[float(k) for k in j] for j in eta_child_start_location[i]] for i in range(len(eta_child_start_location))],
+        #eta_child_end_location = [[[float(k) for k in j] for j in eta_child_end_location[i]] for i in range(len(eta_child_end_location))],
+        #eta_child_start_pxyz = [[[float(k) for k in j] for j in eta_child_start_pxyz[i]] for i in range(len(eta_child_start_pxyz))],
+        #eta_child_conv_dist = [[[float(k) for k in j] for j in eta_child_conv_dist[i]] for i in range(len(eta_child_conv_dist))],
+        primary_shower_start_location = [[float(j) for j in primary_shower_start_location[i]] for i in range(len(primary_shower_start_location))],
+        primary_shower_end_location = [[float(j) for j in primary_shower_end_location[i]] for i in range(len(primary_shower_end_location))],
+        primary_shower_pdg = [int(i) for i in primary_shower_pdg],
+        primary_shower_edep = [float(i) for i in primary_shower_edep],
+        primary_shower_available_energy = [float(i) for i in primary_shower_available_energy],
+        primary_shower_start_pxyz = [[float(j) for j in primary_shower_start_pxyz[i]] for i in range(len(primary_shower_start_pxyz))],
+        primary_shower_conv_dist = [float(i) for i in primary_shower_conv_dist],
+        nu_energy=float(nu_energy),
+        q2 = float(q2),
+        vtx_x = float(vtx_x), 
+        vtx_y = float(vtx_y), 
+        vtx_z = float(vtx_z), 
+        filepath = str(sim_file),
+        flow_event_id = str(flow_event_id),
+        )
+    return
+
 
 ''' Purpose: Fill Python dictionary with basic GENIE and edep-sim truth-level vertex information
              related to FS muon
@@ -335,7 +718,7 @@ def hadron_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, th
              empty Python dictionary (DICT)
     Outputs: Nothing returned, but pi0_dict (DICT) is full after
              method runs'''
-def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict, sim_file):
+def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict, sim_file, flow_event_id):
 
     traj_vert_mask = traj['vertex_id']==vert_id 
     final_states = traj[traj_vert_mask] # Get trajectories associated with vertex
@@ -417,7 +800,7 @@ def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_d
 
         initial_child_track_id_set = particle_assoc.same_pdg_connected_trajectories(pdg, start_tid, final_states, traj, ghdr)
 
-        track_id_set = particle_assoc.connect_pi0_decay_prod_shower_traj(pdg, track_id, final_states, traj, ghdr)
+        track_id_set = particle_assoc.connect_shower_traj(pdg, track_id, final_states, traj, ghdr)
         exclude_track_ids.update(track_id_set) # Exclude track IDs associated with same particle from future counting
         #print("Track ID Set:", track_id_set)
         #for track in track_id_set:
@@ -528,6 +911,7 @@ def pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_d
     # Save collected info in input pi0_dict                                                                                                                         
     pi0_dict[(spill_id,vert_id)]=dict(
         filepath = str(sim_file),
+        flow_event_id = str(flow_event_id),
         pi0_start_mom = [float(i) for i in pi0_start_mom],
         pi0_end_loc = [float(i) for i in pi0_end_loc],
         pi0_start_loc = [float(i) for i in pi0_start_loc],

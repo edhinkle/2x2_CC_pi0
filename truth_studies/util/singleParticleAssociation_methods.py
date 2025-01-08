@@ -123,21 +123,21 @@ def recursive_shower_association(valid_pdgs, start_traj_list, traj_id_set, final
         return final_traj_id_set
 
 
-def connect_pi0_decay_prod_shower_traj(track_pdg, track_id, vertex_assoc_traj,\
+def connect_shower_traj(track_pdg, track_id, vertex_assoc_traj,\
                                     traj, ghdr):
 
     traj_id_set = {track_id} # initialize a set of traj_ids associated with a single particle
 
     # Check that input track has a pi0 parent
-    particle_mask = vertex_assoc_traj['traj_id'] == track_id
-    #print("Particles:", vertex_assoc_traj[particle_mask]['pdg_id'])
-    parent_pdg = truth_ixn_methods.find_parent_pdg(vertex_assoc_traj[particle_mask]['parent_id'],
-                                            vertex_assoc_traj[particle_mask]['vertex_id'],
-                                            traj, ghdr)
-    #print("Parent PDG ID:", parent_pdg)
-    if abs(parent_pdg)!=111:
-        print("Input track does not have a pi0 parent. No shower trajectories to connect.")
-        return traj_id_set # initialize a set of traj_ids associated with a single particle
+    #particle_mask = vertex_assoc_traj['traj_id'] == track_id
+    ##print("Particles:", vertex_assoc_traj[particle_mask]['pdg_id'])
+    #parent_pdg = truth_ixn_methods.find_parent_pdg(vertex_assoc_traj[particle_mask]['parent_id'],
+    #                                        vertex_assoc_traj[particle_mask]['vertex_id'],
+    #                                        traj, ghdr)
+    ##print("Parent PDG ID:", parent_pdg)
+    #if abs(parent_pdg)!=111:
+    #    print("Input track does not have a pi0 parent. No shower trajectories to connect.")
+    #    return traj_id_set # initialize a set of traj_ids associated with a single particle
 
     ## WALK DOWN THE FAMILY TREE
     this_pdg = track_pdg
