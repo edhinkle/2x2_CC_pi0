@@ -6,7 +6,7 @@
 //Requires a file containing a list of input CAF files and returns an int code for success/error
 //The list should be one file/path per line, and files/lines can be commented out using #
 //Boolean flag to switch behavior for reading structured/flat CAFs (defaults to structured CAFs)
-int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
+int pi0_truth_sample(const std::string& file_list, bool is_flat = true)
 {
     
     std::vector<std::string> root_list;
@@ -71,10 +71,9 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     std::vector< int >     reco_ixn_chpi_mult;
     std::vector< int >     reco_ixn_proton_mult;
     std::vector< int >     reco_ixn_chkaon_mult;
-    std::vector< double >     reco_ixn_vtx_x_pos;
-    std::vector< double >     reco_ixn_vtx_y_pos;
-    std::vector< double >     reco_ixn_vtx_z_pos;
-    std::vector< std::vector< int > >  reco_ixn_prim_shower_pdg_list;
+    std::vector< double >  reco_ixn_vtx_x_pos;
+    std::vector< double >  reco_ixn_vtx_y_pos;
+    std::vector< double >  reco_ixn_vtx_z_pos;
 
     //std::vector< double >  true_energy;
     //std::vector< double >  true_p_x; 
@@ -103,10 +102,9 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     std::vector< int >     true_ixn_chpi_mult;
     std::vector< int >     true_ixn_proton_mult;
     std::vector< int >     true_ixn_chkaon_mult;
-    std::vector< double >     true_ixn_vtx_x_pos;
-    std::vector< double >     true_ixn_vtx_y_pos;
-    std::vector< double >     true_ixn_vtx_z_pos;
-    std::vector< std::vector< int > >  true_ixn_prim_shower_pdg_list;
+    std::vector< double >  true_ixn_vtx_x_pos;
+    std::vector< double >  true_ixn_vtx_y_pos;
+    std::vector< double >  true_ixn_vtx_z_pos;
 
     std::vector< double >  overlap;
     std::vector< double >  true_ixn_index;
@@ -152,7 +150,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     fRecoBenchmarkTree->Branch("reco_ixn_vtx_x_pos", &reco_ixn_vtx_x_pos);
     fRecoBenchmarkTree->Branch("reco_ixn_vtx_y_pos", &reco_ixn_vtx_y_pos);
     fRecoBenchmarkTree->Branch("reco_ixn_vtx_z_pos", &reco_ixn_vtx_z_pos);
-    fRecoBenchmarkTree->Branch("reco_ixn_prim_shower_pdg_list", &reco_ixn_prim_shower_pdg_list);
 
 
     //fRecoBenchmarkTree->Branch("true_energy", &true_energy);
@@ -186,7 +183,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     fRecoBenchmarkTree->Branch("true_ixn_vtx_x_pos", &true_ixn_vtx_x_pos);
     fRecoBenchmarkTree->Branch("true_ixn_vtx_y_pos", &true_ixn_vtx_y_pos);
     fRecoBenchmarkTree->Branch("true_ixn_vtx_z_pos", &true_ixn_vtx_z_pos);
-    fRecoBenchmarkTree->Branch("true_ixn_prim_shower_pdg_list", &true_ixn_prim_shower_pdg_list);
 
     fRecoBenchmarkTree->Branch("spill_index", &spill_index);
     fRecoBenchmarkTree->Branch("file_index", &file_index);
@@ -273,11 +269,50 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
 
         for(unsigned long ixn = 0; ixn < num_ixn; ++ixn)
         {
-            const auto& vtx = sr->common.ixn.dlp[ixn].vtx;
+            const auto& reco_vtx = sr->common.ixn.dlp[ixn].vtx;
+
+            //Get the truth interaction(s) corresponding to this reco interaction
+            const auto& vec_truth_ixn = sr->common.ixn.dlp[ixn].truth;
+            const auto& vec_overlap_ixn = sr->common.ixn.dlp[ixn].truthOverlap;
+
+            if(vec_overlap_ixn.empty())
+                continue;
+
+            //Find the truth interaction with the largest overlap
+            //auto result = std::max_element(vec_overlap_ixn.begin(), vec_overlap_ixn.end());
+            //auto max_overlap = std::distance(vec_overlap_ixn.begin(), result);
+
+            //Do this manually since SRProxy wraps all types and loses some functionality in the process
+            //Maybe there is a way to get the object inside the Proxy, but this works for now
+            double current_max = 0;
+            unsigned int max_overlap = 0;
+            for(unsigned int i = 0; i < vec_overlap_ixn.size(); ++i)
+            {
+                auto val = vec_overlap_ixn.at(i);
+                if(val > current_max)
+                {
+                    current_max = val;
+                    max_overlap = i;
+                }
+            }
+            const auto truth_idx = vec_truth_ixn.at(max_overlap);
+            const auto& truth_ixn = sr->mc.nu[truth_idx];
+            const auto& vtx = truth_ixn.vtx;
+
+            //Put cuts on true interaction quantities here
+            //For example, reject interactions not on argon
+            if(truth_ixn.targetPDG != 1000180400)
+                continue;
+            // Reject NC interactions
+            if(truth_ixn.iscc != true)
+                continue;
+            // Reject interactions with primary pi+ or pi-
+            //if(truth_ixn.npip != 0 || truth_ixn.npim != 0)
+            //    continue;
 
 
-
-            // Require RECO vertex to be within the TPCs
+            
+            // Require TRUE vertex to be within the TPCs
             if (!(std::isfinite(vtx.x) && std::isfinite(vtx.y) && std::isfinite(vtx.z)))
                 continue;
             if (vtx.x < det_x_min || vtx.x > det_x_max)
@@ -290,110 +325,60 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                 continue;
             if (vtx.z > ups_z_max && vtx.z < downs_z_min)
                 continue;
+            
 
+            // Get number of pi0s in truth interaction
+            //fauto true_ixn_pi0s = truth_ixn.npi0;
+            auto true_ixn_pi0s_contained = 0;
 
-
-            //Get the truth interaction(s) corresponding to this reco interaction
-            const auto& vec_truth_ixn = sr->common.ixn.dlp[ixn].truth;
-            const auto& vec_overlap_ixn = sr->common.ixn.dlp[ixn].truthOverlap;
-
-            // Initialize truth values
-            auto truth_idx = -1;
-            auto true_ixn_pi0s = -1;
-            auto true_ixn_pi0s_contained = -1;
-            auto true_ixn_electrons = -1;
-            auto true_ixn_gammas = -1;
-            auto true_ixn_muons = -1;
-            auto true_ixn_chpi = -1;
-            auto true_ixn_proton = -1;
-            auto true_ixn_chkaon = -1;
-            auto true_ixn_vtx_x = -1;
-            auto true_ixn_vtx_y = -1;
-            auto true_ixn_vtx_z = -1;
-            std::vector< int > true_ixn_prim_shower_pdg;
-            true_ixn_prim_shower_pdg.clear(); 
-            double current_max = -1; // no overlap bc no truth match
-
-
-            // For truth study, only want to keep if there is a truth match
-            // For reco study, I want to know if there is no truth match
-            //if(vec_overlap_ixn.empty())
+            //if (true_ixn_pi0s == 0)
             //    continue;
 
-            //Find the truth interaction with the largest overlap
-            //auto result = std::max_element(vec_overlap_ixn.begin(), vec_overlap_ixn.end());
-            //auto max_overlap = std::distance(vec_overlap_ixn.begin(), result);
+            // Get number of muons, electrons, gammas in truth interaction
+            auto true_ixn_electrons = 0;
+            auto true_ixn_gammas = 0;
+            auto true_ixn_muons = 0;
+            auto true_ixn_pi0s = 0;
+            auto true_ixn_chpi = 0;
+            auto true_ixn_proton = 0;
+            auto true_ixn_chkaon = 0;
+            for(unsigned long ipart = 0; ipart < truth_ixn.prim.size(); ++ipart)
+            {
+                const auto& true_part = truth_ixn.prim[ipart];
+                //Put true particle counters
+                if((abs(true_part.pdg) == 11))
+                    true_ixn_electrons++;
 
-            //Do this manually since SRProxy wraps all types and loses some functionality in the process
-            //Maybe there is a way to get the object inside the Proxy, but this works for now
-            if(!vec_overlap_ixn.empty()) 
-            {   
-                // Get truth interaction information
-                current_max = 0;
-                unsigned int max_overlap = 0;
-                for(unsigned int i = 0; i < vec_overlap_ixn.size(); ++i)
-                {
-                    auto val = vec_overlap_ixn.at(i);
-                    if(val > current_max)
-                    {
-                        current_max = val;
-                        max_overlap = i;
-                    }
-                }
-                truth_idx = vec_truth_ixn.at(max_overlap);
-                const auto& truth_ixn = sr->mc.nu[truth_idx];
+                if((abs(true_part.pdg) == 22))
+                    true_ixn_gammas++;
 
-                // Get truth vertex
-                true_ixn_vtx_x = truth_ixn.vtx.x;
-                true_ixn_vtx_y = truth_ixn.vtx.y;
-                true_ixn_vtx_z = truth_ixn.vtx.z;
+                if((abs(true_part.pdg) == 13))
+                    true_ixn_muons++;
 
-                // Get number of pi0s in truth interaction
-                true_ixn_pi0s = truth_ixn.npi0;
-                true_ixn_pi0s_contained = 0;
+                if((abs(true_part.pdg) == 111))
+                    true_ixn_pi0s++;
 
-                // Get number of muons, electrons, gammas in truth interaction
-                true_ixn_electrons = 0;
-                true_ixn_gammas = 0;
-                true_ixn_muons = 0;
-                true_ixn_chpi = 0;
-                true_ixn_proton = 0;
-                true_ixn_chkaon = 0;
-                for(unsigned long ipart = 0; ipart < truth_ixn.prim.size(); ++ipart)
-                {
-                    const auto& true_part = truth_ixn.prim[ipart];
-                    //Put true particle counters
-                    if((abs(true_part.pdg) == 11)) {
-                        true_ixn_prim_shower_pdg.push_back(true_part.pdg);
-                        true_ixn_electrons++;
-                    }
+                if((abs(true_part.pdg) == 211))
+                    true_ixn_chpi++;
 
-                    if((abs(true_part.pdg) == 22)) {
-                        true_ixn_prim_shower_pdg.push_back(true_part.pdg);
-                        true_ixn_gammas++;
-                    }
+                if((abs(true_part.pdg) == 2212))
+                    true_ixn_proton++;
 
-                    if((abs(true_part.pdg) == 13))
-                        true_ixn_muons++;
+                if((abs(true_part.pdg) == 321))
+                    true_ixn_chkaon++;
 
-                    if((abs(true_part.pdg) == 211))
-                        true_ixn_chpi++;
-
-                    if((abs(true_part.pdg) == 2212))
-                        true_ixn_proton++;
-
-                    if((abs(true_part.pdg) == 321))
-                        true_ixn_chkaon++;
-
-                    // check pi0 containment (?)
-                    const auto& true_part_end = true_part.end_pos;
-                    if((abs(true_part.pdg) == 111))
-                        if (true_part_end.x > det_x_min && true_part_end.x < det_x_max && true_part_end.y > det_y_min && true_part_end.y < det_y_max && true_part_end.z > det_z_min && true_part_end.z < det_z_max)
-                            true_ixn_pi0s_contained++;
-
-                }
-                
             }
+
+            // Only save interactions with exactly 1 primary muon
+            if(true_ixn_muons != 1)
+                continue;
+            
+            //std::cout << "true_ixn_pi0s: " << true_ixn_pi0s << std::endl;
+            if(true_ixn_pi0s < 1) {
+                //std::cout << "No pi0s in true interaction... skipping..." << std::endl;
+                continue;
+            }
+            //std::cout << "Moving past pi0 cut" << std::endl;
 
             // Get number of pi0s in reco interaction
             auto reco_ixn_gammas = 0;
@@ -404,52 +389,36 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
             auto reco_ixn_chpi = 0;
             auto reco_ixn_proton = 0;
             auto reco_ixn_chkaon = 0;
-            std::vector< int > reco_ixn_prim_shower_pdg;
-            reco_ixn_prim_shower_pdg.clear(); 
 
-            // Loop over particles in the interaction **"The big for loop"**
+            // Loop over particles in the interaction
             for(unsigned long ipart = 0; ipart < sr->common.ixn.dlp[ixn].part.dlp.size(); ++ipart)
             {
                 //Store current reco particle for easier access
                 const auto& part = sr->common.ixn.dlp[ixn].part.dlp[ipart];
 
                 //Put reco particle cuts here
-                if((abs(part.pdg) == 11) and part.primary) {
+                if((abs(part.pdg) == 11) and part.primary)
                     reco_ixn_electrons++;
-                    reco_ixn_prim_shower_pdg.push_back(part.pdg);
                     if (part.contained)
                         reco_ixn_electrons_contained++;
-                }
-
-                if((abs(part.pdg) == 22) and part.primary) {
+                
+                if((abs(part.pdg) == 22) and part.primary)
                     reco_ixn_gammas++;
-                    reco_ixn_prim_shower_pdg.push_back(part.pdg);
                     if (part.contained)
                         reco_ixn_gammas_contained++;
-                }
 
                 if((abs(part.pdg) == 13) and part.primary)
                     reco_ixn_muons++;
 
                 if((abs(part.pdg) == 211) and part.primary)
                     reco_ixn_chpi++;
-
+                
                 if((abs(part.pdg) == 2212) and part.primary)
                     reco_ixn_proton++;
-
+                
                 if((abs(part.pdg) == 321) and part.primary)
                     reco_ixn_chkaon++;
 
-            } // END OF BIG FOR LOOP FOR NOW
-
-            // Requirements on reco particles
-            // Only save interactions with exactly 1 primary muon
-            if (reco_ixn_muons != 1)
-                continue;
-            
-            // Require two photon showers
-            if(reco_ixn_gammas < 1 & reco_ixn_electrons < 1)
-                continue;
                 
 
                 ////Put reco particle cuts here
@@ -596,15 +565,12 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                 //caf_file_name.push_back(current_file.erase(0, current_file.find_last_of("/")+1).c_str());
 //
 //
-            //}// ** END OF BIG FOR LOOP IN ORIGINAL SCRIPT
+            }//
             // Loop over particles in the interaction again to load charged track multiplicity
             //for(unsigned long ipart = 0; ipart < reco_ixn_trks; ++ipart)
             //{
             //    reco_ixn_charged_track_mult.push_back(reco_ixn_trks);
             //}
-            true_ixn_prim_shower_pdg_list.clear();
-            reco_ixn_prim_shower_pdg_list.clear();
-
             true_ixn_pi0_mult.push_back(true_ixn_pi0s);
             true_ixn_e_mult.push_back(true_ixn_electrons);
             true_ixn_gamma_mult.push_back(true_ixn_gammas);
@@ -613,12 +579,9 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
             true_ixn_chpi_mult.push_back(true_ixn_chpi);
             true_ixn_proton_mult.push_back(true_ixn_proton);
             true_ixn_chkaon_mult.push_back(true_ixn_chkaon);
-            true_ixn_vtx_x_pos.push_back(true_ixn_vtx_x);
-            true_ixn_vtx_y_pos.push_back(true_ixn_vtx_y);
-            true_ixn_vtx_z_pos.push_back(true_ixn_vtx_z);
-            true_ixn_prim_shower_pdg_list.push_back(true_ixn_prim_shower_pdg);
-            std::cout << true_ixn_prim_shower_pdg.size() << std::endl;
-            std::cout << true_ixn_prim_shower_pdg_list.size() << std::endl;
+            true_ixn_vtx_x_pos.push_back(vtx.x);
+            true_ixn_vtx_y_pos.push_back(vtx.y);
+            true_ixn_vtx_z_pos.push_back(vtx.z);
             reco_ixn_e_mult.push_back(reco_ixn_electrons);
             reco_ixn_gamma_mult.push_back(reco_ixn_gammas);
             reco_ixn_e_cont_mult.push_back(reco_ixn_electrons_contained);
@@ -627,12 +590,9 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
             reco_ixn_chpi_mult.push_back(reco_ixn_chpi);
             reco_ixn_proton_mult.push_back(reco_ixn_proton);
             reco_ixn_chkaon_mult.push_back(reco_ixn_chkaon);
-            reco_ixn_vtx_x_pos.push_back(vtx.x);
-            reco_ixn_vtx_y_pos.push_back(vtx.y);
-            reco_ixn_vtx_z_pos.push_back(vtx.z);
-            reco_ixn_prim_shower_pdg_list.push_back(reco_ixn_prim_shower_pdg);
-            std::cout << reco_ixn_prim_shower_pdg.size() << std::endl;
-            std::cout << reco_ixn_prim_shower_pdg_list.size() << std::endl;
+            reco_ixn_vtx_x_pos.push_back(reco_vtx.x);
+            reco_ixn_vtx_y_pos.push_back(reco_vtx.y);
+            reco_ixn_vtx_z_pos.push_back(reco_vtx.z);
             overlap.push_back(current_max);
             true_ixn_index.push_back(truth_idx);
             reco_ixn_index.push_back(ixn);
@@ -650,7 +610,7 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    std::string file_name = "pi0_reco_based_sample";
+    std::string file_name = "pi0_truth_based_sample";
 
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");

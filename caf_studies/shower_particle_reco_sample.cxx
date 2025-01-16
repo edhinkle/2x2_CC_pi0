@@ -6,7 +6,7 @@
 //Requires a file containing a list of input CAF files and returns an int code for success/error
 //The list should be one file/path per line, and files/lines can be commented out using #
 //Boolean flag to switch behavior for reading structured/flat CAFs (defaults to structured CAFs)
-int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
+int shower_particle_reco_sample(const std::string& file_list, bool is_flat = true)
 {
     
     std::vector<std::string> root_list;
@@ -44,25 +44,26 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     std::cout << "Finished adding files..." << std::endl;
 
     // DEFINE: Vectors to hold information to keep in output TTree file 
-    //std::vector< double >  reco_energy;
-    //std::vector< double >  reco_p_x; 
-    //std::vector< double >  reco_p_y; 
-    //std::vector< double >  reco_p_z;
-    //std::vector< double >  reco_p_mag;
+    std::vector< double >  reco_energy;
+    std::vector< double >  reco_p_x; 
+    std::vector< double >  reco_p_y; 
+    std::vector< double >  reco_p_z;
+    std::vector< double >  reco_p_mag;
     //std::vector< double >  reco_length;
-    //std::vector< double >  reco_angle;
+    std::vector< double >  reco_shower_to_vtx_dist;
+    std::vector< double >  reco_angle;
     //std::vector< double >  reco_angle_rot;
     //std::vector< double >  reco_angle_incl;
-    //std::vector< double >  reco_angle_x;
-    //std::vector< double >  reco_angle_y;
-    //std::vector< double >  reco_angle_z;
-    //std::vector< double >  reco_track_start_x;
-    //std::vector< double >  reco_track_start_y;
-    //std::vector< double >  reco_track_start_z;
-    //std::vector< double >  reco_track_end_x;
-    //std::vector< double >  reco_track_end_y;
-    //std::vector< double >  reco_track_end_z;
-    //std::vector< int >     reco_pdg;
+    std::vector< double >  reco_angle_x;
+    std::vector< double >  reco_angle_y;
+    std::vector< double >  reco_angle_z;
+    std::vector< double >  reco_shower_start_x;
+    std::vector< double >  reco_shower_start_y;
+    std::vector< double >  reco_shower_start_z;
+    std::vector< double >  reco_shower_end_x;
+    std::vector< double >  reco_shower_end_y;
+    std::vector< double >  reco_shower_end_z;
+    std::vector< int >     reco_pdg;
     std::vector< int >     reco_ixn_gamma_mult;
     std::vector< int >     reco_ixn_e_mult;
     std::vector< int >     reco_ixn_cont_gamma_mult;
@@ -74,27 +75,27 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     std::vector< double >     reco_ixn_vtx_x_pos;
     std::vector< double >     reco_ixn_vtx_y_pos;
     std::vector< double >     reco_ixn_vtx_z_pos;
-    std::vector< std::vector< int > >  reco_ixn_prim_shower_pdg_list;
 
-    //std::vector< double >  true_energy;
-    //std::vector< double >  true_p_x; 
-    //std::vector< double >  true_p_y; 
-    //std::vector< double >  true_p_z;
-    //std::vector< double >  true_p_mag;
+    std::vector< double >  true_energy;
+    std::vector< double >  true_p_x; 
+    std::vector< double >  true_p_y; 
+    std::vector< double >  true_p_z;
+    std::vector< double >  true_p_mag;
     //std::vector< double >  true_length;
-    //std::vector< double >  true_angle;
+    std::vector< double >  true_shower_to_vtx_dist;
+    std::vector< double >  true_angle;
     //std::vector< double >  true_angle_rot;
     //std::vector< double >  true_angle_incl;
-    //std::vector< double >  true_angle_x;
-    //std::vector< double >  true_angle_y;
-    //std::vector< double >  true_angle_z;
-    //std::vector< double >  true_track_start_x;
-    //std::vector< double >  true_track_start_y;
-    //std::vector< double >  true_track_start_z;
-    //std::vector< double >  true_track_end_x;
-    //std::vector< double >  true_track_end_y;
-    //std::vector< double >  true_track_end_z;
-    //std::vector< int >     true_pdg;
+    std::vector< double >  true_angle_x;
+    std::vector< double >  true_angle_y;
+    std::vector< double >  true_angle_z;
+    std::vector< double >  true_shower_start_x;
+    std::vector< double >  true_shower_start_y;
+    std::vector< double >  true_shower_start_z;
+    std::vector< double >  true_shower_end_x;
+    std::vector< double >  true_shower_end_y;
+    std::vector< double >  true_shower_end_z;
+    std::vector< int >     true_pdg;
     std::vector< int >     true_ixn_pi0_mult;
     std::vector< int >     true_ixn_e_mult;
     std::vector< int >     true_ixn_gamma_mult;
@@ -106,7 +107,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     std::vector< double >     true_ixn_vtx_x_pos;
     std::vector< double >     true_ixn_vtx_y_pos;
     std::vector< double >     true_ixn_vtx_z_pos;
-    std::vector< std::vector< int > >  true_ixn_prim_shower_pdg_list;
 
     std::vector< double >  overlap;
     std::vector< double >  true_ixn_index;
@@ -121,25 +121,26 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
 
     // DEFINE: TTree and TBranches to go in output ROOT file
     TTree *fRecoBenchmarkTree=new TTree("RecoBenchmarkTree", "Reco Benchmark Variables");
-    //fRecoBenchmarkTree->Branch("reco_energy", &reco_energy);
-    //fRecoBenchmarkTree->Branch("reco_p_x", &reco_p_x);
-    //fRecoBenchmarkTree->Branch("reco_p_y", &reco_p_y);
-    //fRecoBenchmarkTree->Branch("reco_p_z", &reco_p_z);
-    //fRecoBenchmarkTree->Branch("reco_p_mag", &reco_p_mag);
+    fRecoBenchmarkTree->Branch("reco_energy", &reco_energy);
+    fRecoBenchmarkTree->Branch("reco_p_x", &reco_p_x);
+    fRecoBenchmarkTree->Branch("reco_p_y", &reco_p_y);
+    fRecoBenchmarkTree->Branch("reco_p_z", &reco_p_z);
+    fRecoBenchmarkTree->Branch("reco_p_mag", &reco_p_mag);
     //fRecoBenchmarkTree->Branch("reco_length", &reco_length);
-    //fRecoBenchmarkTree->Branch("reco_angle", &reco_angle);
+    fRecoBenchmarkTree->Branch("reco_angle", &reco_angle);
+    fRecoBenchmarkTree->Branch("reco_shower_to_vtx_dist", &reco_shower_to_vtx_dist);
     //fRecoBenchmarkTree->Branch("reco_angle_rot", &reco_angle_rot);
     //fRecoBenchmarkTree->Branch("reco_angle_incl", &reco_angle_incl);
-    //fRecoBenchmarkTree->Branch("reco_angle_x", &reco_angle_x);
-    //fRecoBenchmarkTree->Branch("reco_angle_y", &reco_angle_y);
-    //fRecoBenchmarkTree->Branch("reco_angle_z", &reco_angle_z);
-    //fRecoBenchmarkTree->Branch("reco_track_start_x", &reco_track_start_x);
-    //fRecoBenchmarkTree->Branch("reco_track_start_y", &reco_track_start_y);
-    //fRecoBenchmarkTree->Branch("reco_track_start_z", &reco_track_start_z);
-    //fRecoBenchmarkTree->Branch("reco_track_end_x", &reco_track_end_x);
-    //fRecoBenchmarkTree->Branch("reco_track_end_y", &reco_track_end_y);
-    //fRecoBenchmarkTree->Branch("reco_track_end_z", &reco_track_end_z);
-    //fRecoBenchmarkTree->Branch("reco_pdg", &reco_pdg);
+    fRecoBenchmarkTree->Branch("reco_angle_x", &reco_angle_x);
+    fRecoBenchmarkTree->Branch("reco_angle_y", &reco_angle_y);
+    fRecoBenchmarkTree->Branch("reco_angle_z", &reco_angle_z);
+    fRecoBenchmarkTree->Branch("reco_shower_start_x", &reco_shower_start_x);
+    fRecoBenchmarkTree->Branch("reco_shower_start_y", &reco_shower_start_y);
+    fRecoBenchmarkTree->Branch("reco_shower_start_z", &reco_shower_start_z);
+    fRecoBenchmarkTree->Branch("reco_shower_end_x", &reco_shower_end_x);
+    fRecoBenchmarkTree->Branch("reco_shower_end_y", &reco_shower_end_y);
+    fRecoBenchmarkTree->Branch("reco_shower_end_z", &reco_shower_end_z);
+    fRecoBenchmarkTree->Branch("reco_pdg", &reco_pdg);
     fRecoBenchmarkTree->Branch("reco_ixn_gamma_mult", &reco_ixn_gamma_mult);
     fRecoBenchmarkTree->Branch("reco_ixn_e_mult", &reco_ixn_e_mult);
     fRecoBenchmarkTree->Branch("reco_ixn_index", &reco_ixn_index);
@@ -152,28 +153,28 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     fRecoBenchmarkTree->Branch("reco_ixn_vtx_x_pos", &reco_ixn_vtx_x_pos);
     fRecoBenchmarkTree->Branch("reco_ixn_vtx_y_pos", &reco_ixn_vtx_y_pos);
     fRecoBenchmarkTree->Branch("reco_ixn_vtx_z_pos", &reco_ixn_vtx_z_pos);
-    fRecoBenchmarkTree->Branch("reco_ixn_prim_shower_pdg_list", &reco_ixn_prim_shower_pdg_list);
 
 
-    //fRecoBenchmarkTree->Branch("true_energy", &true_energy);
-    //fRecoBenchmarkTree->Branch("true_p_x", &true_p_x);
-    //fRecoBenchmarkTree->Branch("true_p_y", &true_p_y);
-    //fRecoBenchmarkTree->Branch("true_p_z", &true_p_z);
-    //fRecoBenchmarkTree->Branch("true_p_mag", &true_p_mag);
+    fRecoBenchmarkTree->Branch("true_energy", &true_energy);
+    fRecoBenchmarkTree->Branch("true_p_x", &true_p_x);
+    fRecoBenchmarkTree->Branch("true_p_y", &true_p_y);
+    fRecoBenchmarkTree->Branch("true_p_z", &true_p_z);
+    fRecoBenchmarkTree->Branch("true_p_mag", &true_p_mag);
     //fRecoBenchmarkTree->Branch("true_length", &true_length);
-    //fRecoBenchmarkTree->Branch("true_angle", &true_angle);
+    fRecoBenchmarkTree->Branch("true_angle", &true_angle);
+    fRecoBenchmarkTree->Branch("true_shower_to_vtx_dist", &true_shower_to_vtx_dist);
     //fRecoBenchmarkTree->Branch("true_angle_rot", &true_angle_rot);
     //fRecoBenchmarkTree->Branch("true_angle_incl", &true_angle_incl);
-    //fRecoBenchmarkTree->Branch("true_angle_x", &true_angle_x);
-    //fRecoBenchmarkTree->Branch("true_angle_y", &true_angle_y);
-    //fRecoBenchmarkTree->Branch("true_angle_z", &true_angle_z);
-    //fRecoBenchmarkTree->Branch("true_track_start_x", &true_track_start_x);
-    //fRecoBenchmarkTree->Branch("true_track_start_y", &true_track_start_y);
-    //fRecoBenchmarkTree->Branch("true_track_start_z", &true_track_start_z);
-    //fRecoBenchmarkTree->Branch("true_track_end_x", &true_track_end_x);
-    //fRecoBenchmarkTree->Branch("true_track_end_y", &true_track_end_y);
-    //fRecoBenchmarkTree->Branch("true_track_end_z", &true_track_end_z);
-    //fRecoBenchmarkTree->Branch("true_pdg", &true_pdg);
+    fRecoBenchmarkTree->Branch("true_angle_x", &true_angle_x);
+    fRecoBenchmarkTree->Branch("true_angle_y", &true_angle_y);
+    fRecoBenchmarkTree->Branch("true_angle_z", &true_angle_z);
+    fRecoBenchmarkTree->Branch("true_shower_start_x", &true_shower_start_x);
+    fRecoBenchmarkTree->Branch("true_shower_start_y", &true_shower_start_y);
+    fRecoBenchmarkTree->Branch("true_shower_start_z", &true_shower_start_z);
+    fRecoBenchmarkTree->Branch("true_shower_end_x", &true_shower_end_x);
+    fRecoBenchmarkTree->Branch("true_shower_end_y", &true_shower_end_y);
+    fRecoBenchmarkTree->Branch("true_shower_end_z", &true_shower_end_z);
+    fRecoBenchmarkTree->Branch("true_pdg", &true_pdg);
     fRecoBenchmarkTree->Branch("true_ixn_pi0_mult", &true_ixn_pi0_mult);
     fRecoBenchmarkTree->Branch("true_ixn_cont_pi0_mult", &true_ixn_cont_pi0_mult);
     fRecoBenchmarkTree->Branch("true_ixn_e_mult", &true_ixn_e_mult);
@@ -186,7 +187,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
     fRecoBenchmarkTree->Branch("true_ixn_vtx_x_pos", &true_ixn_vtx_x_pos);
     fRecoBenchmarkTree->Branch("true_ixn_vtx_y_pos", &true_ixn_vtx_y_pos);
     fRecoBenchmarkTree->Branch("true_ixn_vtx_z_pos", &true_ixn_vtx_z_pos);
-    fRecoBenchmarkTree->Branch("true_ixn_prim_shower_pdg_list", &true_ixn_prim_shower_pdg_list);
 
     fRecoBenchmarkTree->Branch("spill_index", &spill_index);
     fRecoBenchmarkTree->Branch("file_index", &file_index);
@@ -275,8 +275,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
         {
             const auto& vtx = sr->common.ixn.dlp[ixn].vtx;
 
-
-
             // Require RECO vertex to be within the TPCs
             if (!(std::isfinite(vtx.x) && std::isfinite(vtx.y) && std::isfinite(vtx.z)))
                 continue;
@@ -290,7 +288,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                 continue;
             if (vtx.z > ups_z_max && vtx.z < downs_z_min)
                 continue;
-
 
 
             //Get the truth interaction(s) corresponding to this reco interaction
@@ -310,8 +307,6 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
             auto true_ixn_vtx_x = -1;
             auto true_ixn_vtx_y = -1;
             auto true_ixn_vtx_z = -1;
-            std::vector< int > true_ixn_prim_shower_pdg;
-            true_ixn_prim_shower_pdg.clear(); 
             double current_max = -1; // no overlap bc no truth match
 
 
@@ -364,12 +359,10 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                     const auto& true_part = truth_ixn.prim[ipart];
                     //Put true particle counters
                     if((abs(true_part.pdg) == 11)) {
-                        true_ixn_prim_shower_pdg.push_back(true_part.pdg);
                         true_ixn_electrons++;
                     }
 
                     if((abs(true_part.pdg) == 22)) {
-                        true_ixn_prim_shower_pdg.push_back(true_part.pdg);
                         true_ixn_gammas++;
                     }
 
@@ -404,10 +397,8 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
             auto reco_ixn_chpi = 0;
             auto reco_ixn_proton = 0;
             auto reco_ixn_chkaon = 0;
-            std::vector< int > reco_ixn_prim_shower_pdg;
-            reco_ixn_prim_shower_pdg.clear(); 
 
-            // Loop over particles in the interaction **"The big for loop"**
+            // Loop over particles in the interaction 
             for(unsigned long ipart = 0; ipart < sr->common.ixn.dlp[ixn].part.dlp.size(); ++ipart)
             {
                 //Store current reco particle for easier access
@@ -416,14 +407,12 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                 //Put reco particle cuts here
                 if((abs(part.pdg) == 11) and part.primary) {
                     reco_ixn_electrons++;
-                    reco_ixn_prim_shower_pdg.push_back(part.pdg);
                     if (part.contained)
                         reco_ixn_electrons_contained++;
                 }
 
                 if((abs(part.pdg) == 22) and part.primary) {
                     reco_ixn_gammas++;
-                    reco_ixn_prim_shower_pdg.push_back(part.pdg);
                     if (part.contained)
                         reco_ixn_gammas_contained++;
                 }
@@ -440,18 +429,22 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                 if((abs(part.pdg) == 321) and part.primary)
                     reco_ixn_chkaon++;
 
-            } // END OF BIG FOR LOOP FOR NOW
+            } // END OF INITIAL RECO FOR LOOP
 
             // Requirements on reco particles
             // Only save interactions with exactly 1 primary muon
-            if (reco_ixn_muons != 1)
-                continue;
+            //if (reco_ixn_muons != 1)
+            //    continue;
             
-            // Require two photon showers
+            // Require at least one photon showers
             if(reco_ixn_gammas < 1 & reco_ixn_electrons < 1)
                 continue;
                 
-
+            // LOOP OVER PARTICLES AGAIN TO SAVE RECO INFORMATION FOR SHOWERS BY PARTICLE 
+            for(unsigned long ipart = 0; ipart < sr->common.ixn.dlp[ixn].part.dlp.size(); ++ipart)
+            {
+                //Store current reco particle for easier access
+                const auto& part = sr->common.ixn.dlp[ixn].part.dlp[ipart];
                 ////Put reco particle cuts here
                 //if((abs(abs(part.start.z)-64.538) < 1.0) and (abs(abs(part.end.z)-64.538)) < 1.0){
                 //    //std::cout<<"Particle Start:"<<part.start.z<<" End:"<<part.end.z<<std::endl;
@@ -463,194 +456,204 @@ int pi0_reco_sample(const std::string& file_list, bool is_flat = true)
                 //    //std::cout<<"Particle Start:"<<part.start.z<<" End:"<<part.end.z<<std::endl;
                 //    continue;
                 //}
+                // only save reco electrons and gammas
+                if((abs(part.pdg) != 11) and (abs(part.pdg) != 22))
+                    continue;
 
                 
                 //Get truth match(es) for this reco particle
                 //Variables need to be wrapped in the Proxy object (sometimes)
-                //caf::Proxy<caf::SRTrueParticle>* truth_match = nullptr;
-                //const auto& vec_truth_id = part.truth;
-                //const auto& vec_overlap  = part.truthOverlap;
+                caf::Proxy<caf::SRTrueParticle>* truth_match = nullptr;
+                const auto& vec_truth_id = part.truth;
+                const auto& vec_overlap  = part.truthOverlap;
 //
-                ////If the truth overlap vector is empty, then assume no truth match and skip
+                //If the truth overlap vector is empty, then assume no truth match and skip
                 //if(vec_overlap.empty())
                 //{
                 //    //std::cout << "No truth match... skipping reco particle..." << std::endl;
                 //    continue;
                 //}
+//              // Initialize values in the case of no truth match
+                double current_max = -1;
+                auto true_pvec = TVector3(-99999, -99999, -99999);
+                auto true_dir = TVector3(-99999, -99999, -99999);
+                auto true_cos_angle = -99999;
+                auto true_shower_to_true_vtx = -99999;
+                //auto true_length_val = -99999;
+                if (!(vec_overlap.empty()))
+                {//Find the truth particle with the largest overlap
+                    //auto result = std::max_element(vec_overlap.begin(), vec_overlap.end());
+                    //auto max_overlap = std::distance(vec_overlap.begin(), result);
+                    //auto truth_id = vec_truth_id.at(max_overlap);
+                    current_max = 0;
+                    unsigned int max_overlap = 0;
+                    for(unsigned int i = 0; i < vec_overlap.size(); ++i)
+                    {
+                        auto val = vec_overlap.at(i);
+                        if(val > current_max)
+                        {
+                            current_max = val;
+                            max_overlap = i;
+                        }
+                    }
+//                    //if(current_max < 0.25)
+                    //    continue;
+                    const auto& truth_id = vec_truth_id.at(max_overlap);
 //
-//
-                ////Find the truth particle with the largest overlap
-                ////auto result = std::max_element(vec_overlap.begin(), vec_overlap.end());
-                ////auto max_overlap = std::distance(vec_overlap.begin(), result);
-                ////auto truth_id = vec_truth_id.at(max_overlap);
-                //double current_max = 0;
-                //unsigned int max_overlap = 0;
-                //for(unsigned int i = 0; i < vec_overlap.size(); ++i)
-                //{
-                //    auto val = vec_overlap.at(i);
-                //    if(val > current_max)
-                //    {
-                //        current_max = val;
-                //        max_overlap = i;
-                //    }
-                //}
-//
-                ////if(current_max < 0.25)
-                ////    continue;
-                //const auto& truth_id = vec_truth_id.at(max_overlap);
-//
-                ////Get pointer to the corresponding truth particle
-                //if(truth_id.type == 1)
-                //    truth_match = &(sr->mc.nu[truth_id.ixn].prim[truth_id.part]);
-                //else if(truth_id.type == 3)
-                //    truth_match = &(sr->mc.nu[truth_id.ixn].sec[truth_id.part]);
-                //else
-                //{
-                //    std::cout << "Invalid truth id type!" << std::endl;
-                //    continue;
-                //}
+                    //Get pointer to the corresponding truth particle
+                    if(truth_id.type == 1)
+                        truth_match = &(sr->mc.nu[truth_id.ixn].prim[truth_id.part]);
+                    else if(truth_id.type == 3)
+                        truth_match = &(sr->mc.nu[truth_id.ixn].sec[truth_id.part]);
+                    else
+                    {
+                        std::cout << "Invalid truth id type!" << std::endl;
+                        continue;
+                    }
 
-                //Finally get or calculate various reco/truth quantities
-                //auto pvec = TVector3(part.p.x, part.p.y, part.p.z);
-                //auto dir = TVector3(part.end.x, part.end.y, part.end.z) - TVector3(part.start.x, part.start.y, part.start.z);
-                //auto cos_angle = TMath::Cos(dir.Angle(beam_dir)); //calculate cosine of angle w.r.t neutrino beam direction
+                    true_pvec = TVector3(truth_match->p.px, truth_match->p.py, truth_match->p.pz);
+                    true_dir = true_pvec.Unit();
+                    true_cos_angle = TMath::Cos(true_dir.Angle(beam_dir));
+                    true_shower_to_true_vtx = (TVector3(truth_match->start_pos.x, truth_match->start_pos.y, truth_match->start_pos.z) - TVector3(true_ixn_vtx_x, true_ixn_vtx_y, true_ixn_vtx_z)).Mag();
+                    //true_dir.RotateY(-TMath::Pi()/2);
+                    //auto true_cos_rot_anode_angle = TMath::Cos(true_dir.Theta()); //calculate cosine of track rotational angle (projection on anode)
+                    //auto true_cos_incl_anode_angle = TMath::Cos(true_dir.Phi()); //calculate cosine of track inclination angle (off of anode)
+                    //true_dir.RotateY(TMath::Pi()/2);
+                    //true_length_val = true_dir.Mag();
+
+                    true_dir.RotateY(-TMath::Pi()/2);
+
+                    true_energy.push_back(truth_match->p.E);
+                    true_p_x.push_back(truth_match->p.px); 
+                    true_p_y.push_back(truth_match->p.py); 
+                    true_p_z.push_back(truth_match->p.pz);
+                    true_p_mag.push_back(true_pvec.Mag());
+                    //true_length.push_back(true_length_val);
+                    true_dir.RotateY(TMath::Pi()/2);
+                    true_angle.push_back(true_dir.Angle(beam_dir));
+                    true_shower_to_vtx_dist.push_back(true_shower_to_true_vtx);
+                    true_angle_x.push_back(true_dir.Angle(x_plus_dir));
+                    true_angle_y.push_back(true_dir.Angle(y_plus_dir));
+                    true_angle_z.push_back(true_dir.Angle(z_plus_dir));
+                    true_dir.RotateY(-TMath::Pi()/2);
+                    true_shower_start_x.push_back(truth_match->start_pos.x);
+                    true_shower_start_y.push_back(truth_match->start_pos.y);
+                    true_shower_start_z.push_back(truth_match->start_pos.z);
+                    true_shower_end_x.push_back(truth_match->end_pos.x);
+                    true_shower_end_y.push_back(truth_match->end_pos.y);
+                    true_shower_end_z.push_back(truth_match->end_pos.z);
+                    true_pdg.push_back(truth_match->pdg);
+                }
+                else
+                {
+                    true_energy.push_back(-99999);
+                    true_p_x.push_back(-99999); 
+                    true_p_y.push_back(-99999); 
+                    true_p_z.push_back(-99999);
+                    true_p_mag.push_back(-99999);
+                    //true_length.push_back(-99999);
+                    true_shower_to_vtx_dist.push_back(true_shower_to_true_vtx);
+                    true_angle.push_back(-99999);
+                    true_angle_x.push_back(-99999);
+                    true_angle_y.push_back(-99999);
+                    true_angle_z.push_back(-99999);
+                    true_shower_start_x.push_back(-99999);
+                    true_shower_start_y.push_back(-99999);
+                    true_shower_start_z.push_back(-99999);
+                    true_shower_end_x.push_back(-99999);
+                    true_shower_end_y.push_back(-99999);
+                    true_shower_end_z.push_back(-99999);
+                    true_pdg.push_back(-1);
+                }
+                //Finally get or calculate various reco quantities
+                auto pvec = TVector3(part.p.x, part.p.y, part.p.z);
+                auto dir = pvec.Unit();
+                auto cos_angle = TMath::Cos(dir.Angle(beam_dir));
+                auto reco_shower_to_reco_vtx = (TVector3(part.start.x, part.start.y, part.start.z) - TVector3(vtx.x, vtx.y, vtx.z)).Mag();
+                 //calculate cosine of angle w.r.t neutrino beam direction
                 //dir.RotateY(-TMath::Pi()/2);
                 //auto cos_rot_anode_angle = TMath::Cos(dir.Theta()); //calculate cosine of track rotational angle (projection on anode)
                 //auto cos_incl_anode_angle = TMath::Cos(dir.Phi()); //calculate cosine of track inclination angle (off of anode)
                 //dir.RotateY(TMath::Pi()/2);
-                ////auto angle = pvec.Angle(beam_dir) * 180.0 / TMath::Pi(); //different method for the angle
+                //auto angle = pvec.Angle(beam_dir) * 180.0 / TMath::Pi(); //different method for the angle
                 //auto length = dir.Mag();
-//
-                //auto true_pvec = TVector3(truth_match->p.px, truth_match->p.py, truth_match->p.pz);
-                //auto true_dir = TVector3(truth_match->end_pos.x, truth_match->end_pos.y, truth_match->end_pos.z)
-                //                - TVector3(truth_match->start_pos.x, truth_match->start_pos.y, truth_match->start_pos.z);
-                //auto true_cos_angle = TMath::Cos(true_dir.Angle(beam_dir));
-                //true_dir.RotateY(-TMath::Pi()/2);
-                //auto true_cos_rot_anode_angle = TMath::Cos(true_dir.Theta()); //calculate cosine of track rotational angle (projection on anode)
-                //auto true_cos_incl_anode_angle = TMath::Cos(true_dir.Phi()); //calculate cosine of track inclination angle (off of anode)
-                //true_dir.RotateY(TMath::Pi()/2);
-                //auto true_length_val = true_dir.Mag();
-//
+
                 //auto T_diff = truth_match->p.E - part.E;
                 //auto p_diff = true_pvec.Mag() - pvec.Mag();
                 //auto length_diff = true_length_val - length;
                 //auto cos_angle_diff = true_cos_angle - cos_angle;
 //
-                //dir.RotateY(-TMath::Pi()/2);
-                //true_dir.RotateY(-TMath::Pi()/2);
+                dir.RotateY(-TMath::Pi()/2);
 //
-                //// POPULATE: Record information in vectors (defined above) for tracks that
-	            ////           have passed all cuts
-                //
-	            //reco_energy.push_back(part.E);
-                //reco_p_x.push_back(part.p.x); 
-                //reco_p_y.push_back(part.p.y); 
-                //reco_p_z.push_back(part.p.z);
-                //reco_p_mag.push_back(pvec.Mag());
+                // POPULATE: Record information in vectors (defined above) for tracks that
+	            //           have passed all cuts
+                
+	            reco_energy.push_back(part.E);
+                reco_p_x.push_back(part.p.x); 
+                reco_p_y.push_back(part.p.y); 
+                reco_p_z.push_back(part.p.z);
+                reco_p_mag.push_back(pvec.Mag());
                 //reco_length.push_back(length);
-                //dir.RotateY(TMath::Pi()/2);
-                //reco_angle.push_back(dir.Angle(beam_dir));
-                //reco_angle_x.push_back(dir.Angle(x_plus_dir));
-                //reco_angle_y.push_back(dir.Angle(y_plus_dir));
-                //reco_angle_z.push_back(dir.Angle(z_plus_dir));
-                //dir.RotateY(-TMath::Pi()/2);
+                dir.RotateY(TMath::Pi()/2);
+                reco_angle.push_back(dir.Angle(beam_dir));
+                reco_shower_to_vtx_dist.push_back(reco_shower_to_reco_vtx);
+                reco_angle_x.push_back(dir.Angle(x_plus_dir));
+                reco_angle_y.push_back(dir.Angle(y_plus_dir));
+                reco_angle_z.push_back(dir.Angle(z_plus_dir));
+                dir.RotateY(-TMath::Pi()/2);
                 //reco_angle_rot.push_back(dir.Theta());
                 //reco_angle_incl.push_back(dir.Phi());
-                //reco_track_start_x.push_back(part.start.x);
-                //reco_track_start_y.push_back(part.start.y);
-                //reco_track_start_z.push_back(part.start.z);
-                //reco_track_end_x.push_back(part.end.x);
-                //reco_track_end_y.push_back(part.end.y);
-                //reco_track_end_z.push_back(part.end.z);
-                //reco_pdg.push_back(part.pdg);
-                //true_energy.push_back(truth_match->p.E);
-                //true_p_x.push_back(truth_match->p.px); 
-                //true_p_y.push_back(truth_match->p.py); 
-                //true_p_z.push_back(truth_match->p.pz);
-                //true_p_mag.push_back(true_pvec.Mag());
-                //true_length.push_back(true_length_val);
-                //true_dir.RotateY(TMath::Pi()/2);
-                //true_angle.push_back(true_dir.Angle(beam_dir));
-                //true_angle_x.push_back(true_dir.Angle(x_plus_dir));
-                //true_angle_y.push_back(true_dir.Angle(y_plus_dir));
-                //true_angle_z.push_back(true_dir.Angle(z_plus_dir));
-                //true_dir.RotateY(-TMath::Pi()/2);
-                //true_angle_rot.push_back(true_dir.Theta());
-                //true_angle_incl.push_back(true_dir.Phi());
-                //true_track_start_x.push_back(truth_match->start_pos.x);
-                //true_track_start_y.push_back(truth_match->start_pos.y);
-                //true_track_start_z.push_back(truth_match->start_pos.z);
-                //true_track_end_x.push_back(truth_match->end_pos.x);
-                //true_track_end_y.push_back(truth_match->end_pos.y);
-                //true_track_end_z.push_back(truth_match->end_pos.z);
-                //true_pdg.push_back(truth_match->pdg);
-                //true_ixn_charged_track_mult.push_back(true_ixn_trks);
-                //overlap.push_back(current_max);
-                //true_ixn_index.push_back(truth_idx);
-                //reco_ixn_index.push_back(ixn);
-                //spill_index.push_back(spill_num);
-                //file_index.push_back(file_num);
-                //event.push_back(sr->meta.nd_lar.event);
-                //run.push_back(sr->meta.nd_lar.run);
-                //subrun.push_back(sr->meta.nd_lar.subrun);
-                //caf_file_name.push_back(current_file.erase(0, current_file.find_last_of("/")+1).c_str());
-//
-//
-            //}// ** END OF BIG FOR LOOP IN ORIGINAL SCRIPT
-            // Loop over particles in the interaction again to load charged track multiplicity
-            //for(unsigned long ipart = 0; ipart < reco_ixn_trks; ++ipart)
-            //{
-            //    reco_ixn_charged_track_mult.push_back(reco_ixn_trks);
-            //}
-            true_ixn_prim_shower_pdg_list.clear();
-            reco_ixn_prim_shower_pdg_list.clear();
+                reco_shower_start_x.push_back(part.start.x);
+                reco_shower_start_y.push_back(part.start.y);
+                reco_shower_start_z.push_back(part.start.z);
+                reco_shower_end_x.push_back(std::isinf(part.end.x) ? -9999 : part.end.x);
+                reco_shower_end_y.push_back(std::isinf(part.end.y) ? -9999 : part.end.y);
+                reco_shower_end_z.push_back(std::isinf(part.end.z) ? -9999 : part.end.z);
+                reco_pdg.push_back(part.pdg);
 
-            true_ixn_pi0_mult.push_back(true_ixn_pi0s);
-            true_ixn_e_mult.push_back(true_ixn_electrons);
-            true_ixn_gamma_mult.push_back(true_ixn_gammas);
-            true_ixn_cont_pi0_mult.push_back(true_ixn_pi0s_contained);
-            true_ixn_muon_mult.push_back(true_ixn_muons);
-            true_ixn_chpi_mult.push_back(true_ixn_chpi);
-            true_ixn_proton_mult.push_back(true_ixn_proton);
-            true_ixn_chkaon_mult.push_back(true_ixn_chkaon);
-            true_ixn_vtx_x_pos.push_back(true_ixn_vtx_x);
-            true_ixn_vtx_y_pos.push_back(true_ixn_vtx_y);
-            true_ixn_vtx_z_pos.push_back(true_ixn_vtx_z);
-            true_ixn_prim_shower_pdg_list.push_back(true_ixn_prim_shower_pdg);
-            std::cout << true_ixn_prim_shower_pdg.size() << std::endl;
-            std::cout << true_ixn_prim_shower_pdg_list.size() << std::endl;
-            reco_ixn_e_mult.push_back(reco_ixn_electrons);
-            reco_ixn_gamma_mult.push_back(reco_ixn_gammas);
-            reco_ixn_e_cont_mult.push_back(reco_ixn_electrons_contained);
-            reco_ixn_cont_gamma_mult.push_back(reco_ixn_gammas_contained);
-            reco_ixn_muon_mult.push_back(reco_ixn_muons);
-            reco_ixn_chpi_mult.push_back(reco_ixn_chpi);
-            reco_ixn_proton_mult.push_back(reco_ixn_proton);
-            reco_ixn_chkaon_mult.push_back(reco_ixn_chkaon);
-            reco_ixn_vtx_x_pos.push_back(vtx.x);
-            reco_ixn_vtx_y_pos.push_back(vtx.y);
-            reco_ixn_vtx_z_pos.push_back(vtx.z);
-            reco_ixn_prim_shower_pdg_list.push_back(reco_ixn_prim_shower_pdg);
-            std::cout << reco_ixn_prim_shower_pdg.size() << std::endl;
-            std::cout << reco_ixn_prim_shower_pdg_list.size() << std::endl;
-            overlap.push_back(current_max);
-            true_ixn_index.push_back(truth_idx);
-            reco_ixn_index.push_back(ixn);
-            spill_index.push_back(spill_num);
-            file_index.push_back(file_num);
-            event.push_back(sr->meta.nd_lar.event);
-            run.push_back(sr->meta.nd_lar.run);
-            subrun.push_back(sr->meta.nd_lar.subrun);
-            caf_file_name.push_back(current_file.erase(0, current_file.find_last_of("/")+1).c_str());
-        }
-    } //end of reco interactions
+                // Push back event-level values
+                true_ixn_pi0_mult.push_back(true_ixn_pi0s);
+                true_ixn_e_mult.push_back(true_ixn_electrons);
+                true_ixn_gamma_mult.push_back(true_ixn_gammas);
+                true_ixn_cont_pi0_mult.push_back(true_ixn_pi0s_contained);
+                true_ixn_muon_mult.push_back(true_ixn_muons);
+                true_ixn_chpi_mult.push_back(true_ixn_chpi);
+                true_ixn_proton_mult.push_back(true_ixn_proton);
+                true_ixn_chkaon_mult.push_back(true_ixn_chkaon);
+                true_ixn_vtx_x_pos.push_back(true_ixn_vtx_x);
+                true_ixn_vtx_y_pos.push_back(true_ixn_vtx_y);
+                true_ixn_vtx_z_pos.push_back(true_ixn_vtx_z);
+                reco_ixn_e_mult.push_back(reco_ixn_electrons);
+                reco_ixn_gamma_mult.push_back(reco_ixn_gammas);
+                reco_ixn_e_cont_mult.push_back(reco_ixn_electrons_contained);
+                reco_ixn_cont_gamma_mult.push_back(reco_ixn_gammas_contained);
+                reco_ixn_muon_mult.push_back(reco_ixn_muons);
+                reco_ixn_chpi_mult.push_back(reco_ixn_chpi);
+                reco_ixn_proton_mult.push_back(reco_ixn_proton);
+                reco_ixn_chkaon_mult.push_back(reco_ixn_chkaon);
+                reco_ixn_vtx_x_pos.push_back(vtx.x);
+                reco_ixn_vtx_y_pos.push_back(vtx.y);
+                reco_ixn_vtx_z_pos.push_back(vtx.z);
+                overlap.push_back(current_max);
+                true_ixn_index.push_back(truth_idx);
+                reco_ixn_index.push_back(ixn);
+                spill_index.push_back(spill_num);
+                file_index.push_back(file_num);
+                event.push_back(sr->meta.nd_lar.event);
+                run.push_back(sr->meta.nd_lar.run);
+                subrun.push_back(sr->meta.nd_lar.subrun);
+                caf_file_name.push_back(current_file.erase(0, current_file.find_last_of("/")+1).c_str());
+
+            }// ** END OF FINAL RECO PARTICLE LOOP **
+        } // end of loop over reco interactions
+    } //end of loop over spills
 
     } //end of file loop
     const auto t_end{std::chrono::steady_clock::now()};
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    std::string file_name = "pi0_reco_based_sample";
+    std::string file_name = "shower_particle_reco_based_sample";
 
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");
