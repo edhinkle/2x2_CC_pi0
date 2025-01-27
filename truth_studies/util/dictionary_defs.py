@@ -78,7 +78,7 @@ def get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict
              empty Python dictionary (DICT)
     Outputs: Nothing returned, but signal_dict (DICT) is full after
              method runs'''
-def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig_bkg_dict, sim_file, flow_event_id, sig_or_bkg, is_cc):
+def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig_bkg_dict, sim_file, flow_event_id, file_number, sig_or_bkg, is_cc):
 
     # Truth level summary information
     ghdr_vert_mask = ghdr['vertex_id']==vert_id
@@ -449,7 +449,8 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
         vtx_y = float(vtx_y), 
         vtx_z = float(vtx_z), 
         filepath = str(sim_file),
-        flow_event_id = str(flow_event_id),
+        flow_event_id = int(flow_event_id),
+        file_number = int(file_number)
         )
     return
 

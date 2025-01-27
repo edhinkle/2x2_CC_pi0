@@ -108,7 +108,8 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
     std::vector< double >     true_ixn_vtx_y_pos;
     std::vector< double >     true_ixn_vtx_z_pos;
 
-    std::vector< double >  overlap;
+    std::vector< double >  ixn_overlap;
+    std::vector< double >  part_overlap;
     std::vector< double >  true_ixn_index;
     std::vector< double >  reco_ixn_index;
     std::vector< int >     spill_index;
@@ -195,7 +196,8 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
     fRecoBenchmarkTree->Branch("subrun", &subrun);
     fRecoBenchmarkTree->Branch("caf_file_name", &caf_file_name);
 
-    fRecoBenchmarkTree->Branch("overlap", &overlap);
+    fRecoBenchmarkTree->Branch("ixn_overlap", &ixn_overlap);
+    fRecoBenchmarkTree->Branch("part_overlap", &part_overlap);
 
 
     //Beam direction -3.343 degrees in y
@@ -307,7 +309,7 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
             auto true_ixn_vtx_x = -1;
             auto true_ixn_vtx_y = -1;
             auto true_ixn_vtx_z = -1;
-            double current_max = -1; // no overlap bc no truth match
+            double ixn_current_max = -1; // no overlap bc no truth match
 
 
             // For truth study, only want to keep if there is a truth match
@@ -324,14 +326,14 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
             if(!vec_overlap_ixn.empty()) 
             {   
                 // Get truth interaction information
-                current_max = 0;
+                ixn_current_max = 0;
                 unsigned int max_overlap = 0;
                 for(unsigned int i = 0; i < vec_overlap_ixn.size(); ++i)
                 {
                     auto val = vec_overlap_ixn.at(i);
-                    if(val > current_max)
+                    if(val > ixn_current_max)
                     {
-                        current_max = val;
+                        ixn_current_max = val;
                         max_overlap = i;
                     }
                 }
@@ -474,7 +476,7 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
                 //    continue;
                 //}
 //              // Initialize values in the case of no truth match
-                double current_max = -1;
+                double part_current_max = -1;
                 auto true_pvec = TVector3(-99999, -99999, -99999);
                 auto true_dir = TVector3(-99999, -99999, -99999);
                 auto true_cos_angle = -99999;
@@ -485,14 +487,14 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
                     //auto result = std::max_element(vec_overlap.begin(), vec_overlap.end());
                     //auto max_overlap = std::distance(vec_overlap.begin(), result);
                     //auto truth_id = vec_truth_id.at(max_overlap);
-                    current_max = 0;
+                    part_current_max = 0;
                     unsigned int max_overlap = 0;
                     for(unsigned int i = 0; i < vec_overlap.size(); ++i)
                     {
                         auto val = vec_overlap.at(i);
-                        if(val > current_max)
+                        if(val > part_current_max)
                         {
-                            current_max = val;
+                            part_current_max = val;
                             max_overlap = i;
                         }
                     }
@@ -634,7 +636,8 @@ int shower_particle_reco_sample(const std::string& file_list, bool is_flat = tru
                 reco_ixn_vtx_x_pos.push_back(vtx.x);
                 reco_ixn_vtx_y_pos.push_back(vtx.y);
                 reco_ixn_vtx_z_pos.push_back(vtx.z);
-                overlap.push_back(current_max);
+                ixn_overlap.push_back(ixn_current_max);
+                part_overlap.push_back(part_current_max);
                 true_ixn_index.push_back(truth_idx);
                 reco_ixn_index.push_back(ixn);
                 spill_index.push_back(spill_num);

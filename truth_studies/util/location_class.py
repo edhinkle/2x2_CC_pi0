@@ -30,7 +30,9 @@ def fiducialized_vertex(vert_pos):
     flag=False; x_drift_flag=False; y_vertical_flag=False; z_beam_flag=False
     for i in range(3):
         for i_bounds, bounds in enumerate(geometry_defs.tpc_bounds(i)):
-            if vert_pos[i]>bounds[0] and vert_pos[i]<bounds[1]:
+            #print("Axis:", i)
+            #print("Bounds:", bounds)
+            if (vert_pos[i]>bounds[0] and abs(vert_pos[i]-bounds[0])>2.) and (vert_pos[i]<bounds[1] and abs(vert_pos[i]-bounds[1])>2.):
                 if i==0: x_drift_flag=True; break
                 if i==1: y_vertical_flag=True
                 if i==2: z_beam_flag=True

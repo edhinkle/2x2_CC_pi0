@@ -43,6 +43,15 @@ def single_pi0_status(gstack, vert_id):
     if len(gstack_pi0s)==1: return True
     else: return False
 
+def multi_pi0_status(gstack, vert_id):
+    gstack_vert_mask = gstack['vertex_id']==vert_id
+    gstack_pdgs = gstack[gstack_vert_mask]['part_pdg']
+    pi0_pdg = particlePDG_defs.pi0_pdg
+    gstack_pi0_mask = gstack_pdgs == pi0_pdg
+    gstack_pi0s = gstack_pdgs[gstack_pi0_mask]
+    if len(gstack_pi0s)>1: return True
+    else: return False
+
 
 def nu_int_type(ghdr, vert_id):
     ghdr_vert_mask = ghdr['vertex_id']==vert_id

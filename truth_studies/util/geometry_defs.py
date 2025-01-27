@@ -46,11 +46,11 @@ def tpc_bounds(i):
     The dimension is chosen by i: 0, 1, 2 -> x, y, z.
     Values are taken from 2x2_sim/run-edep-sim/geometry/Merged2x2MINERvA_v2"""
             
-    active_tpc_widths = [30.6, 130., 64.] # cm
+    active_tpc_widths = [30.27225, 124.152, 64.538-2.462] # cm
             
     # The positions in cm of the center of each tpc relative to a module center.
     # There are two tpcs for each module.            
-    tpcs_relative_to_module = [[-15.7,0.,0.], [15.7, 0., 0.]]
+    tpcs_relative_to_module = [[-15.3,0.,0.], [15.3, 0., 0.]] # change from 15.7 to get correct bounds
 
     # The positions in cm of each of the four modules, relative to the 2x2 center position.
     modules_relative_to_2x2= [[-33.5,0.,-33.5],

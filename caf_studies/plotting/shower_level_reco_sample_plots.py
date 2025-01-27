@@ -45,11 +45,15 @@ def main(reco_sample_file):
     ak_array = ixns["RecoBenchmarkTree"].arrays(library="ak")
     df = ak.to_dataframe(ak_array)
     df = df.reset_index(drop=True)
+    original_num_showers = len(df)
+    overlap_cut = 0.5
+    df = df[df['part_overlap'] > overlap_cut]
     num_showers = len(df)
 
     print('\n----------------- File content -----------------')
     print('Reco Sample File:', reco_sample_file)
-    print('Number of reconstructed showers:', num_showers)
+    print('Number of reco showers before overlap cut:', original_num_showers)
+    print('Number of reco showers after overlap cut of '+str(overlap_cut)+':', num_showers)
     print('------------------------------------------------\n')
 
     # Set up output file
