@@ -102,6 +102,14 @@ def main(reco_sample_file):
         print("Number of 1:1 truth:reco interactions (1pi0):", len(df_cc1pi0_unique_match))
         print("Number of 1:N truth:reco interactions (entries) (1pi0):", len(df_cc1pi0_multi_match))
         print("Number of 1:N truth:reco interactions (unique truth_dict_keys) (1pi0):", len(df_cc1pi0_multi_match['truth_dict_key'].unique()))
+        df_cc1pi0_no_chpi = df_cc1pi0[df_cc1pi0['true_ixn_chpi_mult'] == 0]
+        df_cc1pi0_no_chmeson = df_cc1pi0_no_chpi[df_cc1pi0_no_chpi['true_ixn_chkaon_mult'] == 0]
+        print("Number of CC 1pi0 0 charged meson ixns:", len(df_cc1pi0_no_chmeson['truth_dict_key'].unique()))
+        df_cc1pi0_no_chmeson_unique_match = df_cc1pi0_no_chmeson.groupby('truth_dict_key').filter(lambda x: len(x) == 1)
+        df_cc1pi0_no_chmeson_multi_match = df_cc1pi0_no_chmeson.groupby('truth_dict_key').filter(lambda x: len(x) > 1)
+        print("Number of 1:1 truth:reco interactions (1pi0, 0chme):", len(df_cc1pi0_no_chmeson_unique_match))
+        print("Number of 1:N truth:reco interactions (entries) (1pi0, 0chme):", len(df_cc1pi0_no_chmeson_multi_match))
+        print("Number of 1:N truth:reco interactions (unique truth_dict_keys) (1pi0, 0chme):", len(df_cc1pi0_no_chmeson_multi_match['truth_dict_key'].unique()))
 
         # Histogram -- ixn overlap (1:1, 1:N) -- 1pi0
         ovlp_bins = np.linspace(0.,1.,101)
