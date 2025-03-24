@@ -47,24 +47,29 @@ def main(reco_sample_file):
     df = df.reset_index(drop=True)
     original_num_showers = len(df)
     overlap_cut = 0.5
+    reco_angle_cut = 0.1
     df = df[df['part_overlap'] > overlap_cut]
+    showers_before_angle_cut = len(df)
+    df = df[abs(df['reco_angle']-(np.pi/2)) < reco_angle_cut]
     num_showers = len(df)
 
     print('\n----------------- File content -----------------')
     print('Reco Sample File:', reco_sample_file)
     print('Number of reco showers before overlap cut:', original_num_showers)
-    print('Number of reco showers after overlap cut of '+str(overlap_cut)+':', num_showers)
+    print('Number of reco showers after overlap cut of '+str(overlap_cut)+':', showers_before_angle_cut)
+    print('Number of reco showers after reco angle cut of '+str(reco_angle_cut)+':', num_showers)
     print('------------------------------------------------\n')
 
     # Set up output file
-    output_pdf_name = reco_sample_file.split('.')[0]+'_validations.pdf'
+    output_pdf_name = reco_sample_file.split('.')[0]+'_ovlpcut'+str(overlap_cut)+'_recoanglecut'+str(reco_angle_cut)+'_validations.pdf'
 
     # Make plots in output file
     with PdfPages(output_pdf_name) as output:
 
         # Plot reco vs. true PDG ID
         fig, ax = plt.subplots(1,2, figsize=(10, 8))
-        ax[0].pie(df['reco_pdg'].value_counts(), labels = df['reco_pdg'].value_counts().index, colors=['#ff7f0e', '#1f77b4'], autopct='%1.1f%%')
+        #ax[0].pie(df['reco_pdg'].value_counts(), labels = df['reco_pdg'].value_counts().index, colors=['#ff7f0e', '#1f77b4'], autopct='%1.1f%%')
+        ax[0].pie(df['reco_pdg'].value_counts(), labels = df['reco_pdg'].value_counts().index, autopct='%1.1f%%')
         ax[0].set_title('Reco PDG ID')
 
         ax[1].pie(df['true_pdg'].value_counts(), labels = df['true_pdg'].value_counts().index, autopct='%1.1f%%')
