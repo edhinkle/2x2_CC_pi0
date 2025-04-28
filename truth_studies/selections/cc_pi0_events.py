@@ -19,7 +19,7 @@ import truth_studies.util.truth_ixn_methods as truth
 import truth_studies.util.kinematicVariable_methods as kinematics
 import truth_studies.util.dictionary_defs as dict_defs
  
-def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dune/www/data/2x2/simulation/productions/MiniRun6.1_1E19_RHC/MiniRun6.1_1E19_RHC.flow/FLOW/'):
+def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dune/www/data/2x2/simulation/productions/MiniRun6.2_1E19_RHC/MiniRun6.2_1E19_RHC.flow/FLOW/'):
 
     test_count = 0
     files_per_section = 100
@@ -57,7 +57,7 @@ def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dun
         if test_count ==int(n_files_processed) : break
         test_count+=1
         print("Looking at file: ", sim_file)
-        #if test_count <149: continue
+        if test_count <501: continue
         if sim_file.find('0000912') != -1: 
             print("---------------SKIPPING PROBLEM FILE---------------")
             continue # Skip MiniRun 5 file 0000912 due to bug (for now)
@@ -78,7 +78,7 @@ def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dun
         # Get flow event information
         file_number = sim_file.split("/")[-1].split(".")[-3]
         file_number_int = int(file_number)
-        flow_file = glob.glob(flow_dir+'000*000/MiniRun6.1_1E19_RHC.flow.'+file_number+'.FLOW.hdf5')[0]
+        flow_file = glob.glob(flow_dir+'000*000/MiniRun6.2_1E19_RHC.flow.'+file_number+'.FLOW.hdf5')[0]
         f = h5py.File(flow_file, 'r')
 
         events = f['charge/events/data']
@@ -116,11 +116,15 @@ def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dun
                 multi_pi0 = truth.multi_pi0_status(gstack, vert_id)
                 fv_particle_origin=loc_class.fiducialized_particle_origin(traj, vert_id)
 
-                if is_cc==True: continue
+                #if is_cc==False: continue
 
                 ### REQUIRE: (A) nu_mu(_bar), (B) CC interaction, (C) NO final state mesons, (D) final state particle start point in FV
-                #if nu_mu==True and is_cc==True and no_charged_mesons==True and one_pi0==True and fv_particle_origin==True:
-                if one_pi0==True and fv_particle_origin==True:
+                if nu_mu==True and is_cc==True and no_charged_mesons==True and one_pi0==True and fv_particle_origin==True:
+                    sig_or_bkg = True
+                    signal_count+=1
+                else:
+                    sig_or_bkg = False
+                '''if one_pi0==True and fv_particle_origin==True:
                     sig_or_bkg = True
                     signal_count+=1
                     nc_one_pi0_count+=1
@@ -129,13 +133,13 @@ def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dun
                     signal_count+=1
                     nc_npi0_count+=1
                 else:
-                    continue
-                    #sig_or_bkg = False
+                    continue'''
 
                 #print("Signal or Background: ", sig_or_bkg)
 
                 #print("Sim file: ", sim_file)
-                #print("Spill ID: ", spill_id)
+                print("Spill ID: ", spill_id)
+                print("Vertex ID: ", vert_id)
                 #print("Spill ID index:", np.where(unique_spill==spill_id))
                 #print("Length of unique spill array:", np.shape(unique_spill))
                 
@@ -143,7 +147,7 @@ def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dun
                 #print("Raw Events:", raw_events)
                 #print("Vertex Position:", vert_pos)
                 #print("Detector Bounds: ",detector_bounds)
-                '''gstack_vert_mask = gstack['vertex_id']==vert_id
+                gstack_vert_mask = gstack['vertex_id']==vert_id
                 gstack_vert = gstack[gstack_vert_mask] # Particle ID information associated with vertex
                 # Get final state particles associated with vertex and their multiplicities
                 gstack_vert_fs_mask = gstack_vert['part_status']==1 # Excludes initial state particles
@@ -175,38 +179,39 @@ def main(sim_dir, input_type, n_files_processed, flow_dir='/global/cfs/cdirs/dun
                 raw_event_ref_for_raw_event = np.sort(raw_event_ref[raw_event_ref[:,0] == raw_event_id, 1])
                 raw_event_ref_for_event = np.sort(raw_event_ref[raw_event_ref[:,0] == raw_event_id, 0])
                 event_id = events[raw_event_ref_for_raw_event]['id'][0]
-                #print("Event ID: ",event_id)
+                print("Event ID: ",event_id)
 
                 dict_defs.get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig_bkg_dict, sim_file, event_id, file_number_int, sig_or_bkg, is_cc)
                 #dict_defs.pi0_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, pi0_dict, sim_file, event_id)
                 #dict_defs.muon_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, muon_dict)
                 #dict_defs.hadron_characterization(spill_id, vert_id, ghdr, gstack, traj, vert, seg, kinematics.threshold, hadron_dict)
-                #dict_defs.get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict)'''
+                #dict_defs.get_truth_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, signal_dict)
 
         if test_count % files_per_section == 0:
             print("Signal Event Count: ", signal_count)
-            print("NC 1pi0 Event Count: ", nc_one_pi0_count)
-            print("NC npi0 Event Count: ", nc_npi0_count)
+            #print("NC 1pi0 Event Count: ", nc_one_pi0_count)
+            #print("NC npi0 Event Count: ", nc_npi0_count)
             print("Number of files processed: ", test_count)
             section = str(test_count//files_per_section)
-            #file_parsing.save_dict_to_json(sig_bkg_dict, "NC_sig_bkg_dict_"+section+"_of_"+total_sections, True)
-            #sig_bkg_dict = dict()
+            file_parsing.save_dict_to_json(sig_bkg_dict, "CC1pi0_sig_bkg_dict_"+section+"_of_"+total_sections, True)
+            sig_bkg_dict = dict()
+
 
     # Save all Python dictionaries to JSON files
     #file_parsing.save_dict_to_json(signal_dict, "signal_dict", True)
     #file_parsing.save_dict_to_json(pi0_dict, "pi0_dict", True)
     #file_parsing.save_dict_to_json(muon_dict, "muon_dict", True)
     #file_parsing.save_dict_to_json(hadron_dict, "hadron_dict", True)
-    #file_parsing.save_dict_to_json(sig_bkg_dict, "NC_sig_bkg_dict_"+total_sections+"_of_"+total_sections, True)
+    file_parsing.save_dict_to_json(sig_bkg_dict, "CC1pi0_sig_bkg_dict_"+total_sections+"_of_"+total_sections, True)
 
     # Save full signal and w.s. bkg counts to TXT file
     signal_count_final = signal_count*scale_factor
-    print("NC 1pi0 Event Count Final [UNSCALED]: ", nc_one_pi0_count)
-    print("NC Npi0 Event Count Final [UNSCALED]: ", nc_npi0_count)
+    #print("NC 1pi0 Event Count Final [UNSCALED]: ", nc_one_pi0_count)
+    #print("NC Npi0 Event Count Final [UNSCALED]: ", nc_npi0_count)
     outfile = open('signal_event_counts.txt', "w")
     outfile.writelines(["Signal Events (scaled to 1.05e19 POT): "+str(signal_count_final)+"\n", \
-                        "NC 1pi0 Events (scaled to 1.05e19 POT): "+str(nc_one_pi0_count*scale_factor)+"\n", \
-                        "NC npi0 Events (scaled to 1.05e19 POT): "+str(nc_npi0_count*scale_factor)+"\n", \
+                        #"NC 1pi0 Events (scaled to 1.05e19 POT): "+str(nc_one_pi0_count*scale_factor)+"\n", \
+                        #"NC npi0 Events (scaled to 1.05e19 POT): "+str(nc_npi0_count*scale_factor)+"\n", \
                         "Number of files used to get count: "+str(n_files_processed)+"\n", \
                         "Scale factor:"+str(scale_factor)+"\n"])
     outfile.close()
@@ -221,7 +226,7 @@ if __name__=='__main__':
                         help='''string corresponding to the output file type: edep or larnd''')
     parser.add_argument('-n', '--n_files_processed', default=1, required=True, type=int, \
                         help='''File count of number of files processed in production sample''')
-    parser.add_argument('-f', '--flow_dir', default='/global/cfs/cdirs/dune/www/data/2x2/simulation/productions/MiniRun6.1_1E19_RHC/MiniRun6.1_1E19_RHC.flow/FLOW/', type=str, \
+    parser.add_argument('-f', '--flow_dir', default='/global/cfs/cdirs/dune/www/data/2x2/simulation/productions/MiniRun6.2_1E19_RHC/MiniRun6.2_1E19_RHC.flow/FLOW/', type=str, \
                         help='''string corresponding to the path of the directory containing flow files''')
     args = parser.parse_args()
     main(**vars(args))

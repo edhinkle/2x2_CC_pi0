@@ -11,13 +11,13 @@ def main(directory):
 
     sig_bkg_dict_FINAL = {}
 
-    for i, dict_file in enumerate(glob.glob(directory+'/sig_bkg_dict_*_of_11.json')):
+    for i, dict_file in enumerate(glob.glob(directory+'/CC1pi0_sig_bkg_dict_*_of_11.json')):
         with open(dict_file) as sig_bkg_file:
             sig_bkg_dict = json.load(sig_bkg_file)
             sig_bkg_dict_FINAL.update(sig_bkg_dict)
 
     # Save the combined dictionary to a new JSON file
-    with open(directory + '/combined_sig_bkg_dict.json', 'w') as outfile:
+    with open(directory + '/combined_CC1pi0_sig_bkg_dict.json', 'w') as outfile:
         json.dump(sig_bkg_dict_FINAL, outfile, indent=4)
 
 

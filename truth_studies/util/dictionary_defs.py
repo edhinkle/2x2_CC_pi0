@@ -162,6 +162,7 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
     pi0_child_available_energy = [[] for i in range(pi0_mult)]
     pi0_child_start_location = [[] for i in range(pi0_mult)]
     pi0_child_end_location = [[] for i in range(pi0_mult)]
+    pi0_child_edep_start = [[] for i in range(pi0_mult)]
     pi0_child_start_pxyz = [[] for i in range(pi0_mult)]
     pi0_child_conv_dist = [[] for i in range(pi0_mult)]
 
@@ -178,6 +179,7 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
     primary_shower_available_energy = []
     primary_shower_start_location = []
     primary_shower_end_location = []
+    primary_shower_edep_start = []
     primary_shower_start_pxyz = []
     primary_shower_conv_dist = []
 
@@ -285,6 +287,8 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
                     start_pt = fs['xyz_start']
                     start_pxyz = fs['pxyz_start']
 
+                primary_shower_edep_start.append(particle_assoc.find_shower_edep_start_xyz(contained_edep, final_states, start_pt, \
+                                                                            end_pt, track_id_set, initial_track_id_set, vert_id, seg))
                 primary_shower_conv_dist.append(particle_assoc.distance_between_points(start_pt, end_pt))
                 primary_shower_start_location.append(start_pt)
                 primary_shower_end_location.append(end_pt)
@@ -331,7 +335,7 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
                             start_pt = start_pt[0]
                             start_pxyz = start_pxyz[0]
 
-                        end_tid = particle_assoc.find_secondary_particle_end_trajectory(track_id_set, final_states,start_tid)
+                        end_tid = particle_assoc.find_secondary_particle_end_trajectory(initial_child_track_id_set, final_states,start_tid)
                         end_tid_mask = final_states['traj_id']==end_tid
                         child_end_traj = final_states[end_tid_mask]
                         end_pt = child_end_traj['xyz_end']
@@ -345,6 +349,8 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
                         start_pt = fs['xyz_start']
                         start_pxyz = fs['pxyz_start']
 
+                    pi0_child_edep_start[pi0_idx].append(particle_assoc.find_shower_edep_start_xyz(contained_edep, final_states, start_pt, \
+                                                            end_pt, track_id_set, initial_child_track_id_set, vert_id, seg))
                     pi0_child_conv_dist[pi0_idx].append(particle_assoc.distance_between_points(start_pt, end_pt))
                     pi0_child_start_location[pi0_idx].append(start_pt)
                     pi0_child_end_location[pi0_idx].append(end_pt)
@@ -427,6 +433,7 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
         pi0_child_available_energy = [[float(j) for j in pi0_child_available_energy[i]] for i in range(len(pi0_child_available_energy))],
         pi0_child_start_location = [[[float(k) for k in j] for j in pi0_child_start_location[i]] for i in range(len(pi0_child_start_location))],
         pi0_child_end_location = [[[float(k) for k in j] for j in pi0_child_end_location[i]] for i in range(len(pi0_child_end_location))],
+        pi0_child_edep_start = [[[float(k) for k in j] for j in pi0_child_edep_start[i]] for i in range(len(pi0_child_edep_start))],
         pi0_child_start_pxyz = [[[float(k) for k in j] for j in pi0_child_start_pxyz[i]] for i in range(len(pi0_child_start_pxyz))],
         pi0_child_conv_dist = [[float(j) for j in pi0_child_conv_dist[i]] for i in range(len(pi0_child_conv_dist))],
         eta_child_pdg = [[int(j) for j in eta_child_pdg[i]] for i in range(len(eta_child_pdg))],
@@ -438,6 +445,7 @@ def get_truth_sig_bkg_dict(spill_id, vert_id, ghdr, gstack, traj, vert, seg, sig
         #eta_child_conv_dist = [[[float(k) for k in j] for j in eta_child_conv_dist[i]] for i in range(len(eta_child_conv_dist))],
         primary_shower_start_location = [[float(j) for j in primary_shower_start_location[i]] for i in range(len(primary_shower_start_location))],
         primary_shower_end_location = [[float(j) for j in primary_shower_end_location[i]] for i in range(len(primary_shower_end_location))],
+        primary_shower_edep_start = [[float(j) for j in primary_shower_edep_start[i]] for i in range(len(primary_shower_edep_start))],
         primary_shower_pdg = [int(i) for i in primary_shower_pdg],
         primary_shower_edep = [float(i) for i in primary_shower_edep],
         primary_shower_available_energy = [float(i) for i in primary_shower_available_energy],

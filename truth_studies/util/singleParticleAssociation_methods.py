@@ -263,13 +263,172 @@ def find_secondary_particle_end_trajectory(traj_id_set, vertex_assoc_traj, start
             break
         else:
             tid_end = tid_end[0]
-        #print("End Point:", tid_end)
-        #print("Start Point:", start_pt)
+        print("End Point:", tid_end)
+        print("Start Point:", start_pt)
         if distance_between_points(tid_end, start_pt)>max_diff:
             traj_id_at_end = tid
         else: continue
 
     return traj_id_at_end
+
+def find_shower_edep_start_xyz(contained_edep, vertex_assoc_traj, start_xyz_shower_particle, end_xyz_shower_particle, traj_id_set, initial_traj_id_set, vert_id, seg_full):
+
+    # If energy isn't deposited in the detector, return the end point of the initial shower particle
+    if contained_edep <= 0.02: 
+        print("Essentially no energy deposited in contained volume. Exiting.")
+        print("End point of shower particle:", end_xyz_shower_particle)
+        return end_xyz_shower_particle
+    
+    else:
+        print("Contained energy:", contained_edep)
+        # Set up energy accounting for the shower particle and its children
+        seg_vert_mask = seg_full['vertex_id']==vert_id
+        seg = seg_full[seg_vert_mask]
+        found_potential_shower_start = False
+
+        # If energy is deposited, find out whether the shower particle deposits energy (i.e. electron)
+        for traj in initial_traj_id_set: 
+
+            depo_energy = 0.
+            seg_id_mask=seg['traj_id']==traj
+            vertex_assoc_traj_mask = vertex_assoc_traj['traj_id'] == traj
+            traj_all_info = vertex_assoc_traj[vertex_assoc_traj_mask]
+            for sg in seg[seg_id_mask]:
+                depo_energy += sg['dE']
+
+            if depo_energy > 0.01:
+
+                if found_potential_shower_start == False:
+                    found_potential_shower_start = True
+                    shower_edep_start_xyz = traj_all_info['xyz_start'][0]
+                    distance_start_to_edep = distance_between_points(shower_edep_start_xyz, start_xyz_shower_particle)
+                elif found_potential_shower_start == True:
+                    new_start_xyz = traj_all_info['xyz_start'][0]
+                    new_dist_start_to_edep = distance_between_points(new_start_xyz, start_xyz_shower_particle)
+                    if new_dist_start_to_edep < distance_start_to_edep:
+                        shower_edep_start_xyz = new_start_xyz
+                        distance_start_to_edep = new_dist_start_to_edep
+                    else: 
+                        continue
+
+        if found_potential_shower_start == True: 
+            print("Shower particle deposits energy.")
+            print("Recorded shower start point:", shower_edep_start_xyz)
+            return shower_edep_start_xyz
+
+        # If the shower particle doesn't deposit energy, check if any of its immediate children do
+        else:
+            shower_particle_children_traj_id_set = set()
+
+            for traj in initial_traj_id_set:
+
+                child_mask = vertex_assoc_traj['parent_id'] == traj
+                child_particles = vertex_assoc_traj[child_mask]
+                for child in child_particles:
+                    child_traj_id = child['traj_id']
+                    child_pdg = child['pdg_id']
+                    if abs(child_pdg) == 11 or abs(child_pdg) == 22:
+                        shower_particle_children_traj_id_set.add(child_traj_id)
+                    else:
+                        continue
+
+            if shower_particle_children_traj_id_set.issubset(traj_id_set) == False:
+                print("initial_traj_id_set:", initial_traj_id_set)
+                print("traj_id_set:", traj_id_set)
+                print("Shower particle children traj_id_set:", shower_particle_children_traj_id_set)
+                for traj in shower_particle_children_traj_id_set:
+                    traj_info = vertex_assoc_traj[vertex_assoc_traj['traj_id'] == traj]
+                    traj_pdg = traj_info['pdg_id']
+                    print("Shower particle child trajectory ID:", traj)
+                    print("Shower particle child PDG ID:", traj_pdg)
+                    seg_mask = seg['traj_id'] == traj
+                    seg_info = seg[seg_mask]
+                    energy_deposited = 0.
+                    for sg in seg_info:
+                        energy_deposited += sg['dE']
+                    print("Energy deposited by shower particle child:", energy_deposited)
+                    print("Start location of shower particle child:", traj_info['xyz_start'][0])
+                    print("End location of shower particle child:", traj_info['xyz_end'][0])
+                raise ValueError("Initial shower particle electron and photon direct children not in full set of shower trajectory IDs. Exiting.")
+
+            for traj in shower_particle_children_traj_id_set:
+
+                depo_energy = 0. 
+                seg_id_mask=seg['traj_id']==traj
+                vertex_assoc_traj_mask = vertex_assoc_traj['traj_id'] == traj
+                traj_all_info = vertex_assoc_traj[vertex_assoc_traj_mask]
+                for sg in seg[seg_id_mask]:
+                    depo_energy += sg['dE']
+                #print("Number of segments: ", len(seg[seg_id_mask]))
+                #print("Energy deposited by shower particle child:", depo_energy)
+
+                if depo_energy > 0.01:
+
+                    if found_potential_shower_start == False:
+                        found_potential_shower_start = True
+                        shower_edep_start_xyz = traj_all_info['xyz_start'][0]
+                        distance_start_to_edep = distance_between_points(shower_edep_start_xyz, start_xyz_shower_particle)
+                    elif found_potential_shower_start == True:
+                        new_start_xyz = traj_all_info['xyz_start'][0]
+                        new_dist_start_to_edep = distance_between_points(new_start_xyz, start_xyz_shower_particle)
+                        if new_dist_start_to_edep < distance_start_to_edep:
+                            shower_edep_start_xyz = new_start_xyz
+                            distance_start_to_edep = new_dist_start_to_edep
+                        else: 
+                            continue
+                else: continue
+
+            if found_potential_shower_start == True:
+                print("Shower particle children deposit energy.")
+                print("Recorded shower start point:", shower_edep_start_xyz)
+                return shower_edep_start_xyz
+            else:
+                # If the shower particle and its immediate children don't deposit energy, check if any of the shower particle's grandchildren do
+                # e.g. if only backwards rescatters from initial shower particle deposit energy
+                grandchildren_traj_id_set = traj_id_set - shower_particle_children_traj_id_set
+                grandchildren_traj_id_set = grandchildren_traj_id_set - initial_traj_id_set
+                for traj in grandchildren_traj_id_set:
+                    
+                    depo_energy = 0. 
+                    seg_id_mask=seg['traj_id']==traj
+                    vertex_assoc_traj_mask = vertex_assoc_traj['traj_id'] == traj
+                    traj_all_info = vertex_assoc_traj[vertex_assoc_traj_mask]
+                    for sg in seg[seg_id_mask]:
+                        depo_energy += sg['dE']
+                    #print("Number of segments: ", len(seg[seg_id_mask]))
+                    #print("Energy deposited by shower particle child:", depo_energy)
+
+                    if depo_energy > 0.01:
+
+                        if found_potential_shower_start == False:
+                            found_potential_shower_start = True
+                            shower_edep_start_xyz = traj_all_info['xyz_start'][0]
+                            distance_start_to_edep = distance_between_points(shower_edep_start_xyz, start_xyz_shower_particle)
+                        elif found_potential_shower_start == True:
+                            new_start_xyz = traj_all_info['xyz_start'][0]
+                            new_dist_start_to_edep = distance_between_points(new_start_xyz, start_xyz_shower_particle)
+                            if new_dist_start_to_edep < distance_start_to_edep:
+                                shower_edep_start_xyz = new_start_xyz
+                                distance_start_to_edep = new_dist_start_to_edep
+                            else: 
+                                continue
+                    else: continue
+
+                if found_potential_shower_start == True:
+                    print("Only backwards rescatters from initial shower particle deposit energy.")
+                    print("Recorded shower start point:", shower_edep_start_xyz)
+                    print("Initial shower particle start point:", start_xyz_shower_particle)
+                    return shower_edep_start_xyz
+                else:
+                    print("Shower particle end point:", end_xyz_shower_particle)
+                    print("traj_id_set:", traj_id_set)
+                    for traj in traj_id_set:
+                        particle_mask = vertex_assoc_traj['traj_id'] == traj
+                        pdg = vertex_assoc_traj[particle_mask]['pdg_id']
+                        print("Trajectory ID:", traj)
+                        print("PDG ID:", pdg, "| Start point:", vertex_assoc_traj[particle_mask]['xyz_start'])
+                    print("Shower particle children traj_id_set:", shower_particle_children_traj_id_set)
+                    raise ValueError("No start point found for shower particle which deposits energy. Exiting.")
 
 def find_forward_secondary_particle_end_trajectory(traj_id_set, vertex_assoc_traj, start_traj_id):
     
