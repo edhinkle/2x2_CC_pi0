@@ -762,7 +762,7 @@ int all_showers_from_truth_sig_bkg_dict_events(const std::string& file_list, con
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    std::string file_name = "pi0_all_showers_from_truth_sig_bkg_dict_events";
+    std::string file_name = "pi0_all_showers_MR6p4_from_truth_sig_bkg_dict_events";
 
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");

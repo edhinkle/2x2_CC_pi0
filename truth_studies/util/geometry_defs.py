@@ -72,7 +72,7 @@ def tpc_bounds(i):
             tpc_bounds_relative_to_2x2.append(bound)
                     
     bounds_relative_to_NDhall = np.array(tpc_bounds_relative_to_2x2) + detector_center[i]
-            
+                
     return np.unique(bounds_relative_to_NDhall, axis = 0)
 
 

@@ -3,7 +3,15 @@
 #include "duneanaobj/StandardRecord/Proxy/SRProxy.h"
 #include "TLatex.h"
 #include "TCanvas.h"
+#include "TTree.h"
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TChain.h"
+#include "TEfficiency.h"
+#include <iostream>
 #include <fstream>
+#include <string>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 //Requires a file containing a list of input CAF files and returns an int code for success/error
