@@ -81,6 +81,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     std::vector< double >  reco_sublead_shower_start_y;
     std::vector< double >  reco_sublead_shower_start_z;
     std::vector< double >  reco_muon_angle;
+    std::vector< double >  reco_muon_pdg;
     std::vector< double >  reco_muon_angle_Mx2_match;
     std::vector< int >     reco_lead_shower_pdg;
     std::vector< int >     reco_sublead_shower_pdg;
@@ -111,6 +112,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     std::vector< double >  true_match_sublead_shower_start_y;
     std::vector< double >  true_match_sublead_shower_start_z;
     std::vector< double >  true_match_muon_angle;
+    std::vector< double >  true_match_muon_pdg;
     std::vector< int >     true_match_lead_shower_pdg;
     std::vector< int >     true_match_sublead_shower_pdg;
     std::vector< double >  true_match_lead_ovlp;
@@ -234,6 +236,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     fRecoTree->Branch("reco_sublead_shower_start_y", &reco_sublead_shower_start_y);
     fRecoTree->Branch("reco_sublead_shower_start_z", &reco_sublead_shower_start_z);
     fRecoTree->Branch("reco_muon_angle", &reco_muon_angle);
+    fRecoTree->Branch("reco_muon_pdg", &reco_muon_pdg);
     fRecoTree->Branch("reco_muon_angle_Mx2_match", &reco_muon_angle_Mx2_match);
     fRecoTree->Branch("reco_lead_shower_pdg", &reco_lead_shower_pdg);
     fRecoTree->Branch("reco_sublead_shower_pdg", &reco_sublead_shower_pdg);
@@ -266,6 +269,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     fRecoTree->Branch("true_match_sublead_shower_start_y", &true_match_sublead_shower_start_y);
     fRecoTree->Branch("true_match_sublead_shower_start_z", &true_match_sublead_shower_start_z);
     fRecoTree->Branch("true_match_muon_angle", &true_match_muon_angle);
+    fRecoTree->Branch("true_match_muon_pdg", &true_match_muon_pdg);
     fRecoTree->Branch("true_match_lead_shower_pdg", &true_match_lead_shower_pdg);
     fRecoTree->Branch("true_match_sublead_shower_pdg", &true_match_sublead_shower_pdg);
     fRecoTree->Branch("true_match_lead_ovlp", &true_match_lead_ovlp);
@@ -355,6 +359,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     double minTrkLength = 0.0; // cm
 
     // Vtx allowance true vs. reco
+    // Also used for vtx to muon start for Mx2 match
     double vtx_allowance = 5.0; // cm
 
     // Fiducial volume cut
@@ -859,7 +864,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             double dirZExiting=-999;   double startZMuonCand=-999;
             double maxDotProductDS=-999; double maxDotProductUS=-999;
             int maxEventPar=-999; int maxEventTyp=-9999; int maxEventIxn=-999;
-            double maxShowerEnergy=-999; 
+            double maxShowerEnergy=-999; unsigned long mnvMatchipart=-999;
             // Loop over reco particles in the interaction **"The big for loop"**
             for(unsigned long ipart = 0; ipart < sr->common.ixn.dlp[ixn].part.dlp.size(); ++ipart)
             {
@@ -891,7 +896,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
 	                double diffVertexdX=abs(muon_start->x-sr->common.ixn.dlp[ixn].vtx.x);
 	                double diffVertexdY=abs(muon_start->y-sr->common.ixn.dlp[ixn].vtx.y);
 	                double diffVertex=TMath::Sqrt(diffVertexdZ*diffVertexdZ+diffVertexdY*diffVertexdY+diffVertexdX*diffVertexdX);
-	                //if (diffVertex>5) continue;
+	                if (diffVertex>vtx_allowance) continue;
                     double dX=(muon_end->x-muon_start->x);
                     double dY=(muon_end->y-muon_start->y);
                     double dZ=(muon_end->z-muon_start->z);
@@ -952,7 +957,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 		                    maxTypeMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
                                             maxIxnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
                                         }	
-                		                //if (end_z>300){ minervaPass=1;} if(dirZExiting<dirZ){ dirZExiting=dirZ;}
+                		                if (end_z>300){ minervaPass=1;} if(dirZExiting<dirZ){ dirZExiting=dirZ;}
                                     }
                                 }
                             
@@ -989,6 +994,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 	    }
                 	    if (dotProductDS>mnvMatchDotProdCut){  minervaTracks++; 
                             if (minervaPass==1){ minervaThrough++;
+                                mnvMatchipart=ipart;
                                 startZMuonCand=muon_start->z; if (muon_start->z>muon_end->z) startZMuonCand=muon_end->z;
                             }
                 	    } 
@@ -1023,7 +1029,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             //std::cout << "DEBUG: Passed muon cut" << std::endl;
             //if (is_mc && is_signal) signalMuonCut++;
             // Only save if muon match to Mx2 throughgoing track
-            if ( /*minervaThrough<1  ||*/  maxDotProductDS<mnvMatchDotProdCut) continue;
+            if ( minervaThrough!=1  ||  maxDotProductDS<mnvMatchDotProdCut) continue;
             ixnsMx2Cut++;
             if (is_mc && is_signal) signalMx2Cut++;
             //std::cout << "DEBUG: Passed minerva cut" << std::endl;
@@ -1051,6 +1057,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             if (is_mc && is_signal) signalKaonCut++;*/
 
             auto muonAngle = 0.; auto trueMuonAngle = 0.;
+            auto recoMuonPDG = 0; auto trueMuonPDG = 0;
             auto recoLeadShowerEnergy = 0.; auto recoLeadShowerPX = 0.; auto recoLeadShowerPY = 0.; auto recoLeadShowerPZ = 0.; auto recoLeadShowerPDG = 0.; 
             auto recoSubleadShowerEnergy = 0.; auto recoSubleadShowerPX = 0.; auto recoSubleadShowerPY = 0.; auto recoSubleadShowerPZ = 0.; auto recoSubleadShowerPDG = 0.; 
             auto recoLeadShowerStartX = 0.; auto recoLeadShowerStartY = 0.; auto recoLeadShowerStartZ = 0.;
@@ -1075,12 +1082,13 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                     isLeadShower = true;
                 }
 
-                // Get Reco Direction Muon Angle
-                if (abs(part.pdg) == 13 && part.primary){
+                // Get Reco Direction Muon Angle --> muon candidate identified by muon match in first part of selection
+                if (mnvMatchipart == ipart){
 
                     auto pvec = TVector3(part.p.x, part.p.y, part.p.z);
                     auto pvec_unit = pvec.Unit();
                     muonAngle = pvec_unit.Angle(beam_dir);
+                    recoMuonPDG = part.pdg;
 
                 }
 
@@ -1161,8 +1169,10 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                         true_pvec = TVector3(truth_match->p.px, truth_match->p.py, truth_match->p.pz);
                         true_dir = true_pvec.Unit();
 
-                        if (abs(part.pdg) == 13 && part.primary){
+                        // save true muon angle and true muon pdg
+                        if (mnvMatchipart == ipart){
                             trueMuonAngle = true_dir.Angle(beam_dir);
+                            trueMuonPDG = truth_match->pdg;
                         }
 
                         if ((abs(part.pdg) == 22 || abs(part.pdg) == 11) && part.primary) {
@@ -1210,6 +1220,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             true_match_sublead_shower_start_y.push_back(trueSubleadShowerStartY);
             true_match_sublead_shower_start_z.push_back(trueSubleadShowerStartZ);
             true_match_muon_angle.push_back(trueMuonAngle);
+            true_match_muon_pdg.push_back(trueMuonPDG);
             true_match_lead_shower_pdg.push_back(trueLeadShowerPDG);
             true_match_sublead_shower_pdg.push_back(trueSubleadShowerPDG);
             true_match_lead_ovlp.push_back(trueLeadShowerOvlp);
@@ -1248,6 +1259,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             reco_sublead_shower_start_y.push_back(recoSubleadShowerStartY);
             reco_sublead_shower_start_z.push_back(recoSubleadShowerStartZ);
             reco_muon_angle.push_back(muonAngle);
+            reco_muon_pdg.push_back(recoMuonPDG);
             reco_muon_angle_Mx2_match.push_back(dirZExiting);
             reco_lead_shower_pdg.push_back(recoLeadShowerPDG);
             reco_sublead_shower_pdg.push_back(recoSubleadShowerPDG);
@@ -1302,7 +1314,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut";
+    std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
     //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v6_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
     //std::string file_name = "first_pass_general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
     //std::string file_name = "MR6p4_debug_multiple_truth_entries";
