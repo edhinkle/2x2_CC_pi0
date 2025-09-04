@@ -350,13 +350,16 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     double mnvAngleAllowance=0.06; //rad
     if (is_mc){ mnvOffsetX=0; mnvOffsetY=0; mnvOffsetZDS=0;}
     double mnvMatchDotProdCut=0.99; //cosine of angle between two vectors
+    double mnvMinZDS=164.0; // cm
+    double mnvMaxZDS=310.0; // cm
+    double mnvFVCut=10.0; // cm
 
     // Muon energy and angle cuts
     double muon_energy_cut = 0.0; 
     double muon_cos_angle_cut = 0.0;
 
     // Track length cut
-    double minTrkLength = 0.0; // cm
+    double minTrkLength = 3.0; // cm
 
     // Vtx allowance true vs. reco
     // Also used for vtx to muon start for Mx2 match
@@ -860,8 +863,10 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             auto reco_ixn_proton = 0;
             auto reco_ixn_chkaon = 0;
 
-            int minervaTracks=0; int minervaThrough=0;
-            double dirZExiting=-999;   double startZMuonCand=-999;
+            int minervaTracks=0; int minervaThroughDS=0;
+            double dirXExiting=-999; double dirYExiting=-999; double dirZExiting=-999;
+            double startZMuonCand=-999;
+            double endZMuonCand=-999;
             double maxDotProductDS=-999; double maxDotProductUS=-999;
             int maxEventPar=-999; int maxEventTyp=-9999; int maxEventIxn=-999;
             double maxShowerEnergy=-999; unsigned long mnvMatchipart=-999;
@@ -890,6 +895,11 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 } 
                 if(((abs(part.pdg) == 13) || (abs(part.pdg) == 2212) || (abs(part.pdg) == 211) || (abs(part.pdg) == 321)) and part.primary){
                 //if(((abs(part.pdg) == 13)) and part.primary){
+
+                    // Check that start/end of particle in z are defined
+                    if (std::isnan(part.start.z) || std::isinf(part.start.z)) continue;
+                    if (std::isnan(part.end.z) || std::isinf(part.end.z)) continue;
+
                     auto* muon_start = &part.start;
                     auto* muon_end = &part.end;
                     double diffVertexdZ=abs(muon_start->z-sr->common.ixn.dlp[ixn].vtx.z);
@@ -903,6 +913,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                     double length=TMath::Sqrt(dX*dX+dY*dY+dZ*dZ);
                     double dirX=dX/length; double dirY=dY/length; double dirZ=dZ/length;
 
+                    // Switch end/start if mis-ID'd by SPINE as start vs. end
                     if (dirZ<0){ dirZ=-dirZ; dirX=-dirX; dirY=-dirY;     
                         muon_start = &part.end;
                         muon_end = &part.start;
@@ -910,97 +921,111 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                     if (std::isnan(muon_start->z)) length=-999;
                     int maxPartMinerva=-999; int maxTypeMinerva=-999; int maxIxnMinerva=-999; int maxPartMinervaUS=-999; int maxTypeMinervaUS=-999;
                     // Check if muon goes through downstream Mx2
-                    int minervaPass=0;
-                    double dotProductDS=-999; double deltaExtrapYUS=-999; double deltaExtrapY=-999; 
-                    double dotProductUS=-999; double deltaExtrapX=-999; double deltaExtrapXUS=-999;	
-                    if(abs(muon_start->z)>fv_abs_z_max || abs(muon_end->z)>fv_abs_z_max){
-                        //std::cout << "DEBUG: Muon start Z: " << muon_start->z << std::endl;
-                        //std::cout << "DEBUG: Muon end Z: " << muon_end->z << std::endl;
-                        //std::cout << "DEBUG: Mx2 ixn size: " << sr->nd.minerva.ixn.size() << std::endl;
-                	 	for(int i=0; i<sr->nd.minerva.ixn.size(); i++){
-                        
-                		    for (int j=0; j<sr->nd.minerva.ixn[i].ntracks; j++){
-                		        double dir_z=sr->nd.minerva.ixn[i].tracks[j].dir.z;
-                		        double end_z=sr->nd.minerva.ixn[i].tracks[j].end.z;
-                		        double start_z=sr->nd.minerva.ixn[i].tracks[j].start.z;
-                		        double end_x=sr->nd.minerva.ixn[i].tracks[j].end.x;
-                		        double start_x=sr->nd.minerva.ixn[i].tracks[j].start.x;
-                		        double end_y=sr->nd.minerva.ixn[i].tracks[j].end.y;
-                		        double start_y=sr->nd.minerva.ixn[i].tracks[j].start.y;
+                    // Make sure track is long enough
+                    if (length>minTrkLength) {
+                        int minervaPass=0;
+                        double dotProductDS=-999; double deltaExtrapYUS=-999; double deltaExtrapY=-999; 
+                        double dotProductUS=-999; double deltaExtrapX=-999; double deltaExtrapXUS=-999;	
+                        if(abs(muon_start->z)>fv_abs_z_max || abs(muon_end->z)>fv_abs_z_max){
+                            //std::cout << "DEBUG: Muon start Z: " << muon_start->z << std::endl;
+                            //std::cout << "DEBUG: Muon end Z: " << muon_end->z << std::endl;
+                            //std::cout << "DEBUG: Mx2 ixn size: " << sr->nd.minerva.ixn.size() << std::endl;
+                            // Loop over track matched Mx2 tracks
+                	     	for(int k=0; k<sr->nd.trkmatch.extrap.size(); k++){
+
+                                if (sr->nd.trkmatch.extrap[k].larid.ixn!=ixn || sr->nd.trkmatch.extrap[k].larid.reco!=1) continue;
+                                int index=sr->nd.trkmatch.extrap[k].larid.idx;
+                                // Check that start and end z positions match
+                                if (sr->nd.lar.dlp[ixn].tracks[index].start.z!=sr->common.ixn.dlp[ixn].part.dlp[ipart].start.z || sr->nd.lar.dlp[ixn].tracks[index].end.z!=sr->common.ixn.dlp[ixn].part.dlp[ipart].end.z) continue;
+
+                                int i=sr->nd.trkmatch.extrap[k].minervaid.ixn;
+                                int j=sr->nd.trkmatch.extrap[k].minervaid.idx;
+                                double dotProductTemp=abs(sr->nd.trkmatch.extrap[k].angdispl);
+
+                	    	    double end_z=sr->nd.minerva.ixn[i].tracks[j].end.z;
+                	    	    double start_z=sr->nd.minerva.ixn[i].tracks[j].start.z;
+                	    	    double end_x=sr->nd.minerva.ixn[i].tracks[j].end.x;
+                	    	    double start_x=sr->nd.minerva.ixn[i].tracks[j].start.x;
+                	    	    double end_y=sr->nd.minerva.ixn[i].tracks[j].end.y;
+                	    	    double start_y=sr->nd.minerva.ixn[i].tracks[j].start.y;
                                 //std::cout << "DEBUG: Track start Z: " << start_z << std::endl;
-                        
-                		        if (start_z>0 && ((muon_start->z)>fv_abs_z_max || (muon_end->z)>fv_abs_z_max) ){
-                		            int truthPart=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                		            double dXMnv=(sr->nd.minerva.ixn[i].tracks[j].end.x-sr->nd.minerva.ixn[i].tracks[j].start.x);
-                		            double dYMnv=(sr->nd.minerva.ixn[i].tracks[j].end.y-sr->nd.minerva.ixn[i].tracks[j].start.y);
-                		            double dZMnv=(sr->nd.minerva.ixn[i].tracks[j].end.z-sr->nd.minerva.ixn[i].tracks[j].start.z);
-                		            double lengthMinerva=TMath::Sqrt(dXMnv*dXMnv+dYMnv*dYMnv+dZMnv*dZMnv);
+                            
+                	    	    if (start_z>0 && (start_z < mnvMinZDS+mnvFVCut) && (end_z > mnvMinZDS+mnvFVCut) && ((muon_start->z)>fv_abs_z_max || (muon_end->z)>fv_abs_z_max) ){
+                	    	        int truthPart=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
+                	    	        double dXMnv=(sr->nd.minerva.ixn[i].tracks[j].end.x-sr->nd.minerva.ixn[i].tracks[j].start.x);
+                	    	        double dYMnv=(sr->nd.minerva.ixn[i].tracks[j].end.y-sr->nd.minerva.ixn[i].tracks[j].start.y);
+                	    	        double dZMnv=(sr->nd.minerva.ixn[i].tracks[j].end.z-sr->nd.minerva.ixn[i].tracks[j].start.z);
+                	    	        double lengthMinerva=TMath::Sqrt(dXMnv*dXMnv+dYMnv*dYMnv+dZMnv*dZMnv);
                                     //std::cout << "DEBUG: Length Minerva: " << lengthMinerva << std::endl;
                 	                if (lengthMinerva<10) continue;
-                          	        double dirXMinerva=dXMnv/lengthMinerva;
-                		            double dirYMinerva=dYMnv/lengthMinerva;
-                		            double dirZMinerva=dZMnv/lengthMinerva;
-                		            double dotProduct=dirXMinerva*dirX+dirYMinerva*dirY+dirZ*dirZMinerva;
-                		            double extrapdZ=start_z-muon_end->z+mnvOffsetZDS;
-                		            double extrapY=dirY/dirZ*(extrapdZ)+muon_end->y-start_y;
-                		            double extrapX=dirX/dirZ*(extrapdZ)+muon_end->x-start_x;
-                		            double diffExtrap=TMath::Sqrt(TMath::Power(extrapY-start_y,2));
-                        
-                        
-                		            if (dotProductDS<dotProduct && abs(extrapY-mnvOffsetY)<mnvDistanceAllowance  && abs(TMath::ATan(dirXMinerva/dirZMinerva)-TMath::ATan(dirX/dirZ))<mnvAngleAllowance && abs(TMath::ATan(dirYMinerva/dirZMinerva)-TMath::ATan(dirY/dirZ))<mnvAngleAllowance && abs(extrapX-mnvOffsetX)<mnvDistanceAllowance){ 
-                                        dotProductDS=dotProduct;
-                		                deltaExtrapY=extrapY;
-                		                deltaExtrapX=extrapX;
-                		                dirZExiting=dirZ;
-                		                if (is_mc){
+                              	    double dirXMinerva=dXMnv/lengthMinerva;
+                	    	        double dirYMinerva=dYMnv/lengthMinerva;
+                	    	        double dirZMinerva=dZMnv/lengthMinerva;
+                	    	        double dotProduct=dirXMinerva*dirX+dirYMinerva*dirY+dirZ*dirZMinerva;
+                	    	        double extrapdZ=start_z-muon_end->z+mnvOffsetZDS;
+                	    	        double extrapY=dirY/dirZ*(extrapdZ)+muon_end->y-start_y;
+                	    	        double extrapX=dirX/dirZ*(extrapdZ)+muon_end->x-start_x;
+                	    	        double diffExtrap=TMath::Sqrt(TMath::Power(extrapY-start_y,2));
+                                
+                                    // Remove cuts based on Mx2 offsets
+                	    	        if (dotProductDS<dotProductTemp && end_z > endZMuonCand) { //&& abs(extrapY-mnvOffsetY)<mnvDistanceAllowance  && abs(TMath::ATan(dirXMinerva/dirZMinerva)-TMath::ATan(dirX/dirZ))<mnvAngleAllowance && abs(TMath::ATan(dirYMinerva/dirZMinerva)-TMath::ATan(dirY/dirZ))<mnvAngleAllowance && abs(extrapX-mnvOffsetX)<mnvDistanceAllowance){ 
+                                        endZMuonCand=end_z;
+                                        dotProductDS=dotProductTemp;
+                	    	            deltaExtrapY=extrapY;
+                	    	            deltaExtrapX=extrapX;
+                	    	            dirZExiting=dirZ;
+                                        dirXExiting = dirX;
+                                        dirYExiting = dirY;
+                	    	            if (is_mc){
                                             maxPartMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                		                    maxTypeMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
+                	    	                maxTypeMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
                                             maxIxnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
                                         }	
-                		                if (end_z>300){ minervaPass=1;} if(dirZExiting<dirZ){ dirZExiting=dirZ;}
+                	    	            if (end_z>mnvMaxZDS+mnvFVCut){ minervaPass=1;} //if(dirZExiting<dirZ){ dirZExiting=dirZ;}
                                     }
                                 }
                             
-                		        if (start_z<0 && end_z>0 && ( (muon_start->z<det_z_min && muon_end->z>det_z_max) || (muon_start->z>det_z_max && muon_end->z<det_z_min))){
-                		            int truthPart=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                		            double dXMnv=(sr->nd.minerva.ixn[i].tracks[j].end.x-sr->nd.minerva.ixn[i].tracks[j].start.x);
-                		            double dYMnv=(sr->nd.minerva.ixn[i].tracks[j].end.y-sr->nd.minerva.ixn[i].tracks[j].start.y);
-                		            double dZMnv=(sr->nd.minerva.ixn[i].tracks[j].end.z-sr->nd.minerva.ixn[i].tracks[j].start.z);
-                		            double lengthMinerva=TMath::Sqrt(dXMnv*dXMnv+dYMnv*dYMnv+dZMnv*dZMnv);
-                		            double dirXMinerva=dXMnv/lengthMinerva;
-                		            double dirYMinerva=dYMnv/lengthMinerva;
-                		            double dirZMinerva=dZMnv/lengthMinerva;
-                		            double dotProduct=dirXMinerva*dirX+dirYMinerva*dirY+dirZ*dirZMinerva;
-                                            
-                		            double extrapdZUS=end_z-muon_end->z;
-                		            double extrapYUS=dirY/dirZ*(extrapdZUS)+muon_end->y-end_y;
-                		            double extrapXUS=dirX/dirZ*(extrapdZUS)+muon_end->x-end_x;
-                        
+                	    	    if (start_z<0 && end_z>0 && ( (muon_start->z<det_z_min && muon_end->z>det_z_max) || (muon_start->z>det_z_max && muon_end->z<det_z_min))){
+                	    	        int truthPart=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
+                	    	        double dXMnv=(sr->nd.minerva.ixn[i].tracks[j].end.x-sr->nd.minerva.ixn[i].tracks[j].start.x);
+                	    	        double dYMnv=(sr->nd.minerva.ixn[i].tracks[j].end.y-sr->nd.minerva.ixn[i].tracks[j].start.y);
+                	    	        double dZMnv=(sr->nd.minerva.ixn[i].tracks[j].end.z-sr->nd.minerva.ixn[i].tracks[j].start.z);
+                	    	        double lengthMinerva=TMath::Sqrt(dXMnv*dXMnv+dYMnv*dYMnv+dZMnv*dZMnv);
+                	    	        double dirXMinerva=dXMnv/lengthMinerva;
+                	    	        double dirYMinerva=dYMnv/lengthMinerva;
+                	    	        double dirZMinerva=dZMnv/lengthMinerva;
+                	    	        double dotProduct=dirXMinerva*dirX+dirYMinerva*dirY+dirZ*dirZMinerva;
+                	    	        double extrapdZUS=end_z-muon_end->z;
+                	    	        double extrapYUS=dirY/dirZ*(extrapdZUS)+muon_end->y-end_y;
+                	    	        double extrapXUS=dirX/dirZ*(extrapdZUS)+muon_end->x-end_x;
+                                
                                     //double diffExtrap=TMath::Sqrt(TMath::Power(extrapY-end_y,2));
-                		            if (dotProductUS<dotProduct  && abs(extrapYUS-mnvOffsetY)<mnvDistanceAllowance && abs(extrapXUS-mnvOffsetX)<mnvDistanceAllowance && abs(TMath::ATan(dirXMinerva/dirZMinerva)-TMath::ATan(dirX/dirZ))<mnvAngleAllowance && abs(TMath::ATan(dirYMinerva/dirZMinerva)-TMath::ATan(dirY/dirZ))<mnvAngleAllowance) dotProductUS=dotProduct;
-                		            deltaExtrapYUS=extrapYUS;
+                                    // Remove corrections based on offsets
+                	    	        if (dotProductUS<dotProductTemp)  dotProductUS=dotProductTemp; // && abs(extrapYUS-mnvOffsetY)<mnvDistanceAllowance && abs(extrapXUS-mnvOffsetX)<mnvDistanceAllowance && abs(TMath::ATan(dirXMinerva/dirZMinerva)-TMath::ATan(dirX/dirZ))<mnvAngleAllowance && abs(TMath::ATan(dirYMinerva/dirZMinerva)-TMath::ATan(dirY/dirZ))<mnvAngleAllowance) dotProductUS=dotProductTemp;
+                	    	        deltaExtrapYUS=extrapYUS;
                                     deltaExtrapXUS=extrapXUS;
-                		            if (is_mc){
+                	    	        if (is_mc){
                                         maxPartMinervaUS=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                		                maxTypeMinervaUS=sr->nd.minerva.ixn[i].tracks[j].truth[0].type;	
+                	    	            maxTypeMinervaUS=sr->nd.minerva.ixn[i].tracks[j].truth[0].type;	
                                     }
-                		        }
-                            } // Loop over minerva tracks
-                        } // Minerva event loop
-                	    if (dotProductDS>maxDotProductDS){ maxDotProductDS=dotProductDS;
-                            maxEventPar=maxPartMinerva;
-                            maxEventTyp=maxTypeMinerva;
-                            maxEventIxn=maxIxnMinerva;
-                	    }
-                	    if (dotProductDS>mnvMatchDotProdCut){  minervaTracks++; 
-                            if (minervaPass==1){ minervaThrough++;
-                                mnvMatchipart=ipart;
-                                startZMuonCand=muon_start->z; if (muon_start->z>muon_end->z) startZMuonCand=muon_end->z;
-                            }
-                	    } 
-                    } // end of if muon goes through minerva
-                
-                    if (dotProductUS>maxDotProductUS) maxDotProductUS=dotProductUS;
+                	    	    }
+                            } // Minerva track match loop
+                	        if (dotProductDS>maxDotProductDS){ maxDotProductDS=dotProductDS;
+                                maxEventPar=maxPartMinerva;
+                                maxEventTyp=maxTypeMinerva;
+                                maxEventIxn=maxIxnMinerva;
+                	        }
+                	        if (dotProductDS>mnvMatchDotProdCut){  
+                                minervaTracks++; 
+                                if (minervaPass==1 && dotProductUS<mnvMatchDotProdCut){ minervaThroughDS++;
+                                    mnvMatchipart=ipart;
+                                    startZMuonCand=muon_start->z; if (muon_start->z>muon_end->z) startZMuonCand=muon_end->z;
+                                }
+                	        } 
+                            if (dotProductUS>maxDotProductUS) maxDotProductUS=dotProductUS;
+                        } // end of if muon goes through minerva
+                    } // end if particle track length is > minTrkLength
+
                 //if (dotProductUS>0.99){   
            /*		if (maxPartNumber==maxPartMinervaUS && maxTypeMinervaUS==maxTypeNumber){ deltaYGoodUS->Fill(deltaExtrapYUS); deltaXGoodUS->Fill(deltaExtrapXUS); goodMINERvAMatchUS++;} 
                          else{ deltaYBadUS->Fill(deltaExtrapYUS); deltaXBadUS->Fill(deltaExtrapXUS); }
@@ -1029,7 +1054,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             //std::cout << "DEBUG: Passed muon cut" << std::endl;
             //if (is_mc && is_signal) signalMuonCut++;
             // Only save if muon match to Mx2 throughgoing track
-            if ( minervaThrough!=1  ||  maxDotProductDS<mnvMatchDotProdCut) continue;
+            if ( minervaThroughDS!=1  ||  maxDotProductDS<mnvMatchDotProdCut) continue;
             ixnsMx2Cut++;
             if (is_mc && is_signal) signalMx2Cut++;
             //std::cout << "DEBUG: Passed minerva cut" << std::endl;
@@ -1314,9 +1339,9 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
+    //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT_MATCHTONUMUCCINC";
     //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v6_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
-    //std::string file_name = "first_pass_general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
+    std::string file_name = "general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
     //std::string file_name = "MR6p4_debug_multiple_truth_entries";
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");
