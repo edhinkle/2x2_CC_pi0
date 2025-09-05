@@ -707,7 +707,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 continue;
             if (abs(vtx.x) > fv_abs_cathode_x_low && abs(vtx.x) < fv_abs_cathode_x_high)
                 continue;
-            //std::cout << "DEBUG: Passed vertex cuts" << std::endl;
+            std::cout << "DEBUG: Passed vertex cuts" << std::endl;
             ixnsVtxCut++;
 
             // Initialize truth values
@@ -980,8 +980,10 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                                             maxPartMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
                 	    	                maxTypeMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
                                             maxIxnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
-                                        }	
-                	    	            if (end_z>mnvMaxZDS+mnvFVCut){ minervaPass=1;} //if(dirZExiting<dirZ){ dirZExiting=dirZ;}
+                                        }
+                                        //std::cout << "DEBUG: end_z " << end_z << std::endl;
+                                        //std::cout << "DEBUG: mnvMaxZDS-mnvFVCut " << mnvMaxZDS-mnvFVCut << std::endl;
+                	    	            if (end_z>mnvMaxZDS-mnvFVCut){ minervaPass=1;} //if(dirZExiting<dirZ){ dirZExiting=dirZ;}
                                     }
                                 }
                             
@@ -1017,6 +1019,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 	        }
                 	        if (dotProductDS>mnvMatchDotProdCut){  
                                 minervaTracks++; 
+                                //std::cout << "DEBUG: minervaPass " << minervaPass << std::endl;
+                                //std::cout << "DEBUG: dotProductUS " << dotProductUS << std::endl;
                                 if (minervaPass==1 && dotProductUS<mnvMatchDotProdCut){ minervaThroughDS++;
                                     mnvMatchipart=ipart;
                                     startZMuonCand=muon_start->z; if (muon_start->z>muon_end->z) startZMuonCand=muon_end->z;
@@ -1051,13 +1055,15 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
 
             //if (reco_ixn_muons != 1) continue;
             //ixnsMuonCut++;
-            //std::cout << "DEBUG: Passed muon cut" << std::endl;
+            //std::cout << "DEBUG: PRE_MINERVA CUT" << std::endl;
             //if (is_mc && is_signal) signalMuonCut++;
             // Only save if muon match to Mx2 throughgoing track
+            //if ( minervaThroughDS!=0) std::cout << "DEBUG: minervaThroughDS" << minervaThroughDS << std::endl;
+            if ( maxDotProductDS!=-999) std::cout << "DEBUG: maxDotProductDS " << maxDotProductDS << std::endl;
             if ( minervaThroughDS!=1  ||  maxDotProductDS<mnvMatchDotProdCut) continue;
             ixnsMx2Cut++;
             if (is_mc && is_signal) signalMx2Cut++;
-            //std::cout << "DEBUG: Passed minerva cut" << std::endl;
+            std::cout << "DEBUG: PASSED MX2 CUT" << std::endl;
             
             // Require two showers (photon or electron bc bad PID)
             //std::cout << "DEBUG: Reco ixn gammas + electrons: " << reco_ixn_gammas << " // " << reco_ixn_electrons << std::endl;
@@ -1339,9 +1345,9 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT_MATCHTONUMUCCINC";
+    std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT_MATCHTONUMUCCINC";
     //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v6_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
-    std::string file_name = "general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
+    //std::string file_name = "general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
     //std::string file_name = "MR6p4_debug_multiple_truth_entries";
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");
