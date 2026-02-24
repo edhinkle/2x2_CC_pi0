@@ -176,6 +176,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     std::vector< int > all_post_mx2_cut;
     std::vector< int > signal_post_shower_cut;
     std::vector< int > all_post_shower_cut;
+    std::vector< int > signal_post_shower_FV_cut;
+    std::vector< int > all_post_shower_FV_cut;
     std::vector< int > signal_post_pion_cut;
     std::vector< int > all_post_pion_cut;
     std::vector< int > signal_post_kaon_cut;
@@ -197,6 +199,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     fPurEffTree->Branch("all_post_mx2_cut", &all_post_mx2_cut);
     fPurEffTree->Branch("signal_post_shower_cut", &signal_post_shower_cut);
     fPurEffTree->Branch("all_post_shower_cut", &all_post_shower_cut);
+    fPurEffTree->Branch("signal_post_shower_FV_cut", &signal_post_shower_FV_cut);
+    fPurEffTree->Branch("all_post_shower_FV_cut", &all_post_shower_FV_cut);
     fPurEffTree->Branch("signal_post_pion_cut", &signal_post_pion_cut);
     fPurEffTree->Branch("all_post_pion_cut", &all_post_pion_cut);
     fPurEffTree->Branch("signal_post_kaon_cut", &signal_post_kaon_cut);
@@ -353,6 +357,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     double mnvMinZDS=164.0; // cm
     double mnvMaxZDS=310.0; // cm
     double mnvFVCut=10.0; // cm
+    double mnvPassCut=10.0; // cm
 
     // Muon energy and angle cuts
     double muon_energy_cut = 0.0; 
@@ -371,6 +376,9 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     double fv_cut_z = 3.0; // cm
     double fv_cut_cathode_x = 2.0; // cm
 
+    // Overlap threshold for match to truth 
+    double overlap_threshold = 0.0;
+
     // Module geometry limits after FV cuts
     const float fv_abs_x_min = abs(mod12_x_min) + fv_cut_x;
     const float fv_abs_x_max = abs(det_x_max) - fv_cut_x;
@@ -386,8 +394,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
 
 
     // Initialize variables for purity/efficiency counting
-    int trueInteractions = 0.; int ixnsNoCuts = 0.; int ixnsVtxCut = 0.; int ixnsMuonCut = 0.; int ixnsMx2Cut = 0.; int ixnsShowerCut = 0.; int ixnsPionCut = 0.; int ixnsKaonCut = 0.;
-    int trueSignal = 0.; int signalNoCuts = 0.; int signalVtxCut = 0.; int signalMuonCut = 0.; int signalMx2Cut = 0.; int signalShowerCut = 0.; int signalPionCut = 0.; int signalKaonCut = 0.;
+    int trueInteractions = 0.; int ixnsNoCuts = 0.; int ixnsVtxCut = 0.; int ixnsMuonCut = 0.; int ixnsMx2Cut = 0.; int ixnsShowerCut = 0.; int ixnsPionCut = 0.; int ixnsKaonCut = 0.; int ixnsShowerFVCut = 0.;
+    int trueSignal = 0.; int signalNoCuts = 0.; int signalVtxCut = 0.; int signalMuonCut = 0.; int signalMx2Cut = 0.; int signalShowerCut = 0.; int signalPionCut = 0.; int signalKaonCut = 0.; int signalShowerFVCut = 0.;
    
 
     
@@ -417,7 +425,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     std::vector <double> true_dict_vtx_z;
     std::vector <string> truth_dict_key_strings;
     if(is_mc){
-        std::string prefix = "RHC.caf_v2.";
+        std::string prefix = "RHC.caf.";//"RHC.caf_v2.";
         std::string suffix = ".CAF.flat.root";
         size_t start_pos = current_file.find(prefix);
         if (start_pos != std::string::npos) {
@@ -610,11 +618,11 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 //std::cout << "DEBUG: End of primaries loop; start of cuts" << std::endl;
                 //if (nKaon>0) continue; // keep if there are no kaons in the event
                 //if (nPion>0) continue; // keep if there are no pions in the event
-                if (cosL<muon_cos_angle_cut && Elep<muon_energy_cut) continue;
+                trueSignal++;
+                //if (cosL<muon_cos_angle_cut && Elep<muon_energy_cut) continue;
                 //escapePi->Fill(escapingPions); 
                 //if (truePartTrkOnly>0) true_multTrkOnly->Fill(truePartTrkOnly);    true_multGENIE->Fill(truePartNoG4); responseGenieToG4->Fill(truePart,truePartTrkOnly);
                 hasANeutrino=true;  
-                trueSignal++;
 
                 //std::cout << "DEBUG: Fill branches in truth tree" << std::endl;
                 truth_vtx_x.push_back(trueVtxX);
@@ -634,11 +642,11 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 std::cout << Form("Index in cafTree (cafTree->GetEntries()) %ld of %ld", n, nspills) << std::endl;
                 std::cout << "DEBUG: Index in sr->mc.nu: " << ntrue << std::endl;
                 std::cout << "DEBUG: Spill ID: " << sr->meta.lar2x2.event << std::endl;
-                std::cout << "DEBUG: Vertex X: " << trueVtxX << std::endl;
-                std::cout << "DEBUG: Vertex Y: " << trueVtxY << std::endl;
-                std::cout << "DEBUG: Vertex Z: " << trueVtxZ << std::endl;
-                std::cout << "DEBUG: True muon energy: " << Elep << std::endl;
-                std::cout << "DEBUG: True muon angle: " << muon_angle << std::endl;
+                //std::cout << "DEBUG: Vertex X: " << trueVtxX << std::endl;
+                //std::cout << "DEBUG: Vertex Y: " << trueVtxY << std::endl;
+                //std::cout << "DEBUG: Vertex Z: " << trueVtxZ << std::endl;
+                //std::cout << "DEBUG: True muon energy: " << Elep << std::endl;
+                //std::cout << "DEBUG: True muon angle: " << muon_angle << std::endl;
                 //std::cout << "DEBUG: nPion: " << nPion << std::endl;
                 //std::cout << "DEBUG: nProton: " << nProton << std::endl;
                 //std::cout << "DEBUG: nKaon: " << nKaon << std::endl;
@@ -691,24 +699,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             ixnsNoCuts++;
             const auto& vtx = sr->common.ixn.dlp[ixn].vtx;
 
-
-            // Require RECO vertex to be within the TPCs
             if (!(std::isfinite(vtx.x) && std::isfinite(vtx.y) && std::isfinite(vtx.z)))
                 continue;
-            if (abs(vtx.x) > fv_abs_x_max)
-                continue;
-            if (abs(vtx.x) < fv_abs_x_min)
-                continue;
-            if (abs(vtx.y) > fv_abs_y_max)
-                continue;
-            if (abs(vtx.z) > fv_abs_z_max)
-                continue;
-            if (abs(vtx.z) < fv_abs_z_min)
-                continue;
-            if (abs(vtx.x) > fv_abs_cathode_x_low && abs(vtx.x) < fv_abs_cathode_x_high)
-                continue;
-            std::cout << "DEBUG: Passed vertex cuts" << std::endl;
-            ixnsVtxCut++;
 
             // Initialize truth values
             auto truth_idx = -1;
@@ -735,6 +727,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             // IF MC Get the truth interaction(s) corresponding to this reco interaction
             bool save_ixn = false;
             if(is_mc){
+                is_signal = false;
                 const auto& vec_truth_ixn = sr->common.ixn.dlp[ixn].truth;
                 const auto& vec_overlap_ixn = sr->common.ixn.dlp[ixn].truthOverlap;
 
@@ -763,6 +756,9 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                             current_max = val;
                             max_overlap = i;
                         }
+                    }
+                    if (current_max < overlap_threshold) {
+                        continue; // skip if max overlap is below threshold
                     }
                     truth_idx = vec_truth_ixn.at(max_overlap);
                     const auto& truth_ixn = sr->mc.nu[truth_idx];
@@ -829,12 +825,16 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                                 true_ixn_pi0s_contained++;
                             }
                     }
-                    if (abs(truth_ixn.pdg)==14 && truth_ixn.iscc==true && truth_ixn.targetPDG==1000180400 && true_ixn_pi0s==1 && abs(vtx.x-true_ixn_vtx_x)<vtx_allowance && abs(vtx.y-true_ixn_vtx_y)<vtx_allowance && abs(vtx.z-true_ixn_vtx_z)<vtx_allowance &&
-                        (abs(true_ixn_vtx_x)>abs(mod12_x_min) && abs(true_ixn_vtx_x)<det_x_max && abs(true_ixn_vtx_z)>abs(downs_z_min) && abs(true_ixn_vtx_z)<det_z_max && abs(true_ixn_vtx_y)<det_y_max)) { // && true_ixn_chpi==0 && true_ixn_chkaon==0
+                    auto diffvtxX = abs(vtx.x - true_ixn_vtx_x);
+                    auto diffvtxY = abs(vtx.y - true_ixn_vtx_y);
+                    auto diffvtxZ = abs(vtx.z - true_ixn_vtx_z);
+                    auto true_to_real_vtx_dist = TMath::Sqrt(diffvtxX * diffvtxX + diffvtxY * diffvtxY + diffvtxZ * diffvtxZ);
+                    if (abs(truth_ixn.pdg)==14 && truth_ixn.iscc==true && truth_ixn.targetPDG==1000180400 && true_ixn_pi0s==1 && true_to_real_vtx_dist<vtx_allowance && (abs(true_ixn_vtx_x)>abs(mod12_x_min) && abs(true_ixn_vtx_x)<det_x_max && abs(true_ixn_vtx_z)>abs(downs_z_min) && abs(true_ixn_vtx_z)<det_z_max && abs(true_ixn_vtx_y)<det_y_max)) { 
+                        //signalNoCuts++;                        // && true_ixn_chpi==0 && true_ixn_chkaon==0
                         if (abs(true_ixn_vtx_x)>fv_abs_x_min && abs(true_ixn_vtx_x)<fv_abs_x_max && abs(true_ixn_vtx_z)>fv_abs_z_min && abs(true_ixn_vtx_z)<fv_abs_z_max && abs(true_ixn_vtx_y)<fv_abs_y_max && (!(abs(true_ixn_vtx_x) > fv_abs_cathode_x_low && abs(true_ixn_vtx_x) < fv_abs_cathode_x_high))) {
-                                signalNoCuts++;
-                                signalVtxCut++;
+                                //signalVtxCut++;
                                 is_signal = true;
+                                std::cout<<"DEBUG: Spill Num: " << spill_num<< ", Ixn: " << ixn << ", Truth index: "<<truth_idx<<", Overlap: "<<current_max<<std::endl;
                             }
                     }
                     if (abs(true_ixn_vtx_x)>fv_abs_x_min && abs(true_ixn_vtx_x)<fv_abs_x_max && abs(true_ixn_vtx_z)>fv_abs_z_min && abs(true_ixn_vtx_z)<fv_abs_z_max && abs(true_ixn_vtx_y)<fv_abs_y_max &&(!(abs(true_ixn_vtx_x) > fv_abs_cathode_x_low && abs(true_ixn_vtx_x) < fv_abs_cathode_x_high))) {
@@ -853,6 +853,25 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 }
             } // end of MC only section getting truth info
 
+            if (is_mc && is_signal) signalNoCuts++;
+
+            // Require RECO vertex to be within the TPCs
+            if (abs(vtx.x) > fv_abs_x_max)
+                continue;
+            if (abs(vtx.x) < fv_abs_x_min)
+                continue;
+            if (abs(vtx.y) > fv_abs_y_max)
+                continue;
+            if (abs(vtx.z) > fv_abs_z_max)
+                continue;
+            if (abs(vtx.z) < fv_abs_z_min)
+                continue;
+            if (abs(vtx.x) > fv_abs_cathode_x_low && abs(vtx.x) < fv_abs_cathode_x_high)
+                continue;
+            //std::cout << "DEBUG: Passed vertex cuts" << std::endl;
+            ixnsVtxCut++;
+            if (is_mc && is_signal) signalVtxCut++;
+
             // Get number of pi0s in reco interaction
             auto reco_ixn_gammas = 0;
             auto reco_ixn_electrons = 0;
@@ -870,6 +889,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             double maxDotProductDS=-999; double maxDotProductUS=-999;
             int maxEventPar=-999; int maxEventTyp=-9999; int maxEventIxn=-999;
             double maxShowerEnergy=-999; unsigned long mnvMatchipart=-999;
+            double subLeadShowerEnergy=-999;
             // Loop over reco particles in the interaction **"The big for loop"**
             for(unsigned long ipart = 0; ipart < sr->common.ixn.dlp[ixn].part.dlp.size(); ++ipart)
             {
@@ -880,13 +900,25 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 if((abs(part.pdg) == 11) and part.primary) {
                     reco_ixn_electrons++;
                     if (part.contained) reco_ixn_electrons_contained++;
-                    if (part.E > maxShowerEnergy) maxShowerEnergy=part.E;
+                    if (part.E > maxShowerEnergy) {
+                        subLeadShowerEnergy=maxShowerEnergy;
+                        maxShowerEnergy=part.E;
+                    }
+                    else if (part.E > subLeadShowerEnergy) {
+                        subLeadShowerEnergy=part.E;
+                    }
                 }
 
                 if((abs(part.pdg) == 22) and part.primary) {
                     reco_ixn_gammas++;
                     if (part.contained) reco_ixn_gammas_contained++;
-                    if (part.E > maxShowerEnergy) maxShowerEnergy=part.E;
+                    if (part.E > maxShowerEnergy) {
+                        subLeadShowerEnergy=maxShowerEnergy;
+                        maxShowerEnergy=part.E;
+                    }
+                    else if (part.E > subLeadShowerEnergy) {
+                        subLeadShowerEnergy=part.E;
+                    }
                 }
 
                 
@@ -982,8 +1014,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                                             maxIxnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
                                         }
                                         //std::cout << "DEBUG: end_z " << end_z << std::endl;
-                                        //std::cout << "DEBUG: mnvMaxZDS-mnvFVCut " << mnvMaxZDS-mnvFVCut << std::endl;
-                	    	            if (end_z>mnvMaxZDS-mnvFVCut){ minervaPass=1;} //if(dirZExiting<dirZ){ dirZExiting=dirZ;}
+                                        //std::cout << "DEBUG: mnvMaxZDS-mnvPassCut " << mnvMaxZDS-mnvPassCut << std::endl;
+                	    	            if (end_z>mnvMaxZDS-mnvPassCut){ minervaPass=1;} //if(dirZExiting<dirZ){ dirZExiting=dirZ;}
                                     }
                                 }
                             
@@ -1053,21 +1085,35 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             // Requirements on reco particles
             // Only save interactions with exactly 1 primary muon
 
-            //if (reco_ixn_muons != 1) continue;
+            //if (reco_ixn_muons+reco_ixn_proton+reco_ixn_chpi+reco_ixn_chkaon <1) continue;
             //ixnsMuonCut++;
             //std::cout << "DEBUG: PRE_MINERVA CUT" << std::endl;
             //if (is_mc && is_signal) signalMuonCut++;
             // Only save if muon match to Mx2 throughgoing track
             //if ( minervaThroughDS!=0) std::cout << "DEBUG: minervaThroughDS" << minervaThroughDS << std::endl;
-            if ( maxDotProductDS!=-999) std::cout << "DEBUG: maxDotProductDS " << maxDotProductDS << std::endl;
-            if ( minervaThroughDS!=1  ||  maxDotProductDS<mnvMatchDotProdCut) continue;
+            //if ( maxDotProductDS!=-999) std::cout << "DEBUG: maxDotProductDS " << maxDotProductDS << std::endl;
+            //if ( minervaThroughDS!=1 || 
+            if (maxDotProductDS<mnvMatchDotProdCut) {
+                //if ( maxDotProductDS!=-999){ 
+                //    std::cout << "DEBUG: FAILED MINERVA CUT " << sr->meta.nd_lar.event << std::endl;
+                //    std::cout << "DEBUG: maxDotProductDS " << maxDotProductDS << std::endl;
+                //    std::cout << "DEBUG: minervaThroughDS " << minervaThroughDS << std::endl;
+                //    std::cout << "DEBUG: endzMuonCand " << endZMuonCand << std::endl;
+                //}
+                continue;
+            }
             ixnsMx2Cut++;
             if (is_mc && is_signal) signalMx2Cut++;
-            std::cout << "DEBUG: PASSED MX2 CUT" << std::endl;
+            //std::cout << "DEBUG: PASSED MX2 CUT" << std::endl;
             
             // Require two showers (photon or electron bc bad PID)
             //std::cout << "DEBUG: Reco ixn gammas + electrons: " << reco_ixn_gammas << " // " << reco_ixn_electrons << std::endl;
-            if((reco_ixn_gammas + reco_ixn_electrons) != 2) continue;
+            if((reco_ixn_gammas + reco_ixn_electrons) > 4 || (reco_ixn_gammas + reco_ixn_electrons) < 2) {
+                //std::cout << "DEBUG: FAILED SHOWER COUNT CUT " << sr->meta.nd_lar.event << std::endl;
+                //std::cout << "DEBUG: reco_ixn_gammas " << reco_ixn_gammas << std::endl;
+                //std::cout << "DEBUG: reco_ixn_electrons " << reco_ixn_electrons << std::endl;
+                continue;
+            }
 
             ixnsShowerCut++;
             if (is_mc && is_signal) signalShowerCut++;
@@ -1098,6 +1144,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             auto trueSubleadShowerStartX = 0.; auto trueSubleadShowerStartY = 0.; auto trueSubleadShowerStartZ = 0.;
             auto trueSubleadShowerEnergy = 0.; auto trueSubleadShowerPX = 0.; auto trueSubleadShowerPY = 0.; auto trueSubleadShowerPZ = 0.; auto trueSubleadShowerPDG = 0.; auto trueSubleadShowerOvlp = 0;
             bool isLeadShower = false; 
+            bool isSubleadShower = false;
             auto true_pvec = TVector3(-99999, -99999, -99999);
             auto true_dir = TVector3(-99999, -99999, -99999);
             //auto true_shower_to_true_vtx = -99999;
@@ -1107,10 +1154,14 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 //Store current reco particle for easier access
                 const auto& part = sr->common.ixn.dlp[ixn].part.dlp[ipart];
 
-                // Reset isLeadShower
+                // Reset isLeadShower and isSubleadShower flags
                 isLeadShower = false;
+                isSubleadShower = false;
                 if (maxShowerEnergy == part.E) {
                     isLeadShower = true;
+                }
+                else if (subLeadShowerEnergy == part.E) {
+                    isSubleadShower = true;
                 }
 
                 // Get Reco Direction Muon Angle --> muon candidate identified by muon match in first part of selection
@@ -1135,7 +1186,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                         recoLeadShowerStartY = part.start.y;
                         recoLeadShowerStartZ = part.start.z;
                     }
-                    else {
+                    else if (isSubleadShower) {
                         recoSubleadShowerEnergy = part.E;
                         recoSubleadShowerPX = part.p.x;
                         recoSubleadShowerPY = part.p.y;
@@ -1234,6 +1285,18 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                         //true_shower_to_true_vtx = (TVector3(truth_match->start_pos.x, truth_match->start_pos.y, truth_match->start_pos.z) - TVector3(true_ixn_vtx_x, true_ixn_vtx_y, true_ixn_vtx_z)).Mag();
                 }
             } // End of second loop over reco particles  
+
+            // CUT ON SHOWER START POINTS
+            if(!(abs(recoLeadShowerStartX)>fv_abs_x_min && abs(recoLeadShowerStartX)<fv_abs_x_max && abs(recoLeadShowerStartZ)>fv_abs_z_min && abs(recoLeadShowerStartZ)<fv_abs_z_max && abs(recoLeadShowerStartY)<fv_abs_y_max &&(!(abs(recoLeadShowerStartX) > fv_abs_cathode_x_low && abs(recoLeadShowerStartX) < fv_abs_cathode_x_high))) &&
+               !(abs(recoSubleadShowerStartX)>fv_abs_x_min && abs(recoSubleadShowerStartX)<fv_abs_x_max && abs(recoSubleadShowerStartZ)>fv_abs_z_min && abs(recoSubleadShowerStartZ)<fv_abs_z_max && abs(recoSubleadShowerStartY)<fv_abs_y_max &&(!(abs(recoSubleadShowerStartX) > fv_abs_cathode_x_low && abs(recoSubleadShowerStartX) < fv_abs_cathode_x_high)))) {
+                //std::cout << "DEBUG: FAILED SHOWER COUNT CUT " << sr->meta.nd_lar.event << std::endl;
+                //std::cout << "DEBUG: reco_ixn_gammas " << reco_ixn_gammas << std::endl;
+                //std::cout << "DEBUG: reco_ixn_electrons " << reco_ixn_electrons << std::endl;
+                continue;
+            }
+
+            ixnsShowerFVCut++;
+            if (is_mc && is_signal) signalShowerFVCut++;
 
             
             true_match_lead_shower_energy.push_back(trueLeadShowerEnergy);
@@ -1335,6 +1398,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
         all_post_mx2_cut.push_back(ixnsMx2Cut);
         signal_post_shower_cut.push_back(signalShowerCut);
         all_post_shower_cut.push_back(ixnsShowerCut);
+        signal_post_shower_FV_cut.push_back(signalShowerFVCut);
+        all_post_shower_FV_cut.push_back(ixnsShowerFVCut);
         signal_post_pion_cut.push_back(signalPionCut);
         all_post_pion_cut.push_back(ixnsPionCut);
         signal_post_kaon_cut.push_back(signalKaonCut);
@@ -1345,9 +1410,10 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     const std::chrono::duration<double> t_elapsed{t_end - t_start};
 
         // Output TTree file name
-    std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT_MATCHTONUMUCCINC";
+    //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT_MATCHTONUMUCCINC";
     //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v6_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
     //std::string file_name = "general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
+    std::string file_name = "general_CC1pi0_selection_MR6p2_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_YES_MX2_CUT_AT_LEAST_ONE_TRACK_RELAX_TWO_SHOWER_CUT_2to4_showers";
     //std::string file_name = "MR6p4_debug_multiple_truth_entries";
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");
