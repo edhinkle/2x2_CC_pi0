@@ -182,6 +182,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     std::vector< int > all_post_pion_cut;
     std::vector< int > signal_post_kaon_cut;
     std::vector< int > all_post_kaon_cut;
+    std::vector< int > signal_post_proton_cut;
+    std::vector< int > all_post_proton_cut;
 
     // DEFINE: TTree and TBranches to go in output ROOT file
 
@@ -205,6 +207,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     fPurEffTree->Branch("all_post_pion_cut", &all_post_pion_cut);
     fPurEffTree->Branch("signal_post_kaon_cut", &signal_post_kaon_cut);
     fPurEffTree->Branch("all_post_kaon_cut", &all_post_kaon_cut);
+    fPurEffTree->Branch("signal_post_proton_cut", &signal_post_proton_cut);
+    fPurEffTree->Branch("all_post_proton_cut", &all_post_proton_cut);
 
     // Define branches for Truth Info Tree
     TTree *fTruthTree=new TTree("TruthTree", "Truth Variables");
@@ -394,8 +398,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
 
 
     // Initialize variables for purity/efficiency counting
-    int trueInteractions = 0.; int ixnsNoCuts = 0.; int ixnsVtxCut = 0.; int ixnsMuonCut = 0.; int ixnsMx2Cut = 0.; int ixnsShowerCut = 0.; int ixnsPionCut = 0.; int ixnsKaonCut = 0.; int ixnsShowerFVCut = 0.;
-    int trueSignal = 0.; int signalNoCuts = 0.; int signalVtxCut = 0.; int signalMuonCut = 0.; int signalMx2Cut = 0.; int signalShowerCut = 0.; int signalPionCut = 0.; int signalKaonCut = 0.; int signalShowerFVCut = 0.;
+    int trueInteractions = 0.; int ixnsNoCuts = 0.; int ixnsVtxCut = 0.; int ixnsMuonCut = 0.; int ixnsMx2Cut = 0.; int ixnsShowerCut = 0.; int ixnsPionCut = 0.; int ixnsKaonCut = 0.; int ixnsProtonCut = 0.; int ixnsShowerFVCut = 0.;
+    int trueSignal = 0.; int signalNoCuts = 0.; int signalVtxCut = 0.; int signalMuonCut = 0.; int signalMx2Cut = 0.; int signalShowerCut = 0.; int signalPionCut = 0.; int signalKaonCut = 0.; int signalProtonCut = 0.; int signalShowerFVCut = 0.;
    
 
     
@@ -616,8 +620,10 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 
                 } //END OF PRIMARIES LOOP
                 //std::cout << "DEBUG: End of primaries loop; start of cuts" << std::endl;
-                //if (nKaon>0) continue; // keep if there are no kaons in the event
-                //if (nPion>0) continue; // keep if there are no pions in the event
+                if (nKaon>0) continue; // keep if there are no kaons in the event
+                if (nPion>0) continue; // keep if there are no pions in the event
+                if (nProton>0) continue; // keep if there are no protons in the event
+                if (nMuon!=1) continue; // keep if there is one muon in the event
                 trueSignal++;
                 //if (cosL<muon_cos_angle_cut && Elep<muon_energy_cut) continue;
                 //escapePi->Fill(escapingPions); 
@@ -832,10 +838,12 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                     if (abs(truth_ixn.pdg)==14 && truth_ixn.iscc==true && truth_ixn.targetPDG==1000180400 && true_ixn_pi0s==1 && true_to_real_vtx_dist<vtx_allowance && (abs(true_ixn_vtx_x)>abs(mod12_x_min) && abs(true_ixn_vtx_x)<det_x_max && abs(true_ixn_vtx_z)>abs(downs_z_min) && abs(true_ixn_vtx_z)<det_z_max && abs(true_ixn_vtx_y)<det_y_max)) { 
                         //signalNoCuts++;                        // && true_ixn_chpi==0 && true_ixn_chkaon==0
                         if (abs(true_ixn_vtx_x)>fv_abs_x_min && abs(true_ixn_vtx_x)<fv_abs_x_max && abs(true_ixn_vtx_z)>fv_abs_z_min && abs(true_ixn_vtx_z)<fv_abs_z_max && abs(true_ixn_vtx_y)<fv_abs_y_max && (!(abs(true_ixn_vtx_x) > fv_abs_cathode_x_low && abs(true_ixn_vtx_x) < fv_abs_cathode_x_high))) {
+                            if ((true_ixn_muons==1) && (true_ixn_chpi==0) && (true_ixn_chkaon==0) && (true_ixn_proton==0)) {
                                 //signalVtxCut++;
                                 is_signal = true;
                                 std::cout<<"DEBUG: Spill Num: " << spill_num<< ", Ixn: " << ixn << ", Truth index: "<<truth_idx<<", Overlap: "<<current_max<<std::endl;
                             }
+                        }
                     }
                     if (abs(true_ixn_vtx_x)>fv_abs_x_min && abs(true_ixn_vtx_x)<fv_abs_x_max && abs(true_ixn_vtx_z)>fv_abs_z_min && abs(true_ixn_vtx_z)<fv_abs_z_max && abs(true_ixn_vtx_y)<fv_abs_y_max &&(!(abs(true_ixn_vtx_x) > fv_abs_cathode_x_low && abs(true_ixn_vtx_x) < fv_abs_cathode_x_high))) {
                         true_ixn_isInFV = true;
@@ -925,7 +933,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
                 if((abs(part.pdg) == 13) and part.primary){
                     reco_ixn_muons++;
                 } 
-                if(((abs(part.pdg) == 13) || (abs(part.pdg) == 2212) || (abs(part.pdg) == 211) || (abs(part.pdg) == 321)) and part.primary){
+                if(((abs(part.pdg) == 13)) and part.primary){
                 //if(((abs(part.pdg) == 13)) and part.primary){
 
                     // Check that start/end of particle in z are defined
@@ -1108,7 +1116,9 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             
             // Require two showers (photon or electron bc bad PID)
             //std::cout << "DEBUG: Reco ixn gammas + electrons: " << reco_ixn_gammas << " // " << reco_ixn_electrons << std::endl;
-            if((reco_ixn_gammas + reco_ixn_electrons) > 4 || (reco_ixn_gammas + reco_ixn_electrons) < 2) {
+
+
+            if((reco_ixn_gammas + reco_ixn_electrons) != 2) {
                 //std::cout << "DEBUG: FAILED SHOWER COUNT CUT " << sr->meta.nd_lar.event << std::endl;
                 //std::cout << "DEBUG: reco_ixn_gammas " << reco_ixn_gammas << std::endl;
                 //std::cout << "DEBUG: reco_ixn_electrons " << reco_ixn_electrons << std::endl;
@@ -1118,6 +1128,22 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
             ixnsShowerCut++;
             if (is_mc && is_signal) signalShowerCut++;
             //std::cout << "DEBUG: Passed shower cut" << std::endl;
+
+            if (reco_ixn_muons != 1) continue;
+            ixnsMuonCut++;
+            if (is_mc && is_signal) signalMuonCut++;
+
+            if (reco_ixn_chpi != 0) continue;
+            ixnsPionCut++;
+            if (is_mc && is_signal) signalPionCut++;
+
+            if (reco_ixn_chkaon != 0) continue;
+            ixnsKaonCut++;
+            if (is_mc && is_signal) signalKaonCut++;
+
+            if (reco_ixn_proton != 0) continue;
+            ixnsProtonCut++;
+            if (is_mc && is_signal) signalProtonCut++;
 
             // Require no charged pions or kaons
             /*if(reco_ixn_chpi != 0)
@@ -1174,7 +1200,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
 
                 }
 
-                if ((abs(part.pdg) == 22 || abs(part.pdg) == 11) && part.primary) {
+                if ((abs(part.pdg) == 22 || abs(part.pdg) == 11)) { // && part.primary) {
                     
                     if (isLeadShower) {
                         recoLeadShowerEnergy = part.E;
@@ -1404,6 +1430,8 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
         all_post_pion_cut.push_back(ixnsPionCut);
         signal_post_kaon_cut.push_back(signalKaonCut);
         all_post_kaon_cut.push_back(ixnsKaonCut);
+        signal_post_proton_cut.push_back(signalProtonCut);
+        all_post_proton_cut.push_back(ixnsProtonCut);
     }
 
     const auto t_end{std::chrono::steady_clock::now()};
@@ -1413,7 +1441,7 @@ int general_CC1pi0_selection(const std::string& file_list, const std::string& js
     //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v11beta_with_mesons_fv_cut_xy2cm_z3cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT_MATCHTONUMUCCINC";
     //std::string file_name = "first_pass_general_CC1pi0_selection_SANDBOX_v6_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut";
     //std::string file_name = "general_CC1pi0_selection_MR6p4_1000_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_REVISEDMX2CUT";
-    std::string file_name = "general_CC1pi0_selection_MR6p2_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_any_track_PID_no_single_muon_cut_YES_MX2_CUT_AT_LEAST_ONE_TRACK_RELAX_TWO_SHOWER_CUT_2to4_showers";
+    std::string file_name = "general_CC1pi0_selection_MR6p2_files_with_mesons_fv_cut_xy2cm_z3cm_cathode2cm_mx2_muon_PID_single_muon_cut_YES_MX2_CUT_2_shower_cut_pion_kaon_proton_cuts";
     //std::string file_name = "MR6p4_debug_multiple_truth_entries";
     // DEFINE: Output TFile
     TFile *f=new TFile(Form("%s.root", file_name.c_str()),"RECREATE");
