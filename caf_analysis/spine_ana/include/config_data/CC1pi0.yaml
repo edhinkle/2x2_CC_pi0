@@ -1,0 +1,9 @@
+selection:
+  minTrackLength: 3 # cm 
+  # Selection cuts for Mx2 matching
+  cosThetaCut: 0.9 
+  muonEnergyCut: 1 # GeV
+beam:
+  beam_x: 0
+  beam_y: -0.05836
+  beam_z: 1.0
