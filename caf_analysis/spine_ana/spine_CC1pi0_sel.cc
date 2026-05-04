@@ -31,6 +31,7 @@
 
 // Local includes:
 #include "config/ConfigLoader.h"
+#include "io/CAFUtils.h"
 
 
 
@@ -355,36 +356,36 @@ rw.GenerateThrows(100);
   double sumPOT = 0;
 
   // Give an input list
-  std::ifstream caf_list(input_file_list.c_str());
-
-  // Check if input list is present
-  if (!caf_list.is_open()) {
-    std::cerr << Form("File %s not found", input_file_list.c_str())
-              << std::endl;
-    return 1;
-  }
-
-  // Add files to CAF chain from input list
-  std::string tmp;
-  TChain *caf_chain = new TChain("cafTree");
-
-  while (caf_list >> tmp) {
-    caf_chain->Add(tmp.c_str());
-    //std::cout << Form("Adding File %s", tmp.c_str()) << std::endl;
-  }
+  //std::ifstream caf_list(input_file_list.c_str());
+//
+  //// Check if input list is present
+  //if (!caf_list.is_open()) {
+  //  std::cerr << Form("File %s not found", input_file_list.c_str())
+  //            << std::endl;
+  //  return 1;
+  //}
+//
+  //// Add files to CAF chain from input list
+  //std::string tmp;
+  //TChain *caf_chain = new TChain("cafTree");
+//
+  //while (caf_list >> tmp) {
+  //  caf_chain->Add(tmp.c_str());
+  //  //std::cout << Form("Adding File %s", tmp.c_str()) << std::endl;
+  //}
 
   // Check if CAF tree is present
-  if (!caf_chain) {
-    std::cerr << Form("There is no tree in %s", tmp.c_str()) << std::endl;
-    return 1;
-  }
-
-  long Nentries = caf_chain->GetEntries();
-  std::cout << Form("Total number of spills = %ld", Nentries) << std::endl;
+  //if (!caf_chain) {
+  //  std::cerr << Form("There is no tree in %s", tmp.c_str()) << std::endl;
+  //  return 1;
+  //}
+//
+  //long Nentries = caf_chain->GetEntries();
+  //std::cout << Form("Total number of spills = %ld", Nentries) << std::endl;
 
   // Define Standard Record and link it to the CAF tree branch "rec"
-  auto sr = new caf::StandardRecord;
-  caf_chain->SetBranchAddress("rec", &sr);
+  //auto sr = new caf::StandardRecord;
+  //caf_chain->SetBranchAddress("rec", &sr);
   totalSpills->Fill(0.5, Nentries);
   bool skipEvent = false;
   // Run over the events
@@ -1572,7 +1573,9 @@ rw.GenerateThrows(100);
 // Main macro method
 int main(int argc, char **argv) {
 
-    // Check for correct number of arguments
+    // -------------------------------
+    // 1. Check for correct number of arguments
+    // -------------------------------
     if (argc != 5) {
         std::cout << "\n USAGE: " << argv[0]
             << "input_caf_file_list output_root_file mcOnlyString\n"
@@ -1580,7 +1583,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Get arguments and set mcOnly flag
+    // -------------------------------
+    // 2. Get arguments and set mcOnly flag
+    // -------------------------------
     std::string input_file_list = argv[1];
     std::string output_rootfile = argv[2];
     std::string mcOnlyString = argv[3];
@@ -1590,9 +1595,33 @@ int main(int argc, char **argv) {
         mcOnly = false;
     std::cout << "MC Only: " << mcOnly << "," << argv[3] << std::endl;
 
-    // Load configs
+    // -------------------------------
+    // 3. Load configurations
+    // -------------------------------
     config::SelectionConfig selectionCuts = config::LoadSelectionConfig(configFilepath);
     config::BeamConfig beamInfo = config::LoadBeamConfig(configFilepath);
+
+    // -------------------------------
+    // 3. Load CAF chain
+    // -------------------------------
+    TChain* caf_chain = io::BuildCAFChain(input_file_list);
+    
+      // Check that CAF chain loaded correctly 
+    if (!caf_chain) {
+      std::cerr << "Failed to build CAF chain from file list: " << input_file_list << "\n" << std::endl;
+      return 1;
+    }
+
+      // Define Standard Record and link it to the CAF tree branch "rec"
+    auto sr = new caf::StandardRecord;
+    caf_chain->SetBranchAddress("rec", &sr);
+
+      // Set number of entries
+    long Nentries = caf_chain->GetEntries();
+    std::cout << "Total spills: " << Nentries << std::endl;
+
+      // Set totalPOT to 0 before looping over spills
+    double totalPOT = 0;
 
     // Run analysis
     caf_plotter(input_file_list, output_rootfile, mcOnly, configFile);
