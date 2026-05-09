@@ -32,6 +32,8 @@
 // Local includes:
 #include "config/ConfigLoader.h"
 #include "io/CAFUtils.h"
+#include "plotting/HistogramManager.h"
+#include "selection/TruthSelection.h"
 
 
 
@@ -138,16 +140,18 @@ rw.GenerateThrows(100);
   //double beam_y = -0.05836 / TMath::Sqrt(0.05836 * 0.05836 + 1);
   //double beam_z = 1.0 / TMath::Sqrt(0.05836 * 0.05836 + 1);
   // Define histograms
-  TH1D *part_energy_hist =
-      new TH1D("recpart_energy", "Reco particle energy in GeV", 100, 0, 1);
-  TH1D *trueEnu =
-      new TH1D("trueEnu", "trueEnu", 100, 0, 20);
+
+  //**NEVER FILLED**//
+  //TH1D *part_energy_hist =
+   //   new TH1D("recpart_energy", "Reco particle energy in GeV", 100, 0, 1);
+  //TH1D *trueEnu =
+  //    new TH1D("trueEnu", "trueEnu", 100, 0, 20);
 
   int binsMult = 7;
   Double_t edgesMult[8] = {1, 2, 3, 4, 5, 6, 8, 10};
-  TH1D *track_length = new TH1D("track_length", "track_length", 100, 0, 100);
-  TH1D *part_multTrkOnly =
-      new TH1D("part_multTrkOnly", "part_multTrkOnly", binsMult, edgesMult);
+  //TH1D *track_length = new TH1D("track_length", "track_length", 100, 0, 100);
+  //TH1D *part_multTrkOnly =
+  //    new TH1D("part_multTrkOnly", "part_multTrkOnly", binsMult, edgesMult);
   TH1D *part_mult = new TH1D("part_mult", "part_mult", binsMult, edgesMult);
   TH1D *bad_origin = new TH1D("rock", "rock", 2, 0, 2);
   TH1D *track_mult = new TH1D("track_mult", "track_mult", binsMult, edgesMult);
@@ -349,7 +353,7 @@ rw.GenerateThrows(100);
   TH1D *longest_track = new TH1D("longest_track", "longest_track", 100, 0, 100);
   TH1D *totalPOT = new TH1D("totalPOT", "totalPOT", 1, 0, 1);
   TH1D *totalSpills = new TH1D("totalSpilles", "totalSpills", 1, 0, 1);
-  TH1D *trueIntPerSpill = new TH1D("trueIntPerSpill", "trueIntPerSpill", 10,0,10);
+  //TH1D *trueIntPerSpill = new TH1D("trueIntPerSpill", "trueIntPerSpill", 10,0,10);
   true_mult->SetTitle(Form("%0.08f",Phi_nom));
   true_multTrkOnly->SetTitle(Form("%0.08f",Phi_nom));
 
@@ -401,9 +405,9 @@ rw.GenerateThrows(100);
        //         << std::endl;
     caf_chain->GetEntry(n); // Get spill from tree
     sumPOT = sr->beam.pulsepot / 1e13 + sumPOT;
-    int intAboveThresh=0;
+    //int intAboveThresh=0;
 
-    bool hasANeutrino = false;
+    //bool hasANeutrino = false;
     double mnvOffsetX = -10;
     double mnvOffsetY = 5;
     if (mcOnly) {
@@ -418,46 +422,46 @@ rw.GenerateThrows(100);
 
         auto truePrimary = sr->mc.nu[ntrue].prim;
         auto trueSecondary = sr->mc.nu[ntrue].sec;
-        int aboveThresh=0;
-        for (long unsigned int k = 0; k < sr->mc.nu[ntrue].prim.size(); k++) {
-        int pdg=abs(sr->mc.nu[ntrue].prim[k].pdg);
-        auto start_pos = sr->mc.nu[ntrue].prim[k].start_pos;
-        if (abs(start_pos.x) > 59 || abs(start_pos.x) < 5)
-          continue;
-        if (abs(start_pos.z) > 59.5 ||
-            abs(start_pos.z) < 5)
-          continue;
-        if (abs(start_pos.y) > 57)
-          continue;
-        if (pdg!=211 && pdg!=2212 && pdg!=111 && pdg!=13 /*&& pdg!=11*/) continue; 
-        auto p = sr->mc.nu[ntrue].prim[k].p;
-            
-        double momentum=TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-        double energy=sr->mc.nu[ntrue].prim[k].p.E;
-        double mass=TMath::Sqrt(energy*energy-momentum*momentum);
-        double KE=energy-mass;
-        if (KE>0.01) aboveThresh=1;
-        }
-        for (long unsigned int k = 0; k < sr->mc.nu[ntrue].sec.size(); k++) {
-        int pdg=abs(sr->mc.nu[ntrue].sec[k].pdg);
-        auto start_pos = sr->mc.nu[ntrue].sec[k].start_pos;
-        if (abs(start_pos.x) > 59 || abs(start_pos.x) < 5)
-          continue;
-        if (abs(start_pos.z) > 59.5 ||
-            abs(start_pos.z) < 5)
-          continue;
-        if (abs(start_pos.y) > 57)
-          continue;
-        if (pdg!=211 && pdg!=2212 && pdg!=111 && pdg!=13 /*&& pdg!=11*/) continue; 
-        auto p = sr->mc.nu[ntrue].sec[k].p;
-            
-        double momentum=TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-        double energy=sr->mc.nu[ntrue].sec[k].p.E;
-        double mass=TMath::Sqrt(energy*energy-momentum*momentum);
-        double KE=energy-mass;
-        if (KE>0.01) aboveThresh=1;
-        }
-        if (aboveThresh>0) intAboveThresh++;
+        //int aboveThresh=0;
+        //for (long unsigned int k = 0; k < sr->mc.nu[ntrue].prim.size(); k++) {
+        //int pdg=abs(sr->mc.nu[ntrue].prim[k].pdg);
+        //auto start_pos = sr->mc.nu[ntrue].prim[k].start_pos;
+        //if (abs(start_pos.x) > 59 || abs(start_pos.x) < 5)
+        //  continue;
+        //if (abs(start_pos.z) > 59.5 ||
+        //    abs(start_pos.z) < 5)
+        //  continue;
+        //if (abs(start_pos.y) > 57)
+        //  continue;
+        //if (pdg!=211 && pdg!=2212 && pdg!=111 && pdg!=13 /*&& pdg!=11*/) continue; 
+        //auto p = sr->mc.nu[ntrue].prim[k].p;
+        //    
+        //double momentum=TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
+        //double energy=sr->mc.nu[ntrue].prim[k].p.E;
+        //double mass=TMath::Sqrt(energy*energy-momentum*momentum);
+        //double KE=energy-mass;
+        //if (KE>0.01) aboveThresh=1;
+        //}
+        //for (long unsigned int k = 0; k < sr->mc.nu[ntrue].sec.size(); k++) {
+        //int pdg=abs(sr->mc.nu[ntrue].sec[k].pdg);
+        //auto start_pos = sr->mc.nu[ntrue].sec[k].start_pos;
+        //if (abs(start_pos.x) > 59 || abs(start_pos.x) < 5)
+        //  continue;
+        //if (abs(start_pos.z) > 59.5 ||
+        //    abs(start_pos.z) < 5)
+        //  continue;
+        //if (abs(start_pos.y) > 57)
+        //  continue;
+        //if (pdg!=211 && pdg!=2212 && pdg!=111 && pdg!=13 /*&& pdg!=11*/) continue; 
+        //auto p = sr->mc.nu[ntrue].sec[k].p;
+        //    
+        //double momentum=TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
+        //double energy=sr->mc.nu[ntrue].sec[k].p.E;
+        //double mass=TMath::Sqrt(energy*energy-momentum*momentum);
+        //double KE=energy-mass;
+        //if (KE>0.01) aboveThresh=1;
+        //}
+        //if (aboveThresh>0) intAboveThresh++;
 
           
         int truePart = 0;
@@ -466,31 +470,31 @@ rw.GenerateThrows(100);
         int truePartShort = 0;
         int truePartNoG4 = 0;
         // We only want CC numu interactions on argon in the fiducial volume
-        if (sr->mc.nu[ntrue].targetPDG != 1000180400)
-          continue;
-        if (abs(sr->mc.nu[ntrue].vtx.x) > 63 || abs(sr->mc.nu[ntrue].vtx.x) < 2)
-          continue;
-        if (abs(sr->mc.nu[ntrue].vtx.z) > 64 ||
-            abs(sr->mc.nu[ntrue].vtx.z) < 2)
-          continue;
-        if (abs(sr->mc.nu[ntrue].vtx.y) > 63)
-          continue;
-        totalNuAr++;
+        //if (sr->mc.nu[ntrue].targetPDG != 1000180400)
+        //  continue;
+        //if (abs(sr->mc.nu[ntrue].vtx.x) > 63 || abs(sr->mc.nu[ntrue].vtx.x) < 2)
+        //  continue;
+        //if (abs(sr->mc.nu[ntrue].vtx.z) > 64 ||
+        //    abs(sr->mc.nu[ntrue].vtx.z) < 2)
+        //  continue;
+        //if (abs(sr->mc.nu[ntrue].vtx.y) > 63)
+        //  continue;
+        //totalNuAr++;
 
 
 
-        if (abs(sr->mc.nu[ntrue].pdg) != 14)
-          continue;
-        if (abs(sr->mc.nu[ntrue].vtx.x) > 59 || abs(sr->mc.nu[ntrue].vtx.x) < 5)
-          continue;
-        if (abs(sr->mc.nu[ntrue].vtx.z) > 59.5 ||
-            abs(sr->mc.nu[ntrue].vtx.z) < 5)
-          continue;
-        if (abs(sr->mc.nu[ntrue].vtx.y) > 57)
-          continue;
-        totalNuArFidVol++;
-        if (sr->mc.nu[ntrue].iscc == false)
-          continue;
+        //if (abs(sr->mc.nu[ntrue].pdg) != 14)
+        //  continue;
+        //if (abs(sr->mc.nu[ntrue].vtx.x) > 59 || abs(sr->mc.nu[ntrue].vtx.x) < 5)
+        //  continue;
+        //if (abs(sr->mc.nu[ntrue].vtx.z) > 59.5 ||
+        //    abs(sr->mc.nu[ntrue].vtx.z) < 5)
+        //  continue;
+        //if (abs(sr->mc.nu[ntrue].vtx.y) > 57)
+        //  continue;
+        //totalNuArFidVol++;
+        //if (sr->mc.nu[ntrue].iscc == false)
+        //  continue;
         // Sum the number of hadrons in case you need it
         int npipPrimaries = 0;
         int npimPrimaries = 0;
@@ -595,14 +599,14 @@ rw.GenerateThrows(100);
         true_multGENIE->Fill(truePartNoG4);
         responseGenieToG4->Fill(truePart, truePartTrkOnly);
         trueMult_unbinned->Fill(truePartTrkOnly);
-        hasANeutrino = true;
+        //hasANeutrino = true;
       }
     }
     int rock = 0;
     bool goodInteraction = false;
     std::vector<int> trueInteractionIndex;
     std::vector<int> primaryTrkIndex;
-    trueIntPerSpill->Fill(intAboveThresh);
+    //trueIntPerSpill->Fill(intAboveThresh);
     for (long unsigned nixn = 0; nixn < sr->common.ixn.dlp.size(); nixn++) {
       double cosL = -999;
       double endZTemp=-999;
@@ -1458,7 +1462,7 @@ rw.GenerateThrows(100);
   trueIntPerSpill->Write();
   part_mult->Write();
   part_multTrkOnly->Write();
-  part_energy_hist->Write();
+  //**NEVER FILLED**//part_energy_hist->Write();
   track_mult->Write();
   track_multGood->Write();
   track_multBad->Write();
@@ -1600,9 +1604,15 @@ int main(int argc, char **argv) {
     // -------------------------------
     config::SelectionConfig selectionCuts = config::LoadSelectionConfig(configFilepath);
     config::BeamConfig beamInfo = config::LoadBeamConfig(configFilepath);
+    config::DetectorConfig detInfo = config::LoadDetectorConfig(configFilepath);
 
     // -------------------------------
-    // 3. Load CAF chain
+    // 4. Initialize histograms
+    // -------------------------------
+    HistogramManager hist(flux_nom); //TODO : Pass flux info to get nom flux
+
+    // -------------------------------
+    // 5. Load CAF chain
     // -------------------------------
     TChain* caf_chain = io::BuildCAFChain(input_file_list);
     
@@ -1622,6 +1632,33 @@ int main(int argc, char **argv) {
 
       // Set totalPOT to 0 before looping over spills
     double totalPOT = 0;
+
+    // -------------------------------
+    // 5. Loop over spills
+    // -------------------------------
+    for (long i = 0; i < Nentries; ++i) {
+      
+      caf_chain->GetEntry(i);
+      //totalPOT += GetSpillPOT(sr); TODO: Implement GetSpillPOT to extract POT from the spill record
+      //sumPOT = sr->beam.pulsepot / 1e13 + sumPOT;
+
+      // ---------------------------
+      // 5a. Truth processing
+      // ---------------------------
+      if (mcOnly) {
+        TruthSelection truthSel(selectionCuts, beamInfo, detInfo);
+
+        truthSel.SelectTruthInteractions(*sr, hist);
+      }
+
+    }
+
+    // -------------------------------
+    // 6. Finalize + write output
+    // -------------------------------
+    TFile *caf_out_file = new TFile(output_rootfile.c_str(), "recreate");
+    hist.Write(caf_out_file);
+    caf_out_file->Close();
 
     // Run analysis
     caf_plotter(input_file_list, output_rootfile, mcOnly, configFile);

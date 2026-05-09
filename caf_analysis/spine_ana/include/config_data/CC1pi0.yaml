@@ -1,9 +1,31 @@
-selection:
-  minTrackLength: 3 # cm 
+selection: 
   # Selection cuts for Mx2 matching
   cosThetaCut: 0.9 
   muonEnergyCut: 1 # GeV
+  # FV cuts -- matching CC numu inclusive (Richie) for now
+  detFVCutAbsMinX: 1.931 # cm
+  detFVCutAbsMaxX: 4.931 # cm
+  detFVCutAbsMinY: 4.8543 # cm
+  detFVCutAbsMaxY: 4.8543 # cm
+  detFVCutAbsMinZ: 2.3163 # cm
+  detFVCutAbsMaxZ: 4.8163 # cm
 beam:
   beam_x: 0
   beam_y: -0.05836
   beam_z: 1.0
+detector:
+  # Thresholds for determining if a particle is visible in the detector
+  keThreshold: 0.01 # GeV
+  minTrackLength: 3 # cm
+  # Offsets for Mx2 matching; must account for offset in real detector positions
+  mx2OffsetXTruth: 0.0 # cm, offset in X for Mx2 matching for truth particles
+  mx2OffsetYTruth: 0.0 # cm, offset in Y for Mx2 matching for truth particles
+  mx2OffsetXReco: -10.0  # cm, offset in X for Mx2 matching for reco particles
+  mx2OffsetYReco: 5.0  # cm, offset in Y for Mx2 matching for reco particles
+  # Module boundaries (absolute values -- symmetric in XYZ); used for FV cuts
+  absModMinX: 3.069 # cm, minimum absolute value X position of modules
+  absModMaxX: 63.931 # cm, maximum absolute value X position of modules
+  absModMinY: 61.8543 # cm, minimum absolute value Y position of modules
+  absModMaxY: 61.8543 # cm, maximum absolute value Y position of modules
+  absModMinZ: 2.6837 # cm, minimum absolute value Z position of modules
+  absModMaxZ: 64.3163 # cm, maximum absolute value Z position of modules 
