@@ -20,9 +20,6 @@ private:
   TruthInteractionSummary BuildSummary(
       const caf::SRTrueInteraction& nu);
 
-  bool PassesSignal(
-      const TruthInteractionSummary& summary) const;
-
   const config::SelectionConfig& fSelCuts;
   const config::BeamConfig& fBeam;
   const config::DetectorConfig& fDetector;

@@ -5,7 +5,7 @@
 
 class TruthHists {
 public:
-    TruthHists(double flux_nom);
+    TruthHists();
 
     //------------------------------------------
     // Filling histograms
@@ -14,9 +14,9 @@ public:
     // Fill histograms for number of interactions above KE threshold per spill
     void FillInteractionsAboveKEThresholdPerSpill(int n);
 
-    void FillMuonKinematics(double cosL, double Elep, double Enu);
-    void FillMultiplicity(int nTrk, int nShort, int nLong);
-    void FillPionInfo(int nPi, int escapingPi);
+    void FillMuonKinematics(double cosL, double Elep, bool Numubar);
+    void FillEnu(double Enu);
+    void FillPi0Multiplicity(int nPi0);
 
     void Write(TDirectory* dir);
 
@@ -28,24 +28,14 @@ private:
 
     TH1D* h_true_ixnsAboveKEThresholdPerSpill;
 
-
-
+    TH1D* h_true_CosL;
+    TH1D* h_true_CosL_zoomOut;
+    TH1D* h_true_CosLNumubar_zoomOut;
+    TH1D* h_true_CosLNumu_zoomOut;
+    TH1D* h_true_Elep;
 
     TH1D* h_true_Enu;
 
-    TH1D* h_true_partMult;
-    TH1D* h_true_showerMult;
-    TH1D* h_true_ixn
+    TH1D* h_true_nPi0;
 
-
-    TH1D* h_trueCosL;
-    TH1D* h_trueCosL_zoomOut;
-    TH1D* h_trueEnu;
-
-    TH1D* h_true_mult;
-    TH1D* h_true_multShort;
-    TH1D* h_true_multLong;
-
-    TH1D* h_nPi;
-    TH1D* h_escapePi;
 };

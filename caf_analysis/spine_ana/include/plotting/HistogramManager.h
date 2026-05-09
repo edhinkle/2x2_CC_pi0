@@ -8,8 +8,8 @@
 
 class HistogramManager {
 public:
-    HistogramManager(double flux_nom)
-        : truth(flux_nom), reco(), match(), cuts() {}
+    HistogramManager()
+        : truth(), reco(), match(), cuts() {}
 
     void Write(TFile* f);
 

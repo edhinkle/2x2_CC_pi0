@@ -215,12 +215,12 @@ rw.GenerateThrows(100);
   Double_t edges[7] = {0.91, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
   TH1D *trueBacktrackedCosL_zoomOut = new TH1D(
       "trueBacktrackedCosL_zoomOut", "trueBacktrackedCosL_zoomOut", 50, 0.8, 1);
-  TH1D *trueCosL_zoomOut = new TH1D(
-      "trueCosL_zoomOut", "trueCosL_zoomOut", 50, 0.8, 1);
-  TH1D *trueCosLNumubar_zoomOut = new TH1D(
-      "trueCosLNumubar_zoomOut", "trueCosLNumubar_zoomOut", 50, 0.8, 1);
-      TH1D *trueCosLNumu_zoomOut = new TH1D(
-      "trueCosLNumu_zoomOut", "trueCosLNumu_zoomOut", 50, 0.8, 1);
+  //TH1D *trueCosL_zoomOut = new TH1D(
+  //    "trueCosL_zoomOut", "trueCosL_zoomOut", 50, 0.8, 1);
+  //TH1D *trueCosLNumubar_zoomOut = new TH1D(
+  //    "trueCosLNumubar_zoomOut", "trueCosLNumubar_zoomOut", 50, 0.8, 1);
+  //    TH1D *trueCosLNumu_zoomOut = new TH1D(
+  //    "trueCosLNumu_zoomOut", "trueCosLNumu_zoomOut", 50, 0.8, 1);
   TH1D *trueBacktrackedCosL =
       new TH1D("trueBacktrackedCosL", "trueBacktrackedCosL", 6, edges);
   TH1D *minervaMatchPDG = new TH1D("minervaMatchPDG", "minervaMatchPDG", 6000, -3000, 3000);
@@ -251,11 +251,11 @@ rw.GenerateThrows(100);
 
   TH2D *confusionMatrix =  new TH2D("confusionMatrix", "confusionMatrix", 4, 0, 4, 4, 0, 4);
 
-  TH1D *nPi = new TH1D("nPi", "nPi", binsMult, edges);
-  TH1D *nP = new TH1D("nP", "nP", 20, 0, 20);
-  TH1D *escapePi = new TH1D("escapePi", "escapePi", 20, 0, 20);
-  TH1D *containPiLen = new TH1D("containPiLen", "containPiLen", 100, 0, 20);
-  TH1D *containPLen = new TH1D("containP", "containP", 100, 0, 20);
+  //TH1D *nPi = new TH1D("nPi", "nPi", binsMult, edges);
+  //TH1D *nP = new TH1D("nP", "nP", 20, 0, 20);
+  //TH1D *escapePi = new TH1D("escapePi", "escapePi", 20, 0, 20);
+  //TH1D *containPiLen = new TH1D("containPiLen", "containPiLen", 100, 0, 20);
+  //TH1D *containPLen = new TH1D("containP", "containP", 100, 0, 20);
 
   TH1D *truePionEWithRecoInt =  new TH1D("truePionEWithRecoInt", "truePionEWithRecoInt", 15, 0, 0.2);
   TH1D *trueProtonEWithRecoInt =  new TH1D("trueProtonEWithRecoInt", "trueProtonEWithRecoInt", 15, 0, 0.2);
@@ -295,19 +295,19 @@ rw.GenerateThrows(100);
 
 
 
-  TH1D *true_mult =
-      new TH1D("true_mult", "true_mult", binsMult, edgesMult);
-  TH1D *true_multTrkOnly =
-      new TH1D("true_multTrkOnly", "true_multTrkOnly", binsMult, edgesMult);
-  TH1D *true_multLong =
-      new TH1D("true_multLong", "true_multLong", binsMult, edgesMult);
-  TH2D *true_multResp =
-      new TH2D("true_multResp", "true_multResp", 10,0,10,10,0,10);
-      TH1D *true_multShort =
-      new TH1D("true_multShort", "true_multShort", binsMult, edgesMult);
-  TH1D *trueDiffPosvsPDirZ =
-      new TH1D("trueDiffPosvsPDirZ", "trueDiffPosvsPDirZ", 20, -1, 1);
-
+  //TH1D *true_mult =
+  //    new TH1D("true_mult", "true_mult", binsMult, edgesMult);
+  //TH1D *true_multTrkOnly =
+  //    new TH1D("true_multTrkOnly", "true_multTrkOnly", binsMult, edgesMult);
+  //TH1D *true_multLong =
+  //    new TH1D("true_multLong", "true_multLong", binsMult, edgesMult);
+  //TH2D *true_multResp =
+  //    new TH2D("true_multResp", "true_multResp", 10,0,10,10,0,10);
+  //    TH1D *true_multShort =
+  //    new TH1D("true_multShort", "true_multShort", binsMult, edgesMult);
+  //TH1D *trueDiffPosvsPDirZ =
+  //    new TH1D("trueDiffPosvsPDirZ", "trueDiffPosvsPDirZ", 20, -1, 1);
+//
   TH1D *true_multGENIE =      new TH1D("true_multGENIE", "true_multGENIE", binsMult, edgesMult);
   TH2D *responseGenieToG4 = new TH2D("responseGenieToG4", "responseGenieToG4",
                                      binsMult, edges, binsMult, edgesMult);
@@ -320,7 +320,7 @@ rw.GenerateThrows(100);
   TH1D *matchHistEl = new TH1D("matchHistEl", "matchHistEl", 100, 0, 20);
   TH1D *matchHistCosl = new TH1D("matchHistCosl", "matchHistCosl", 20, -1, 1);
 
-  TH1D *histEl = new TH1D("histEl", "histEl", 50, 0, 20);
+  //TH1D *histEl = new TH1D("histEl", "histEl", 50, 0, 20);
 
   TH2D *recoVertex2DNoCuts = new TH2D(
       "recoVertex2DNoCuts", "recoVertex2DNoCuts", 70, -70, 70, 70, -70, 70);
@@ -334,14 +334,14 @@ rw.GenerateThrows(100);
   TH1D *trueBacktrackedCosL_unbinned =
       new TH1D("trueBacktrackedCosL_unbinned", "trueBacktrackedCosL_unbinned",
                50, 0.8, 1);
-  TH1D *trueCosL_unbinned =
-      new TH1D("trueCosL_unbinned", "trueCosL_unbinned", 50, 0.8, 1);
-  TH1D *trueBacktrackedMult_unbinned =
-      new TH1D("trueBacktrackedMult_unbinned", "trueBacktrackedMult_unbinned",
-               20, 0.0, 20);
-  TH1D *trueMult_unbinned =
-      new TH1D("trueMult_unbinned", "trueMult_unbinned", 20, 0, 20);
-  TH1D *trueCosL = new TH1D("trueCosL", "trueCosL", 6, edges);
+  //TH1D *trueCosL_unbinned =
+  //    new TH1D("trueCosL_unbinned", "trueCosL_unbinned", 50, 0.8, 1);
+  //TH1D *trueBacktrackedMult_unbinned =
+  //    new TH1D("trueBacktrackedMult_unbinned", "trueBacktrackedMult_unbinned",
+  //             20, 0.0, 20);
+  //TH1D *trueMult_unbinned =
+  //    new TH1D("trueMult_unbinned", "trueMult_unbinned", 20, 0, 20);
+  //TH1D *trueCosL = new TH1D("trueCosL", "trueCosL", 6, edges);
   TH2D *responseCosL =
       new TH2D("responseCosL", "responseCosL", 6, edges, 6, edges);
 
@@ -408,200 +408,9 @@ rw.GenerateThrows(100);
     //int intAboveThresh=0;
 
     //bool hasANeutrino = false;
-    double mnvOffsetX = -10;
-    double mnvOffsetY = 5;
-    if (mcOnly) {
-      mnvOffsetX = 0;
-      mnvOffsetY = 0;
-      // Save truth distributions
-      for (long unsigned ntrue = 0; ntrue < sr->mc.nu.size(); ntrue++) {
-        auto vertex = sr->mc.nu[ntrue].vtx;
-        trueVtxX = vertex.x;
-        trueVtxY = vertex.y;
-        trueVtxZ = vertex.z;
-
-        auto truePrimary = sr->mc.nu[ntrue].prim;
-        auto trueSecondary = sr->mc.nu[ntrue].sec;
-        //int aboveThresh=0;
-        //for (long unsigned int k = 0; k < sr->mc.nu[ntrue].prim.size(); k++) {
-        //int pdg=abs(sr->mc.nu[ntrue].prim[k].pdg);
-        //auto start_pos = sr->mc.nu[ntrue].prim[k].start_pos;
-        //if (abs(start_pos.x) > 59 || abs(start_pos.x) < 5)
-        //  continue;
-        //if (abs(start_pos.z) > 59.5 ||
-        //    abs(start_pos.z) < 5)
-        //  continue;
-        //if (abs(start_pos.y) > 57)
-        //  continue;
-        //if (pdg!=211 && pdg!=2212 && pdg!=111 && pdg!=13 /*&& pdg!=11*/) continue; 
-        //auto p = sr->mc.nu[ntrue].prim[k].p;
-        //    
-        //double momentum=TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-        //double energy=sr->mc.nu[ntrue].prim[k].p.E;
-        //double mass=TMath::Sqrt(energy*energy-momentum*momentum);
-        //double KE=energy-mass;
-        //if (KE>0.01) aboveThresh=1;
-        //}
-        //for (long unsigned int k = 0; k < sr->mc.nu[ntrue].sec.size(); k++) {
-        //int pdg=abs(sr->mc.nu[ntrue].sec[k].pdg);
-        //auto start_pos = sr->mc.nu[ntrue].sec[k].start_pos;
-        //if (abs(start_pos.x) > 59 || abs(start_pos.x) < 5)
-        //  continue;
-        //if (abs(start_pos.z) > 59.5 ||
-        //    abs(start_pos.z) < 5)
-        //  continue;
-        //if (abs(start_pos.y) > 57)
-        //  continue;
-        //if (pdg!=211 && pdg!=2212 && pdg!=111 && pdg!=13 /*&& pdg!=11*/) continue; 
-        //auto p = sr->mc.nu[ntrue].sec[k].p;
-        //    
-        //double momentum=TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-        //double energy=sr->mc.nu[ntrue].sec[k].p.E;
-        //double mass=TMath::Sqrt(energy*energy-momentum*momentum);
-        //double KE=energy-mass;
-        //if (KE>0.01) aboveThresh=1;
-        //}
-        //if (aboveThresh>0) intAboveThresh++;
-
-          
-        int truePart = 0;
-        int truePartTrkOnly = 0;
-        int truePartLong = 0;
-        int truePartShort = 0;
-        int truePartNoG4 = 0;
-        // We only want CC numu interactions on argon in the fiducial volume
-        //if (sr->mc.nu[ntrue].targetPDG != 1000180400)
-        //  continue;
-        //if (abs(sr->mc.nu[ntrue].vtx.x) > 63 || abs(sr->mc.nu[ntrue].vtx.x) < 2)
-        //  continue;
-        //if (abs(sr->mc.nu[ntrue].vtx.z) > 64 ||
-        //    abs(sr->mc.nu[ntrue].vtx.z) < 2)
-        //  continue;
-        //if (abs(sr->mc.nu[ntrue].vtx.y) > 63)
-        //  continue;
-        //totalNuAr++;
-
-
-
-        //if (abs(sr->mc.nu[ntrue].pdg) != 14)
-        //  continue;
-        //if (abs(sr->mc.nu[ntrue].vtx.x) > 59 || abs(sr->mc.nu[ntrue].vtx.x) < 5)
-        //  continue;
-        //if (abs(sr->mc.nu[ntrue].vtx.z) > 59.5 ||
-        //    abs(sr->mc.nu[ntrue].vtx.z) < 5)
-        //  continue;
-        //if (abs(sr->mc.nu[ntrue].vtx.y) > 57)
-        //  continue;
-        //totalNuArFidVol++;
-        //if (sr->mc.nu[ntrue].iscc == false)
-        //  continue;
-        // Sum the number of hadrons in case you need it
-        int npipPrimaries = 0;
-        int npimPrimaries = 0;
-        int npPrimaries = 0;
-        int nneutronsPrimaries = 0;
-        int npi0Primaries = 0; 
-        for (long unsigned int k = 0; k < sr->mc.nu[ntrue].prim.size(); k++) {
-          if (sr->mc.nu[ntrue].prim[k].pdg == 211)
-            npipPrimaries++;
-          if (sr->mc.nu[ntrue].prim[k].pdg == 2212)
-            npPrimaries++;
-          if (sr->mc.nu[ntrue].prim[k].pdg == -211)
-            npimPrimaries++;
-          if (sr->mc.nu[ntrue].prim[k].pdg == 111)
-              npi0Primaries++;
-          if (sr->mc.nu[ntrue].prim[k].pdg == 2112)
-            nneutronsPrimaries++;
-        }
-
-        int nProton = 0;
-        int nPion = 0;
-        int escapingPions = 0;
-        double Elep = -999;
-        double cosL = -999;
-        for (long unsigned primaries = 0; primaries < truePrimary.size();
-             primaries++) {
-          int pdg = truePrimary[primaries].pdg;
-          double px = truePrimary[primaries].p.px;
-          double py = truePrimary[primaries].p.py;
-          double pz = truePrimary[primaries].p.pz;
-
-          if ((abs(pdg) == 13 || abs(pdg) == 2212 || abs(pdg) == 211 ||
-               abs(pdg) == 321)) {
-            truePartNoG4++;
-            if (abs(pdg) == 211)
-              nPion++;
-            if (abs(pdg) == 2212)
-              nProton++;
-            auto start_pos = sr->mc.nu[ntrue].prim[primaries].start_pos;
-            auto end_pos = sr->mc.nu[ntrue].prim[primaries].end_pos;
-            // if (std::isnan(start_pos.z)){  continue;}
-            auto p = sr->mc.nu[ntrue].prim[primaries].p;
-            double dX = (end_pos.x - start_pos.x);
-            double dY = (end_pos.y - start_pos.y);
-            double dZ = (end_pos.z - start_pos.z);
-            double dPX = p.px;
-            double dPY = p.py;
-            double dPZ = p.pz;
-            double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
-            double lengthP =
-                TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-            // Save the muon information for the CCINC analysis
-            if (sr->mc.nu[ntrue].iscc && abs(sr->mc.nu[ntrue].pdg) == 14 &&
-                abs(pdg) == 13) {
-
-              Elep = sr->mc.nu[ntrue].prim[primaries].p.E;
-              double dir_x = dPX / lengthP;
-              double dir_y = dPY / lengthP;
-              double dir_z = dPZ / lengthP;
-              cosL = dir_x * beam_x + dir_y * beam_y + dir_z * beam_z;
-              histEl->Fill(Elep);
-              trueCosL_unbinned->Fill(cosL); trueCosL_zoomOut->Fill(cosL);
-                if ((sr->mc.nu[ntrue].pdg) == 14){ trueCosLNumu_zoomOut->Fill(cosL);}
-                else{ trueCosLNumubar_zoomOut->Fill(cosL);}
-              if (cosL > 0.91 && Elep>1) {
-                trueCosL->Fill(cosL);
-                trueEnu->Fill(sr->mc.nu[ntrue].E);
-              }
-              // std::cout<<n<<","<<ntrue<<","<<primaries<<","<<dX<<","<<dY<<","<<dZ<<","<<p.pz/lengthP<<std::endl;
-
-              trueDiffPosvsPDirZ->Fill(cosL - p.pz / lengthP);
-            }
-            // Some information on if the pion stays or leaves
-            if ((abs(end_pos.z) > 62 || abs(end_pos.x) > 62) && abs(pdg) == 211)
-              escapingPions++;
-            else if (abs(pdg) == 211)
-              containPiLen->Fill(length);
-            if (abs(end_pos.z) < 62 && abs(end_pos.x) < 62 && abs(pdg) == 2212)
-              containPLen->Fill(length);
-              
-            // Save the track if it is above the minimum threshold
-            if (length > minTrkLength) {
-              truePartTrkOnly++;
-
-            if (length>minTrkLength && length<10) truePartShort++;
-            if (length>10) truePartLong++;
-            }
-          }
-          truePart++;
-        }
-        // Save hadron information if it is above the cosL signal definition
-        if (cosL < 0.9 || Elep<1)
-          continue;
-        escapePi->Fill(escapingPions);
-        nPi->Fill(nPion);
-        nP->Fill(nProton);
-        true_mult->Fill(truePartTrkOnly);
-        true_multTrkOnly->Fill(truePartTrkOnly);
-        true_multLong->Fill(truePartLong);
-        true_multShort->Fill(truePartShort);
-        true_multResp->Fill(truePartShort,truePartLong);
-        true_multGENIE->Fill(truePartNoG4);
-        responseGenieToG4->Fill(truePart, truePartTrkOnly);
-        trueMult_unbinned->Fill(truePartTrkOnly);
-        //hasANeutrino = true;
-      }
-    }
+    //double mnvOffsetX = -10;
+    //double mnvOffsetY = 5;
+    
     int rock = 0;
     bool goodInteraction = false;
     std::vector<int> trueInteractionIndex;
@@ -1458,10 +1267,10 @@ rw.GenerateThrows(100);
 
   matchHistCosl->Write();
   matchHistEl->Write();
-  histEl->Write();
-  trueIntPerSpill->Write();
+  //histEl->Write();
+  //trueIntPerSpill->Write();
   part_mult->Write();
-  part_multTrkOnly->Write();
+  //part_multTrkOnly->Write();
   //**NEVER FILLED**//part_energy_hist->Write();
   track_mult->Write();
   track_multGood->Write();
@@ -1491,13 +1300,13 @@ rw.GenerateThrows(100);
   recoBacktrackElAr->Write();
   trueBacktrackedCosL->Write();
   trueBacktrackedCosL_zoomOut->Write();
-  trueCosL_unbinned->Write();
-  trueCosL_zoomOut->Write();
-  trueCosLNumubar_zoomOut->Write();
-  trueCosLNumu_zoomOut->Write();
+  //trueCosL_unbinned->Write();
+  //trueCosL_zoomOut->Write();
+  //trueCosLNumubar_zoomOut->Write();
+  //trueCosLNumu_zoomOut->Write();
   trueBacktrackedCosL_unbinned->Write();
-  true_mult->Write();
-  true_multTrkOnly->Write();
+  //true_mult->Write();
+  //true_multTrkOnly->Write();
   true_multGENIE->Write();
   recoHistVertexX->Write();
   recoHistVertexZ->Write();
@@ -1647,7 +1456,6 @@ int main(int argc, char **argv) {
       // ---------------------------
       if (mcOnly) {
         TruthSelection truthSel(selectionCuts, beamInfo, detInfo);
-
         truthSel.SelectTruthInteractions(*sr, hist);
       }
 

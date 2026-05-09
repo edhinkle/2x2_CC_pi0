@@ -16,6 +16,7 @@ struct TruthInteractionSummary {
 
   int nuPDG = 0;
   double nuE = -999.0;
+  bool Numubar = false;
 
   caf::SRVector3D vertex;
 
@@ -27,31 +28,15 @@ struct TruthInteractionSummary {
   double muonCosL   = -999.0;
 
   // -----------------------------
-  // Multiplicity info
-  // -----------------------------
-
-  int nVisibleTracks = 0;
-
-  int nShortTracks = 0;
-  int nLongTracks  = 0;
-
-  // -----------------------------
   // Hadron content
   // -----------------------------
 
-  int nPions      = 0;
-  int nProtons    = 0;
-  int nNeutrons   = 0;
-
-  int nPiPlus     = 0;
-  int nPiMinus    = 0;
   int nPi0        = 0;
 
-  int nEscapingPi = 0;
 
   // -----------------------------
   // Signal flags
   // -----------------------------
 
-  bool passesSignal = false;
+  bool passesMx2 = false;
 };

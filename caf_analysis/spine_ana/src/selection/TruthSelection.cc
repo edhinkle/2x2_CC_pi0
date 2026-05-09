@@ -51,214 +51,27 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     // Event-level truth summary quantities
     //--------------------------------------------------------------------
 
-    TruthInteractionSummary summary;
+    TruthInteractionSummary summary = BuildSummary(nu);
 
-    summary.nuPDG = nu.pdg;
-    summary.nuE = nu.E;
-    summary.vertex = nu.vtx;
+    // Fill histograms for number of pi0s
+    hist.truth.FillPi0Multiplicity(summary.nPi0);
 
-    //--------------------------------------------------------------------
-    // Primary hadron counting
-    //--------------------------------------------------------------------
-
-    int nPiPlus   = 0;
-    int nPiMinus  = 0;
-    int nPi0      = 0;
-    int nProton   = 0;
-    int nNeutron  = 0;
-
-    for (const auto& prim : nu.prim) {
-
-      switch (prim.pdg) {
-
-        case 211:
-          ++nPiPlus;
-          break;
-
-        case -211:
-          ++nPiMinus;
-          break;
-
-        case 111:
-          ++nPi0;
-          break;
-
-        case 2212:
-          ++nProton;
-          break;
-
-        case 2112:
-          ++nNeutron;
-          break;
-      }
-    }
-
-    summary.nPiPlus  = nPiPlus;
-    summary.nPiMinus = nPiMinus;
-    summary.nPi0     = nPi0;
-    summary.nProton  = nProton;
-    summary.nNeutron = nNeutron;
-
-    //--------------------------------------------------------------------
-    // Final-state particle loop
-    //--------------------------------------------------------------------
-
-    int nVisibleTracks = 0;
-    int nShortTracks   = 0;
-    int nLongTracks    = 0;
-    int nPions         = 0;
-    int nContainedPi   = 0;
-    int nEscapingPi    = 0;
-
-    double muonEnergy = -999.0;
-    double muonCosL   = -999.0;
-
-    for (const auto& prim : nu.prim) {
-
-      const int pdg = std::abs(prim.pdg);
-
-      //------------------------------------------------------------------
-      // Keep only reconstructable charged particles
-      //------------------------------------------------------------------
-
-      if (pdg != 13 &&
-          pdg != 2212 &&
-          pdg != 211 &&
-          pdg != 321)
-        continue;
-
-      //------------------------------------------------------------------
-      // Kinematics
-      //------------------------------------------------------------------
-
-      const auto& start = prim.start_pos;
-      const auto& end   = prim.end_pos;
-      const auto& p4    = prim.p;
-
-      const double px = p4.px;
-      const double py = p4.py;
-      const double pz = p4.pz;
-
-      const double momentum =
-          std::sqrt(px*px + py*py + pz*pz);
-
-      const double dx = end.x - start.x;
-      const double dy = end.y - start.y;
-      const double dz = end.z - start.z;
-
-      const double length =
-          std::sqrt(dx*dx + dy*dy + dz*dz);
-
-      //------------------------------------------------------------------
-      // Muon kinematics
-      //------------------------------------------------------------------
-
-      if (pdg == 13) {
-
-        muonEnergy = p4.E;
-
-        const double dirX = px / momentum;
-        const double dirY = py / momentum;
-        const double dirZ = pz / momentum;
-
-        muonCosL =
-            dirX * beam.beamX +
-            dirY * beam.beamY +
-            dirZ * beam.beamZ;
-
-        hist.FillTrueMuonKinematics(muonEnergy, muonCosL);
-      }
-
-      //------------------------------------------------------------------
-      // Pion containment
-      //------------------------------------------------------------------
-
-      if (pdg == 211) {
-
-        ++nPions;
-
-        const bool escapes =
-            (std::abs(end.x) > cfg.detectorXMax ||
-             std::abs(end.z) > cfg.detectorZMax);
-
-        if (escapes) {
-          ++nEscapingPi;
-        }
-        else {
-          ++nContainedPi;
-          hist.FillContainedPionLength(length);
-        }
-      }
-
-      //------------------------------------------------------------------
-      // Proton containment
-      //------------------------------------------------------------------
-
-      if (pdg == 2212) {
-
-        const bool contained =
-            (std::abs(end.x) < cfg.detectorXMax &&
-             std::abs(end.z) < cfg.detectorZMax);
-
-        if (contained) {
-          hist.FillContainedProtonLength(length);
-        }
-      }
-
-      //------------------------------------------------------------------
-      // Track multiplicity
-      //------------------------------------------------------------------
-
-      if (length > cfg.minTrackLength) {
-
-        ++nVisibleTracks;
-
-        if (length < 10.0)
-          ++nShortTracks;
-        else
-          ++nLongTracks;
-      }
-    }
-
-    //--------------------------------------------------------------------
-    // Signal definition
-    //--------------------------------------------------------------------
-
-    const bool passesSignal =
-        (muonCosL > cfg.minMuonCosL &&
-         muonEnergy > cfg.minMuonEnergy);
-
-    if (!passesSignal)
+    // Only one pi0
+    if (summary.nPi0 != 1)
       continue;
+    hist.cuts.Count("Truth", "1 Pi0");
 
-    //--------------------------------------------------------------------
-    // Store summary quantities
-    //--------------------------------------------------------------------
+    // Fill histograms for muon kinematics
+    hist.truth.FillMuonKinematics(summary.muonCosL, summary.muonEnergy, summary.Numubar);
 
-    summary.muonEnergy    = muonEnergy;
-    summary.muonCosL      = muonCosL;
+    // Passes Mx2 signal definition
+    if (!summary.passesMx2)
+      continue;
+    hist.cuts.Count("Truth", "Muon Through Mx2");
 
-    summary.nVisibleTracks = nVisibleTracks;
-    summary.nShortTracks   = nShortTracks;
-    summary.nLongTracks    = nLongTracks;
+    // Fill histograms for neutrino energy
+    hist.truth.FillEnu(summary.nuE);
 
-    summary.nPions         = nPions;
-    summary.nEscapingPi    = nEscapingPi;
-
-    //--------------------------------------------------------------------
-    // Fill histograms
-    //--------------------------------------------------------------------
-
-    hist.FillTruth(summary);
-
-    hist.FillTruthMultiplicity(nVisibleTracks);
-    hist.FillTruthMultiplicity2D(nShortTracks, nLongTracks);
-
-    hist.FillPionMultiplicity(nPions);
-    hist.FillEscapingPions(nEscapingPi);
-
-    hist.FillMuonCosTheta(muonCosL);
-    hist.FillNeutrinoEnergy(nu.E);
   }
   // Fill histograms for number of interactions above KE threshold for detector
   hist.truth.FillInteractionsAboveKEThresholdPerSpill(ixnsOverKEThreshold);
@@ -282,6 +95,7 @@ TruthInteractionSummary TruthSelection::BuildSummary(
   summary.nuPDG    = nu.pdg;
   summary.nuE = nu.E;
   summary.vertex   = nu.vtx;
+  summary.Numubar = nu.pdg < 0;
 
   //--------------------------------------------------
   // Loop over primaries
@@ -317,44 +131,21 @@ TruthInteractionSummary TruthSelection::BuildSummary(
     }
 
     //----------------------------------------------
-    // Proton counting
+    // Pi0 counting
     //----------------------------------------------
 
-    if (pdg == 2212)
-      ++summary.nProtons;
+    if (pdg == 111)
+      ++summary.nPi0;
 
-    //----------------------------------------------
-    // Pion counting
-    //----------------------------------------------
-
-    if (pdg == 211)
-      ++summary.nPions;
-
-    //----------------------------------------------
-    // Track multiplicity
-    //----------------------------------------------
-
-    const double length =
-        ComputeTrackLength(prim);
-
-    if (length > fConfig.minTrackLength) {
-
-      ++summary.nVisibleTracks;
-
-      if (length < 10.0)
-        ++summary.nShortTracks;
-      else
-        ++summary.nLongTracks;
-    }
   }
 
   //--------------------------------------------------
   // Signal definition
   //--------------------------------------------------
 
-  summary.passesSignal =
-      (summary.muonCosL > fConfig.minMuonCosL &&
-       summary.muonEnergy > fConfig.minMuonEnergy);
+  summary.passesMx2 =
+      (summary.muonCosL > fSelCuts.minMuonCosL &&
+       summary.muonEnergy > fSelCuts.minMuonEnergy);
 
   return summary;
 }
