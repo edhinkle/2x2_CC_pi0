@@ -12,7 +12,37 @@ namespace config {
     
         cfg.cosThetaCut = config["selection"]["cosThetaCut"].as<double>();
         cfg.muonEnergyCut = config["selection"]["muonEnergyCut"].as<double>();
+
+        cfg.minTruthIxnOverlap = config["selection"]["minTruthIxnOverlap"].as<double>();
+        cfg.minRockIxnTruthId = config["selection"]["minRockIxnTruthId"].as<double>();
+        cfg.maxTruthRecoVertexDiff = config["selection"]["maxTruthRecoVertexDiff"].as<double>();
     
+        cfg.maxMx2TrackVertexDiff = config["selection"]["maxMx2TrackVertexDiff"].as<double>();
+        cfg.maxTrkMatchMx2MatchDiff = config["selection"]["maxTrkMatchMx2MatchDiff"].as<double>();
+
+        cfg.mx2MatchExtrapLocZ = config["selection"]["mx2MatchExtrapLocZ"].as<double>();
+        cfg.maxMx2MatchExtrapDiffX = config["selection"]["maxMx2MatchExtrapDiffX"].as<double>();
+        cfg.maxMx2MatchExtrapDiffY = config["selection"]["maxMx2MatchExtrapDiffY"].as<double>();
+        cfg.maxMx2MatchArctanDiffXZ = config["selection"]["maxMx2MatchArctanDiffXZ"].as<double>();
+        cfg.maxMx2MatchArctanDiffYZ = config["selection"]["maxMx2MatchArctanDiffYZ"].as<double>();
+
+        cfg.minMx2TrackLength = config["selection"]["minMx2TrackLength"].as<double>();
+
+        // Mx2 Track Start Limit
+        mx2EnterDownstreamAllowance = config["selection"]["mx2EnterDownstreamAllowance"].as<double>();
+        mx2DownstreamZMin = config["detector"]["mx2DownstreamZMin"].as<double>(); // cm
+
+        cfg.maxMx2MatchTrackStartZ = mx2DownstreamZMin + mx2EnterDownstreamAllowance;
+
+        // Mx2 Track End Limit (for muon)
+        mx2DistFromEndDownstreamZ = config["selection"]["mx2DistFromEndDownstreamZ"].as<double>();
+        mx2DownstreamZMax = config["detector"]["mx2DownstreamZMax"].as<double>(); // cm
+
+        cfg.minMx2MatchTrackEndZ = mx2DownstreamZMax - mx2DistFromEndDownstreamZ;
+
+        // Mx2 Matching Threshold
+        cfg.mx2TrackMatchDotProdThreshold = config["selection"]["mx2TrackMatchDotProdThreshold"].as<double>();
+
         return cfg;
     }
     
@@ -47,12 +77,6 @@ namespace config {
         cfg.keThreshold = config["detector"]["keThreshold"].as<double>();
         cfg.minTrackLength = config["detector"]["minTrackLength"].as<double>();
 
-        // Mx2 offsets for matching (misalignment in physical detectors)
-        cfg.mx2OffsetXTruth = config["detector"]["mx2OffsetTruth"].as<double>();
-        cfg.mx2OffsetYTruth = config["detector"]["mx2OffsetTruth"].as<double>();
-        cfg.mx2OffsetXReco = config["detector"]["mx2OffsetReco"].as<double>();
-        cfg.mx2OffsetYReco = config["detector"]["mx2OffsetReco"].as<double>();
-
         // Module boundaries for FV cuts
         // First, get module boundaries (abs value; assumes symmetric in + and - directions for XYZ)
         cfg.absModuleXMin = config["detector"]["absModuleMinX"].as<double>();
@@ -63,14 +87,15 @@ namespace config {
         cfg.absModuleZMax = config["detector"]["absModuleMaxZ"].as<double>();
 
         // Then, get FV cuts
-        detFVCutAbsMinX = config["detector"]["detFVCutAbsMinX"].as<double>();
-        detFVCutAbsMaxX = config["detector"]["detFVCutAbsMaxX"].as<double>();
-        detFVCutAbsMinY = config["detector"]["detFVCutAbsMinY"].as<double>();
-        detFVCutAbsMaxY = config["detector"]["detFVCutAbsMaxY"].as<double>();
-        detFVCutAbsMinZ = config["detector"]["detFVCutAbsMinZ"].as<double>();
-        detFVCutAbsMaxZ = config["detector"]["detFVCutAbsMaxZ"].as<double>();
+        detFVCutAbsMinX = config["selection"]["detFVCutAbsMinX"].as<double>();
+        detFVCutAbsMaxX = config["selection"]["detFVCutAbsMaxX"].as<double>();
+        detFVCutAbsMinY = config["selection"]["detFVCutAbsMinY"].as<double>();
+        detFVCutAbsMaxY = config["selection"]["detFVCutAbsMaxY"].as<double>();
+        detFVCutAbsMinZ = config["selection"]["detFVCutAbsMinZ"].as<double>();
+        detFVCutAbsMaxZ = config["selection"]["detFVCutAbsMaxZ"].as<double>();
+        detFVCutAbsMaxZExiting = config["selection"]["detFVCutAbsMaxZExiting"].as<double>(); // Mx2 exiting track requirement
 
-        // Finally, apply FV cuts
+        // Apply FV cuts
         cfg.absFiducialXMin = cfg.absModuleXMin + detFVCutAbsMinX;
         cfg.absFiducialXMax = cfg.absModuleXMax - detFVCutAbsMaxX;
         cfg.absFiducialYMin = cfg.absModuleYMin - detFVCutAbsMinY; // symmetry in y (+ no gaps)
@@ -78,7 +103,15 @@ namespace config {
         cfg.absFiducialZMin = cfg.absModuleZMin + detFVCutAbsMinZ;
         cfg.absFiducialZMax = cfg.absModuleZMax - detFVCutAbsMaxZ;
 
-    
+        // Mx2 exiting track requirement:
+        cfg.absFiducialZMaxExiting = cfg.absModuleZMax - detFVCutAbsMaxZExiting;
+
+        // Mx2 boundaries from DUNE DocDB 32440
+        cfg.mx2DownstreamZMin = config["detector"]["mx2DownstreamZMin"].as<double>(); // cm
+        cfg.mx2DownstreamZMax = config["detector"]["mx2DownstreamZMax"].as<double>(); // cm
+        cfg.mx2UpstreamZMin = config["detector"]["mx2UpstreamZMin"].as<double>(); // cm
+        cfg.mx2UpstreamZMax = config["detector"]["mx2UpstreamZMax"].as<double>(); // cm
+
         return cfg;
     }
 

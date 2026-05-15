@@ -36,72 +36,6 @@
 #include "selection/TruthSelection.h"
 
 
-
-
-  bool Passes_cut(caf::SRTrack track_minerva, double x1_lar, double x2_lar, double y1_lar, double y2_lar, double z1_lar, double z2_lar, double &costheta, double &residual)
-  {
-
-    double z_extr=-70;
-    double d_x = 17;
-    double d_y = 19;
-    double d_thetax =0.08;
-    double d_thetay=0.09;
-      
-    double x1_minerva = track_minerva.start.x;
-    double x2_minerva = track_minerva.end.x;
-    double y1_minerva = track_minerva.start.y;
-    double y2_minerva = track_minerva.end.y;
-    double z1_minerva = track_minerva.start.z;
-    double z2_minerva = track_minerva.end.z;
-
-    double dX=x2_lar-x1_lar;
-    double dY=y2_lar-y1_lar;
-    double dZ=z2_lar-z1_lar;
-    double track_LarLen=TMath::Sqrt(dX*dX+dY*dY+dZ*dZ);
-
-    /*
-    The experimental setup: Liquid Argon Detector is placed betbeen two MINERvA planes.
-    To define matching criteria it is needed to find angles between LAr and MINERvA tracks.
-    For LAr detector resolution is diffeent in X and Y direction, therefore it is needed to find angles between tracks
-    as finction of the angle in X direction and as the function of an angle in Y direction. Distances between tracks
-    will be calculated as distancec between extrapolated points - points of intersection of LAr and MINERvA tracls with
-    the plane (parallel to plane XY) of LAr detector.
-    */
-
-    double tg_theta_mn_x = (x2_minerva - x1_minerva) / (z2_minerva - z1_minerva); // tangent of an angle between minerva track and X-axis
-    double tg_theta_mn_y = (y2_minerva - y1_minerva) / (z2_minerva - z1_minerva); // tangent of an angle between minerva track and Y-axis
-    double theta_mn_x = atan(tg_theta_mn_x);                                      // angle between minerva track and X-axis
-    double theta_mn_y = atan(tg_theta_mn_y);                                      // angle between minerva track and Y-axis
-
-    double tg_theta_nd_x = (x2_lar - x1_lar) / (z2_lar - z1_lar); // tangent of the angle between LAr track and X-axis
-    double tg_theta_nd_y = (y2_lar - y1_lar) / (z2_lar - z1_lar); // tangent of the angle between LAr track and Y-axis
-    double theta_nd_x = atan(tg_theta_nd_x);                      // angle between LAr track and X-axis
-    double theta_nd_y = atan(tg_theta_nd_y);                      // angle between LAr track and Y-axis
-
-    double delta_theta_x = theta_mn_y - theta_nd_y;
-    double delta_theta_y = theta_mn_x - theta_nd_x;
-
-    // Extrapolating Both tracks to the same point z = zextr (here it's the front of Lar)
-    double t_mn = (z_extr - z1_minerva) / (z2_minerva - z1_minerva);
-    double x_mn = t_mn * (x2_minerva - x1_minerva) + x1_minerva; // X-coordinate of extrapolated point of LAr track
-    double y_mn = t_mn * (y2_minerva - y1_minerva) + y1_minerva; // Y-coordinate of extrapolated point of LAr track
-
-    double t_nd = (z_extr - z1_lar) / (z2_lar - z1_lar); // parametr of the equation of the line (LAr track)
-    double x_nd = t_nd * (x2_lar - x1_lar) + x1_lar;     // X-coordinate of extrapolated point of LAr track
-    double y_nd = t_nd * (y2_lar - y1_lar) + y1_lar;     // Y-coordinate of extrapolated point of LAr track
-
-    double dist_x = (x_mn - x_nd); // distance between X-coordinates of extrapolated points of minerva and LAr tracks
-    double dist_y = (y_mn - y_nd); // distance between Y-coordinates of extrapolated points of minerva and LAr tracks
-
-    residual = sqrt(pow(dist_x, 2) + pow(dist_y, 2));
-    costheta = ((x2_minerva - x1_minerva) * (x2_lar - x1_lar) +
-                (y2_minerva - y1_minerva) * (y2_lar - y1_lar) +
-                (z2_minerva - z1_minerva) * (z2_lar - z1_lar)) /
-               (track_LarLen * track_minerva.len_cm); // angle between minerva and Lar tracks
-
-    return (abs(delta_theta_x) < d_thetax && abs(delta_theta_y) < d_thetay && abs(dist_x) < d_y && abs(dist_y) < d_x);
-  }
-
 int caf_plotter(std::string input_file_list, std::string output_rootfile,
                 bool mcOnly) {
   int muons=0; int pions=0;
@@ -182,12 +116,12 @@ rw.GenerateThrows(100);
       new TH1D("track_correctness", "track_correctness", 4, 0, 4);
   TH1D *showerCorrectness =
       new TH1D("shower_corrrectness", "shower_correctness", 4, 0, 4);
-  TH1D *recoHistVertexY =
-      new TH1D("recoHistVertexY", "recoHistVertexY", 140, -70, 70);
-  TH1D *recoHistVertexX =
-      new TH1D("recoHistVertexX", "recoHistVertexX", 140, -70, 70);
-  TH1D *recoHistVertexZ =
-      new TH1D("recoHistVertexZ", "recoHistVertexZ", 140, -70, 70);
+  //TH1D *recoHistVertexY =
+  //    new TH1D("recoHistVertexY", "recoHistVertexY", 140, -70, 70);
+  //TH1D *recoHistVertexX =
+  //    new TH1D("recoHistVertexX", "recoHistVertexX", 140, -70, 70);
+  //TH1D *recoHistVertexZ =
+  //    new TH1D("recoHistVertexZ", "recoHistVertexZ", 140, -70, 70);
   TH1D *diffVertexHist =
       new TH1D("diffVertexHist", "diffVertexHist", 100, 0, 10);
 
@@ -322,8 +256,8 @@ rw.GenerateThrows(100);
 
   //TH1D *histEl = new TH1D("histEl", "histEl", 50, 0, 20);
 
-  TH2D *recoVertex2DNoCuts = new TH2D(
-      "recoVertex2DNoCuts", "recoVertex2DNoCuts", 70, -70, 70, 70, -70, 70);
+  //TH2D *recoVertex2DNoCuts = new TH2D(
+  //    "recoVertex2DNoCuts", "recoVertex2DNoCuts", 70, -70, 70, 70, -70, 70);
   TH2D *recoVertex2D =
       new TH2D("recoVertex2D", "recoVertex2D", 60, -60, 60, 60, -60, 60);
   TH2D *recoVertex2DBadYZ = new TH2D("recoVertex2DBadYZ", "recoVertex2DBadYZ",
@@ -405,11 +339,6 @@ rw.GenerateThrows(100);
        //         << std::endl;
     caf_chain->GetEntry(n); // Get spill from tree
     sumPOT = sr->beam.pulsepot / 1e13 + sumPOT;
-    //int intAboveThresh=0;
-
-    //bool hasANeutrino = false;
-    //double mnvOffsetX = -10;
-    //double mnvOffsetY = 5;
     
     int rock = 0;
     bool goodInteraction = false;
@@ -437,326 +366,287 @@ rw.GenerateThrows(100);
       double dirYExiting = -9999;
       std::vector<int> mx2IntCandidateVector, mx2IdxCandidateVector, ndlarTrkCandidateVector;
 
-      double recoVertexX = sr->common.ixn.dlp[nixn].vtx.x;
-      double recoVertexY = sr->common.ixn.dlp[nixn].vtx.y;
-      double recoVertexZ = sr->common.ixn.dlp[nixn].vtx.z;
+      //double recoVertexX = sr->common.ixn.dlp[nixn].vtx.x;
+      //double recoVertexY = sr->common.ixn.dlp[nixn].vtx.y;
+      //double recoVertexZ = sr->common.ixn.dlp[nixn].vtx.z;
 
-      recoVertex2DNoCuts->Fill(sr->common.ixn.dlp[nixn].vtx.x,
-                               sr->common.ixn.dlp[nixn].vtx.z);
+      //recoVertex2DNoCuts->Fill(sr->common.ixn.dlp[nixn].vtx.x,
+       //                        sr->common.ixn.dlp[nixn].vtx.z);
 
-      if (mcOnly) {
+      //if (mcOnly) {
 
-        for (long unsigned int ntruth = 0; ntruth < sr->common.ixn.dlp[nixn].truth.size();
-             ntruth++) {
+        //for (long unsigned int ntruth = 0; ntruth < sr->common.ixn.dlp[nixn].truth.size();
+        //     ntruth++) {
+//
+        //  if (biggestMatch < sr->common.ixn.dlp[nixn].truthOverlap.at(ntruth) && sr->common.ixn.dlp[nixn].truthOverlap.at(ntruth)>0.5) {
+        //    biggestMatch = sr->common.ixn.dlp[nixn].truthOverlap.at(ntruth);
+        //    biggestMatchIndex = sr->common.ixn.dlp[nixn].truth.at(ntruth);
+        //  }
+        //}
+        //if (sr->mc.nu[biggestMatchIndex].id > 1E9) {
+        //  rock = 1;
+        //}
+        //trueVtxX = sr->mc.nu[biggestMatchIndex].vtx.x;
+        //trueVtxY = sr->mc.nu[biggestMatchIndex].vtx.y;
+        //trueVtxZ = sr->mc.nu[biggestMatchIndex].vtx.z;
+        //double diffVtx =
+        //    TMath::Sqrt((recoVertexY - trueVtxY) * (recoVertexY - trueVtxY) +
+        //                (recoVertexX - trueVtxX) * (recoVertexX - trueVtxX) +
+        //                (recoVertexZ - trueVtxZ) * (recoVertexZ - trueVtxZ));
+        //if (abs(sr->mc.nu[biggestMatchIndex].pdg) == 14 &&
+        //    abs(sr->mc.nu[biggestMatchIndex].iscc) == true &&
+        //    sr->mc.nu[biggestMatchIndex].targetPDG == 1000180400 &&
+        //    diffVtx < 20 && abs(trueVtxX) < 59 && abs(trueVtxZ) > 5 && abs(trueVtxX)>5 &&
+        //    abs(trueVtxZ) < 59.5 && abs(trueVtxY) < 57){
+        //    goodOutOfSigDef=true;
+        //                for (int primaries = 0;
+        //         primaries < sr->mc.nu[biggestMatchIndex].prim.size();
+        //         primaries++) {
+        //    if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) != 13)
+        //        continue;
+        //      double Elep = sr->mc.nu[biggestMatchIndex].prim[primaries].p.E;
+        //      auto start_pos =
+        //          sr->mc.nu[biggestMatchIndex].prim[primaries].start_pos;
+        //      auto end_pos =
+        //          sr->mc.nu[biggestMatchIndex].prim[primaries].end_pos;
+        //      auto p = sr->mc.nu[biggestMatchIndex].prim[primaries].p;
+        //      // if (std::isnan(start_pos.z)) continue;
+        //      double dX = (p.px);
+        //      double dY = (p.py);
+        //      double dZ = (p.pz);
+        //      double length =
+        //          TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
+        //      double dir_x = dX / length;
+        //      double dir_y = dY / length;
+        //      double dir_z = dZ / length;
+        //      double cosLPrelim = dir_x * beam_x + dir_y * beam_y + dir_z * beam_z;
+//
+        //     if (cosLPrelim<0.91 || Elep<1) goodInteraction = false; else goodInteraction=true;}
+        //}
+      //}
+       // recoHistVertexY->Fill(sr->common.ixn.dlp[nixn].vtx.y);
+       // recoHistVertexX->Fill(sr->common.ixn.dlp[nixn].vtx.x);
+       // recoHistVertexZ->Fill(sr->common.ixn.dlp[nixn].vtx.z);
+      //  if (goodInteraction == true)
+      //    goodIntNum++;
+      //  else
+      //    badIntNum++;
+//
+      //  if (/*abs(abs(sr->common.ixn.dlp[nixn].vtx.x)-33)<1 || */ abs(
+      //        sr->common.ixn.dlp[nixn].vtx.x) > 59 ||
+      //    abs(sr->common.ixn.dlp[nixn].vtx.x) < 5 ||
+      //    abs(sr->common.ixn.dlp[nixn].vtx.y) > 57 ||
+      //    abs(sr->common.ixn.dlp[nixn].vtx.z) < 5 ||
+      //    abs(sr->common.ixn.dlp[nixn].vtx.z) > 59.5)
+      //  continue;
+//
+//
+//
+      //  if (goodInteraction == true)
+      //    goodIntInFidVol++;
+      //  else
+      //    badIntInFidVol++;
 
-          if (biggestMatch < sr->common.ixn.dlp[nixn].truthOverlap.at(ntruth) && sr->common.ixn.dlp[nixn].truthOverlap.at(ntruth)>0.5) {
-            biggestMatch = sr->common.ixn.dlp[nixn].truthOverlap.at(ntruth);
-            biggestMatchIndex = sr->common.ixn.dlp[nixn].truth.at(ntruth);
-          }
-        }
-        if (sr->mc.nu[biggestMatchIndex].id > 1E9) {
-          rock = 1;
-        }
-        trueVtxX = sr->mc.nu[biggestMatchIndex].vtx.x;
-        trueVtxY = sr->mc.nu[biggestMatchIndex].vtx.y;
-        trueVtxZ = sr->mc.nu[biggestMatchIndex].vtx.z;
-        double diffVtx =
-            TMath::Sqrt((recoVertexY - trueVtxY) * (recoVertexY - trueVtxY) +
-                        (recoVertexX - trueVtxX) * (recoVertexX - trueVtxX) +
-                        (recoVertexZ - trueVtxZ) * (recoVertexZ - trueVtxZ));
-        if (abs(sr->mc.nu[biggestMatchIndex].pdg) == 14 &&
-            abs(sr->mc.nu[biggestMatchIndex].iscc) == true &&
-            sr->mc.nu[biggestMatchIndex].targetPDG == 1000180400 &&
-            diffVtx < 20 && abs(trueVtxX) < 59 && abs(trueVtxZ) > 5 && abs(trueVtxX)>5 &&
-            abs(trueVtxZ) < 59.5 && abs(trueVtxY) < 57){
-            goodOutOfSigDef=true;
-                        for (int primaries = 0;
-                 primaries < sr->mc.nu[biggestMatchIndex].prim.size();
-                 primaries++) {
-            if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) != 13)
-                continue;
-              double Elep = sr->mc.nu[biggestMatchIndex].prim[primaries].p.E;
-              auto start_pos =
-                  sr->mc.nu[biggestMatchIndex].prim[primaries].start_pos;
-              auto end_pos =
-                  sr->mc.nu[biggestMatchIndex].prim[primaries].end_pos;
-              auto p = sr->mc.nu[biggestMatchIndex].prim[primaries].p;
-              // if (std::isnan(start_pos.z)) continue;
-              double dX = (p.px);
-              double dY = (p.py);
-              double dZ = (p.pz);
-              double length =
-                  TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-              double dir_x = dX / length;
-              double dir_y = dY / length;
-              double dir_z = dZ / length;
-              double cosLPrelim = dir_x * beam_x + dir_y * beam_y + dir_z * beam_z;
-
-             if (cosLPrelim<0.91 || Elep<1) goodInteraction = false; else goodInteraction=true;}
-        }
-      }
-        recoHistVertexY->Fill(sr->common.ixn.dlp[nixn].vtx.y);
-        recoHistVertexX->Fill(sr->common.ixn.dlp[nixn].vtx.x);
-        recoHistVertexZ->Fill(sr->common.ixn.dlp[nixn].vtx.z);
-        if (goodInteraction == true)
-          goodIntNum++;
-        else
-          badIntNum++;
-
-        if (/*abs(abs(sr->common.ixn.dlp[nixn].vtx.x)-33)<1 || */ abs(
-              sr->common.ixn.dlp[nixn].vtx.x) > 59 ||
-          abs(sr->common.ixn.dlp[nixn].vtx.x) < 5 ||
-          abs(sr->common.ixn.dlp[nixn].vtx.y) > 57 ||
-          abs(sr->common.ixn.dlp[nixn].vtx.z) < 5 ||
-          abs(sr->common.ixn.dlp[nixn].vtx.z) > 59.5)
-        continue;
-
-
-
-        if (goodInteraction == true)
-          goodIntInFidVol++;
-        else
-          badIntInFidVol++;
-
-      int partMult = 0;
-      int partMultTrkOnly = 0;
-      bool hasAtLeastOneProton = false;
-      bool hasAtLeastOneMuon = false;
-      bool hasAtLeastOne = false;
-      // std::cout<<"Interaction: "<<nixn<<std::endl;
-      int correctTrack = 2;
-      int correctShower = 2;
-      double longestTrk = -9999;
-      int trackMult = 0;
-      int trackMultExit = 0;
-      int minervaTracks = 0;
-      int minervaThrough = 0;
-      int mx2IntCandidate=-9;
-      int mx2IdxCandidate=-9;
-      for (long unsigned npart = 0;
-           npart < sr->common.ixn.dlp[nixn].part.dlp.size();
-           npart++) { // loop over particles
-      //  if (!sr->common.ixn.dlp[nixn].part.dlp[npart].primary)
-      //    continue;
-        int pdg = sr->common.ixn.dlp[nixn].part.dlp[npart].pdg;
-        // Loop over primary tracks
-        if ((abs(pdg) == 2212 || abs(pdg) == 13 || abs(pdg) == 211 ||
-             abs(pdg) == 321)) {
-
-          auto start_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].start;
-          auto end_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].end;
-          double diffVertexdZ =
-              abs(start_pos.z - sr->common.ixn.dlp[nixn].vtx.z);
-          double diffVertexdX =
-              abs(start_pos.x - sr->common.ixn.dlp[nixn].vtx.x);
-          double diffVertexdY =
-              abs(start_pos.y - sr->common.ixn.dlp[nixn].vtx.y);
-          double diffVertex = TMath::Sqrt(diffVertexdZ * diffVertexdZ +
-                                          diffVertexdY * diffVertexdY +
-                                          diffVertexdX * diffVertexdX);
-          if (diffVertex > 5)
-            continue;
+      //int partMult = 0;
+      //int partMultTrkOnly = 0;
+      //bool hasAtLeastOneProton = false;
+      //bool hasAtLeastOneMuon = false;
+      //bool hasAtLeastOne = false;
+      //// std::cout<<"Interaction: "<<nixn<<std::endl;
+      //int correctTrack = 2;
+      //int correctShower = 2;
+      //double longestTrk = -9999;
+      //int trackMult = 0;
+      ////int trackMultExit = 0;
+      //int minervaTracks = 0;
+      //int minervaThrough = 0;
+      //int mx2IntCandidate=-9;
+      //int mx2IdxCandidate=-9;
+      //for (long unsigned npart = 0;
+      //     npart < sr->common.ixn.dlp[nixn].part.dlp.size();
+      //     npart++) { // loop over particles
+      ////  if (!sr->common.ixn.dlp[nixn].part.dlp[npart].primary)
+      ////    continue;
+        //int pdg = sr->common.ixn.dlp[nixn].part.dlp[npart].pdg;
+        //// Loop over primary tracks
+        //if ((abs(pdg) == 2212 || abs(pdg) == 13 || abs(pdg) == 211 ||
+        //     abs(pdg) == 321)) {
+//
+        //  auto start_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].start;
+        //  auto end_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].end;
+        //  double diffVertexdZ =
+        //      abs(start_pos.z - sr->common.ixn.dlp[nixn].vtx.z);
+        //  double diffVertexdX =
+        //      abs(start_pos.x - sr->common.ixn.dlp[nixn].vtx.x);
+        //  double diffVertexdY =
+        //      abs(start_pos.y - sr->common.ixn.dlp[nixn].vtx.y);
+        //  double diffVertex = TMath::Sqrt(diffVertexdZ * diffVertexdZ +
+        //                                  diffVertexdY * diffVertexdY +
+        //                                  diffVertexdX * diffVertexdX);
+        //  if (diffVertex > 5)
+        //    continue;
           // Make sure it is near the vertex
-          double dX = (end_pos.x - start_pos.x);
-          double dY = (end_pos.y - start_pos.y);
-          double dZ = (end_pos.z - start_pos.z);
-          double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
-          double dirX = dX / length;
-          double dirY = dY / length;
-          double dirZ = dZ / length;
-
-          if (dirZ < 0) {
-            dirZ = -dirZ;
-            dirX = -dirX;
-            dirY = -dirY;
-            auto temp = start_pos;
-            end_pos = start_pos;
-            end_pos = temp;
-          }
-          if (std::isnan(start_pos.z))
-            length = -999;
-          if (length > longestTrk)
-            longestTrk = length;
-          // Make sure it is above the track threshold
-          if (sr->common.ixn.dlp[nixn].part.dlp[npart].primary == true &&
-              length > minTrkLength) {
-            partMult++;
-            trackMult++;
+          // double dX = (end_pos.x - start_pos.x);
+          // double dY = (end_pos.y - start_pos.y);
+          // double dZ = (end_pos.z - start_pos.z);
+          // double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
+          // double dirX = dX / length;
+          // double dirY = dY / length;
+          // double dirZ = dZ / length;
+// 
+          // if (dirZ < 0) {
+          //   dirZ = -dirZ;
+          //   dirX = -dirX;
+          //   dirY = -dirY;
+          //   auto temp = start_pos;
+          //   end_pos = start_pos;
+          //   end_pos = temp;
+          // }
+          // if (std::isnan(start_pos.z))
+          //   length = -999;
+          // if (length > longestTrk)
+          //   longestTrk = length;
+          // // Make sure it is above the track threshold
+           //if (sr->common.ixn.dlp[nixn].part.dlp[npart].primary == true &&
+          //     length > minTrkLength) {
+          //   partMult++;
+          //   trackMult++;
             // see if it punches out and match it to MINERvA
-            if ((start_pos.z) > 62 || (end_pos.z) > 62)
-              trackMultExit++;
-            int maxPartMinerva = -999;
-            int maxTypeMinerva = -999;
-            int maxIxnMinerva = -999;
-            int maxPartMinervaUS = -999;
-            int maxTypeMinervaUS = -999;
-            if ((abs(start_pos.z) > 62 || abs(end_pos.z) > 62)) {
-              int minervaPass = 0;
-              double dotProductDS = -999;
-              double deltaExtrapYUS = -999;
-              double deltaExtrapY = -999;
-              double dotProductUS = -999;
-              double deltaExtrapX = -999;
-              double deltaExtrapXUS = -999;
-              double dotProductFromCAF=-999;
-        	 	for(int i=0; i<sr->nd.trkmatch.extrap.size(); i++){
-                if (sr->nd.trkmatch.extrap[i].larid.ixn==nixn && sr->nd.trkmatch.extrap[i].larid.reco==1){
-                    int index=sr->nd.trkmatch.extrap[i].larid.idx;
-                    if (sr->nd.lar.dlp[nixn].tracks[index].start.z==sr->common.ixn.dlp[nixn].part.dlp[npart].start.z && sr->nd.lar.dlp[nixn].tracks[index].end.z==sr->common.ixn.dlp[nixn].part.dlp[npart].end.z){
-                    double angldispl=abs(sr->nd.trkmatch.extrap[i].angdispl);
-                    if (dotProductFromCAF<angldispl) dotProductFromCAF=angldispl;
-                }}
-                }
-                            if (dotProductFromCAF<0) continue;
-    
-        
-                    for(int i=0; i<sr->nd.minerva.ixn.size(); i++){
-                
-                    for (int j=0; j<sr->nd.minerva.ixn[i].ntracks; j++){
-                    double dotProductTemp=0;
-                    double trackDispl=0;
-                    bool pass=Passes_cut(sr->nd.minerva.ixn[i].tracks[j], start_pos.x,end_pos.x,start_pos.y,end_pos.y,start_pos.z, end_pos.z, dotProductTemp, trackDispl);
-                    if (!pass) continue;
-                    dotProductTemp=abs(dotProductTemp);
-                    if (mcOnly && abs(dotProductTemp-dotProductFromCAF)>0.001) continue;
-                  double dir_z = sr->nd.minerva.ixn[i].tracks[j].dir.z;
-                  double end_z = sr->nd.minerva.ixn[i].tracks[j].end.z;
-                  double start_z = sr->nd.minerva.ixn[i].tracks[j].start.z;
-                  double end_x = sr->nd.minerva.ixn[i].tracks[j].end.x;
-                  double start_x = sr->nd.minerva.ixn[i].tracks[j].start.x;
-
-                  double end_y = sr->nd.minerva.ixn[i].tracks[j].end.y;
-                  double start_y = sr->nd.minerva.ixn[i].tracks[j].start.y;
+            //if ((start_pos.z) > 62 || (end_pos.z) > 62)
+            //  trackMultExit++;
+            //int maxPartMinerva = -999;
+            //int maxTypeMinerva = -999;
+            //int maxIxnMinerva = -999;
+            //int maxPartMinervaUS = -999;
+            //int maxTypeMinervaUS = -999;
+            //if ((abs(start_pos.z) > 62 || abs(end_pos.z) > 62)) {
+            //  int minervaPass = 0;
+            //  double dotProductDS = -999;
+            //  double deltaExtrapYUS = -999;
+            //  double deltaExtrapY = -999;
+            //  double dotProductUS = -999;
+            //  double deltaExtrapX = -999;
+            //  double deltaExtrapXUS = -999;
+            //  double dotProductFromCAF=-999;
+        	 	//for(int i=0; i<sr->nd.trkmatch.extrap.size(); i++){
+            //    if (sr->nd.trkmatch.extrap[i].larid.ixn==nixn && sr->nd.trkmatch.extrap[i].larid.reco==1){
+            //        int index=sr->nd.trkmatch.extrap[i].larid.idx;
+            //        if (sr->nd.lar.dlp[nixn].tracks[index].start.z==sr->common.ixn.dlp[nixn].part.dlp[npart].start.z && sr->nd.lar.dlp[nixn].tracks[index].end.z==sr->common.ixn.dlp[nixn].part.dlp[npart].end.z){
+            //        double angldispl=abs(sr->nd.trkmatch.extrap[i].angdispl);
+            //        if (dotProductFromCAF<angldispl) dotProductFromCAF=angldispl;
+            //    }}
+            //    }
+            //                if (dotProductFromCAF<0) continue;
+    //
+        //
+                    //for(int i=0; i<sr->nd.minerva.ixn.size(); i++){
+            //    
+                    //for (int j=0; j<sr->nd.minerva.ixn[i].ntracks; j++){
+            //        double dotProductTemp=0;
+            //        double trackDispl=0;
+            //        bool pass=Passes_cut(sr->nd.minerva.ixn[i].tracks[j], start_pos.x,end_pos.x,start_pos.y,end_pos.y,start_pos.z, end_pos.z, dotProductTemp, trackDispl);
+            //        if (!pass) continue;
+            //        dotProductTemp=abs(dotProductTemp);
+            //        if (mcOnly && abs(dotProductTemp-dotProductFromCAF)>0.001) continue;
+                  //double dir_z = sr->nd.minerva.ixn[i].tracks[j].dir.z;
+                  //double end_z = sr->nd.minerva.ixn[i].tracks[j].end.z;
+                  //double start_z = sr->nd.minerva.ixn[i].tracks[j].start.z;
+                  //double end_x = sr->nd.minerva.ixn[i].tracks[j].end.x;
+                  //double start_x = sr->nd.minerva.ixn[i].tracks[j].start.x;
+//
+                  //double end_y = sr->nd.minerva.ixn[i].tracks[j].end.y;
+                  //double start_y = sr->nd.minerva.ixn[i].tracks[j].start.y;
                   // Try to match a track starting in 2x2 to MINERvA
-                  if (start_z > 0 && start_z < 170 && end_z > 170 &&
-                      ((end_pos.z) > 62)) {
-                    int truthPart =
-                        sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                    double dXMnv = (sr->nd.minerva.ixn[i].tracks[j].end.x -
-                                    sr->nd.minerva.ixn[i].tracks[j].start.x);
-                    double dYMnv = (sr->nd.minerva.ixn[i].tracks[j].end.y -
-                                    sr->nd.minerva.ixn[i].tracks[j].start.y);
-                    double dZMnv = (sr->nd.minerva.ixn[i].tracks[j].end.z -
-                                    sr->nd.minerva.ixn[i].tracks[j].start.z);
-                    double lengthMinerva = TMath::Sqrt(
-                        dXMnv * dXMnv + dYMnv * dYMnv + dZMnv * dZMnv);
-                    if (lengthMinerva < 10)
-                      continue;
-                    double dirXMinerva = dXMnv / lengthMinerva;
-                    double dirYMinerva = dYMnv / lengthMinerva;
-                    double dirZMinerva = dZMnv / lengthMinerva;
-                    double dotProduct = dirXMinerva * dirX +
-                                        dirYMinerva * dirY + dirZ * dirZMinerva;
-                    double extrapdZ = start_z - end_pos.z;
-                    double extrapY =
-                        dirY / dirZ * (extrapdZ) + end_pos.y - start_y;
-                    double extrapX =
-                        dirX / dirZ * (extrapdZ) + end_pos.x - start_x;
-                    double diffExtrap =
-                        TMath::Sqrt(TMath::Power(extrapY - start_y, 2));
+                  //if (start_z > 0 && start_z < 170 && end_z > 170 &&
+                  //    ((end_pos.z) > 62)) {
+                  //  int truthPart =
+                  //      sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
+                    //double dXMnv = (sr->nd.minerva.ixn[i].tracks[j].end.x -
+                    //                sr->nd.minerva.ixn[i].tracks[j].start.x);
+                    //double dYMnv = (sr->nd.minerva.ixn[i].tracks[j].end.y -
+                    //                sr->nd.minerva.ixn[i].tracks[j].start.y);
+                    //double dZMnv = (sr->nd.minerva.ixn[i].tracks[j].end.z -
+                    //                sr->nd.minerva.ixn[i].tracks[j].start.z);
+                    //double lengthMinerva = TMath::Sqrt(
+                    //    dXMnv * dXMnv + dYMnv * dYMnv + dZMnv * dZMnv);
+                    //if (lengthMinerva < 10)
+                    //  continue;
+                    //double dirXMinerva = dXMnv / lengthMinerva;
+                    //double dirYMinerva = dYMnv / lengthMinerva;
+                    //double dirZMinerva = dZMnv / lengthMinerva;
+                    //double dotProduct = dirXMinerva * dirX +
+                    //                    dirYMinerva * dirY + dirZ * dirZMinerva;
+                    //double extrapdZ = start_z - end_pos.z;
+                    //double extrapY =
+                    //    dirY / dirZ * (extrapdZ) + end_pos.y - start_y;
+                    //double extrapX =
+                    //    dirX / dirZ * (extrapdZ) + end_pos.x - start_x;
+                    //double diffExtrap =
+                    //    TMath::Sqrt(TMath::Power(extrapY - start_y, 2));
 
-                    if (dotProductDS < dotProductTemp) {
-                      dotProductDS = dotProductTemp;
-                      deltaExtrapY = extrapY;
-                      deltaExtrapX = extrapX;
-                      endZTemp=end_z;
-                      mx2IntCandidate=i;
-                      mx2IdxCandidate=j;
-                      dirZExiting = dirZ;
-                      dirXExiting = dirX;
-                      dirYExiting = dirY;
-                      if (mcOnly) {
-                        maxPartMinerva =
-                            sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                        maxTypeMinerva =
-                            sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
-                        maxIxnMinerva =
-                            sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
-                      }
-                      // if (end_z>300){ minervaPass=1;} if(dirZExiting<dirZ){
-                      // dirZExiting=dirZ;}
-                    }
-                  }
-                  // Try matching a through-going particle of both to each other
-                  if (start_z < 0 && end_z > 0 &&
-                      ((start_pos.z < -62 && end_pos.z > 62) ||
-                       (start_pos.z > 62 && end_pos.z < -62))) {
-                    int truthPart =
-                        sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                    double dXMnv = (sr->nd.minerva.ixn[i].tracks[j].end.x -
-                                    sr->nd.minerva.ixn[i].tracks[j].start.x);
-                    double dYMnv = (sr->nd.minerva.ixn[i].tracks[j].end.y -
-                                    sr->nd.minerva.ixn[i].tracks[j].start.y);
-                    double dZMnv = (sr->nd.minerva.ixn[i].tracks[j].end.z -
-                                    sr->nd.minerva.ixn[i].tracks[j].start.z);
-                    double lengthMinerva = TMath::Sqrt(
-                        dXMnv * dXMnv + dYMnv * dYMnv + dZMnv * dZMnv);
-                    double dirXMinerva = dXMnv / lengthMinerva;
-                    double dirYMinerva = dYMnv / lengthMinerva;
-                    double dirZMinerva = dZMnv / lengthMinerva;
-                    double dotProduct = dirXMinerva * dirX +
-                                        dirYMinerva * dirY + dirZ * dirZMinerva;
-
-                    double extrapdZUS = end_z - end_pos.z;
-                    double extrapYUS =
-                        dirY / dirZ * (extrapdZUS) + end_pos.y - end_y;
-                    double extrapXUS =
-                        dirX / dirZ * (extrapdZUS) + end_pos.x - end_x;
-
-                    // double
-                    // diffExtrap=TMath::Sqrt(TMath::Power(extrapY-end_y,2));
-                    if (dotProductUS < dotProductTemp)
-                      dotProductUS = dotProductTemp;
-                    deltaExtrapYUS = extrapYUS;
-                    deltaExtrapXUS = extrapXUS;
-                    if (mcOnly) {
-                      maxPartMinervaUS =
-                          sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                      maxTypeMinervaUS =
-                          sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
-                    }
-                  }
-                }
-              } // Minerva
+                    //if (dotProductDS < dotProductTemp) {
+                    //  dotProductDS = dotProductTemp;
+                    //  //deltaExtrapY = extrapY;
+                    //  //deltaExtrapX = extrapX;
+                    //  //endZTemp=end_z;
+                    //  //mx2IntCandidate=i;
+                    //  //mx2IdxCandidate=j;
+                    //  //dirZExiting = dirZ;
+                    //  //dirXExiting = dirX;
+                    //  //dirYExiting = dirY;
+                    //  if (mcOnly) {
+                    //    maxPartMinerva =
+                    //        sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
+                    //    maxTypeMinerva =
+                    //        sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
+                    //    maxIxnMinerva =
+                    //        sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
+                    //  }
+                    //  // if (end_z>300){ minervaPass=1;} if(dirZExiting<dirZ){
+                    //  // dirZExiting=dirZ;}
+                    //}
+                  //}
+                //}
+              //} // Minerva
               // See how good the best one was
-              if (dotProductDS > maxDotProductDS) {
-                maxDotProductDS = dotProductDS;
-                mx2IntCandidateVector.push_back(mx2IntCandidate);
-                mx2IdxCandidateVector.push_back(mx2IdxCandidate);
-                ndlarTrkCandidateVector.push_back(npart);
-                maxEventPar = maxPartMinerva;
-                maxEventTyp = maxTypeMinerva;
-                maxEventIxn = maxIxnMinerva;
-                
-              }
-              if (dotProductDS > 0.99) {
-                minervaTracks++;
-                if (minervaPass == 1) {
-                  minervaThrough++;
-                  startZMuonCand = start_pos.z;
-                  if (start_pos.z > end_pos.z)
-                    startZMuonCand = end_pos.z;
-                }
-              }
-              if (dotProductUS > maxDotProductUS)
-                maxDotProductUS = dotProductUS;
-              if (dotProductUS > 0.99) { //could add a cout here to get rid of any overlapping through-going muons
-        	 }
-            } // exiting particles
+              //if (dotProductDS > maxDotProductDS) {
+              //  //maxDotProductDS = dotProductDS;
+              //  mx2IntCandidateVector.push_back(mx2IntCandidate);
+              //  mx2IdxCandidateVector.push_back(mx2IdxCandidate);
+              //  ndlarTrkCandidateVector.push_back(npart);
+              //  //maxEventPar = maxPartMinerva;
+              //  //maxEventTyp = maxTypeMinerva;
+              //  //maxEventIxn = maxIxnMinerva;
+              //  
+              //}
+              //if (dotProductDS > 0.99) {
+              //  minervaTracks++;
+              //  if (minervaPass == 1) {
+              //    minervaThrough++;
+              //    startZMuonCand = start_pos.z;
+              //    if (start_pos.z > end_pos.z)
+              //      startZMuonCand = end_pos.z;
+              //  }
+              //}
+              //if (dotProductUS > maxDotProductUS)
+              //  maxDotProductUS = dotProductUS;
+              //if (dotProductUS > 0.99) { //could add a cout here to get rid of any overlapping through-going muons
+        	 //}
+            //} // exiting particles
               // else oneContained=true;
-          }   // primary of particle greater than 5
-        }
-      } // particles
-     if (/*minervaThrough<1  ||*/ maxDotProductDS < 0.99 || mx2IntCandidateVector.size()==0)
-        continue;
-      // If you got one matched to downstream Mx2, then it likely was the muon
-      int muonIndex=-1; double muonCandidateZ=-170;
-      for (int k=0; k<mx2IntCandidateVector.size(); k++){
-            int i=mx2IntCandidateVector.at(k); int j=mx2IdxCandidateVector.at(k); 
-            double end_z = sr->nd.minerva.ixn[i].tracks[j].end.z;
-            if (end_z>muonCandidateZ){ muonIndex=k; muonCandidateZ=end_z;}
-
-            }
+          //}   // primary of particle greater than 5
+        //}
+      //} // particles
+      //if (/*minervaThrough<1  ||*/ maxDotProductDS < 0.99 || mx2IntCandidateVector.size()==0)
+      //  continue;
+      //// If you got one matched to downstream Mx2, then it likely was the muon
+      //int muonIndex=-1; double muonCandidateZ=-170;
+      //for (int k=0; k<mx2IntCandidateVector.size(); k++){
+      //      int i=mx2IntCandidateVector.at(k); int j=mx2IdxCandidateVector.at(k); 
+      //      double end_z = sr->nd.minerva.ixn[i].tracks[j].end.z;
+      //      if (end_z>muonCandidateZ){ muonIndex=k; muonCandidateZ=end_z;}
+//
+      //      }
      // Calculate muon direction based on distance
       int npart=ndlarTrkCandidateVector.at(muonIndex);
       auto start_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].start;
@@ -1418,7 +1308,7 @@ int main(int argc, char **argv) {
     // -------------------------------
     // 4. Initialize histograms
     // -------------------------------
-    HistogramManager hist(flux_nom); //TODO : Pass flux info to get nom flux
+    HistogramManager hist(); //TODO : Pass flux info to get nom flux
 
     // -------------------------------
     // 5. Load CAF chain
@@ -1459,7 +1349,38 @@ int main(int argc, char **argv) {
         truthSel.SelectTruthInteractions(*sr, hist);
       }
 
-    }
+      // ---------------------------
+      // 4b. Reco interaction loop
+      // ---------------------------
+      RecoSelection recoSel(selectionCuts, beamInfo, detInfo, mcOnly);
+      recoSel.SelectRecoInteractions(*sr, hist);
+
+      for (const auto& ixn : sr->common.ixn.dlp) {
+
+        // --- Vertex cut
+        if (!InFiducialVolume(ixn.vtx)) continue;
+
+        // --- Truth match (if MC)
+        TruthMatch match;
+        if (mcOnly) {
+          match = FindBestTruthMatch(ixn, *sr);
+        }
+
+        // --- Reco summary
+        RecoInteractionSummary reco =
+            AnalyzeRecoInteraction(ixn, *sr, cfg, beam);
+
+        // --- MINERvA matching (muon candidate)
+        MinervaMatchResult muonMatch =
+            MatchMuonToMinerva(ixn, *sr, cfg);
+
+        if (!muonMatch.isValid) continue;
+
+        // --- Compute reco kinematics
+        reco.cosTheta = ComputeCosTheta(muonMatch.direction, beam);
+
+
+      }
 
     // -------------------------------
     // 6. Finalize + write output

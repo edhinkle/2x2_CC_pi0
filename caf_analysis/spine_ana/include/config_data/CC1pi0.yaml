@@ -1,7 +1,17 @@
 selection: 
   # Selection cuts for Mx2 matching
-  cosThetaCut: 0.9 
+  cosThetaCut: 0.91 
   muonEnergyCut: 1 # GeV
+  minTruthIxnOverlap: 0.5 # Minimum overlap to consider Reco/Truth Ixn match successful
+  minRockIxnTruthId: 1000000000 # Minimum truth ID to consider an interaction a rock interaction
+  maxTruthRecoVertexDiff: 20.0 # cm, maximum distance between truth and reco vertex for a successful match
+  maxMx2TrackVertexDiff: 5.0 # cm, maximum distance between track start and vertex for Mx2 matching candidate
+  maxTrkMatchMx2MatchDiff: 0.001 # max difference in dot product between trkmatch (CAF branch) matched track dot product & dot product bewteen Mx2 track and 2x2 track
+  mx2MatchExtrapLocZ: -70. # cm, Z location to which tracks in LAr and 2x2 are extrapolated
+  maxMx2MatchExtrapDiffX: 17.0 # cm, allowance for difference in X of extrapolated LAr and Mx2 tracks
+  maxMx2MatchExtrapDiffY: 19.0 # cm, allowance for difference in Y of extrapolated LAr and Mx2 tracks
+  maxMx2MatchArctanDiffXZ: 0.08 # rad, allowance for differnce in arctangent in X/Z plane for LAr and Mx2 tracks
+  maxMx2MatchArctanDiffYZ: 0.09 # rad, allowance for differnce in arctangent in Y/Z plane for LAr and Mx2 tracks
   # FV cuts -- matching CC numu inclusive (Richie) for now
   detFVCutAbsMinX: 1.931 # cm
   detFVCutAbsMaxX: 4.931 # cm
@@ -9,6 +19,14 @@ selection:
   detFVCutAbsMaxY: 4.8543 # cm
   detFVCutAbsMinZ: 2.3163 # cm
   detFVCutAbsMaxZ: 4.8163 # cm
+  # FV cut for Mx2 exiting track requirement -- matching CC numu inclusive (Richie) for now
+  detFVCutAbsMaxZExiting: 2.3163 # cm
+  # Mx2 hand-matching cuts
+  minMx2TrackLength: 10.0 # cm
+  mx2EnterDownstreamAllowance: 6.0 # cm -- distance into downstream Mx2 track is allowed to start (Z) and still be considered for match to 2x2
+  mx2DistFromEndDownstreamZ: 40.0 # cm -- distance into downstream Mx2 track is allowed to end (Z) and still be considered as muon match in 2x2
+  # Mx2 Match Tracks Dot Product Threshold
+  mx2TrackMatchDotProdThreshold: 0.99
 beam:
   beam_x: 0
   beam_y: -0.05836
@@ -17,11 +35,6 @@ detector:
   # Thresholds for determining if a particle is visible in the detector
   keThreshold: 0.01 # GeV
   minTrackLength: 3 # cm
-  # Offsets for Mx2 matching; must account for offset in real detector positions
-  mx2OffsetXTruth: 0.0 # cm, offset in X for Mx2 matching for truth particles
-  mx2OffsetYTruth: 0.0 # cm, offset in Y for Mx2 matching for truth particles
-  mx2OffsetXReco: -10.0  # cm, offset in X for Mx2 matching for reco particles
-  mx2OffsetYReco: 5.0  # cm, offset in Y for Mx2 matching for reco particles
   # Module boundaries (absolute values -- symmetric in XYZ); used for FV cuts
   absModMinX: 3.069 # cm, minimum absolute value X position of modules
   absModMaxX: 63.931 # cm, maximum absolute value X position of modules
@@ -29,3 +42,8 @@ detector:
   absModMaxY: 61.8543 # cm, maximum absolute value Y position of modules
   absModMinZ: 2.6837 # cm, minimum absolute value Z position of modules
   absModMaxZ: 64.3163 # cm, maximum absolute value Z position of modules 
+  # Mx2 boundaries from DUNE DocDB 32440
+  mx2DownstreamZMin: 164.0 # cm
+  mx2DownstreamZMax: 310.0 # cm
+  mx2UpstreamZMin: -240.0 # cm
+  mx2UpstreamZMax: -190.0 # cm

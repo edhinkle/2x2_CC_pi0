@@ -17,6 +17,8 @@ struct TruthInteractionSummary {
   int nuPDG = 0;
   double nuE = -999.0;
   bool Numubar = false;
+  bool iscc = false;
+  int targetPDG = 0;
 
   caf::SRVector3D vertex;
 

@@ -15,9 +15,11 @@ public:
   void SelectTruthInteractions(const caf::StandardRecord& sr,
                                HistogramManager& hist);
 
+  bool IxnPassesTruthLArCuts(const TruthInteractionSummary& summary) const;
+
 private:
 
-  TruthInteractionSummary BuildSummary(
+  TruthInteractionSummary BuildTruthSummary(
       const caf::SRTrueInteraction& nu);
 
   const config::SelectionConfig& fSelCuts;

@@ -13,13 +13,13 @@ TruthHists::TruthHists()
     Double_t edges[7] = {0.91, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
 
     // True muon kinematics
-    h_true_CosL = new TH1D("true_CosL", "true_CosL", 6, edges);
-    h_true_CosL_zoomOut = new TH1D("true_CosL_zoomOut", "true_CosL_zoomOut", 50, 0.8, 1);
+    h_true_CosL = new TH1D("true_CosL", "true_CosL", 6, edges); // Signal region (passes Mx2 cuts)
+    h_true_CosL_zoomOut = new TH1D("true_CosL_zoomOut", "true_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
     h_true_CosLNumubar_zoomOut = new TH1D(
-      "trueCosLNumubar_zoomOut", "trueCosLNumubar_zoomOut", 50, 0.8, 1);
+      "trueCosLNumubar_zoomOut", "trueCosLNumubar_zoomOut", 50, 0.8, 1); // Numubar events passing initial cuts
     h_true_CosLNumu_zoomOut = new TH1D(
-      "trueCosLNumu_zoomOut", "trueCosLNumu_zoomOut", 50, 0.8, 1);
-    h_true_Elep = new TH1D("true_Elep", "true_Elep", 50, 0, 20);
+      "trueCosLNumu_zoomOut", "trueCosLNumu_zoomOut", 50, 0.8, 1); // Numu events passing initial cuts
+    h_true_Elep = new TH1D("true_Elep", "true_Elep", 50, 0, 20); // Signal region (passes Mx2 cuts)
 
     // True neutrino energy
     h_true_Enu = new TH1D("true_Enu", "true_Enu", 100, 0, 20);
@@ -42,7 +42,7 @@ void TruthHists::FillInteractionsAboveKEThresholdPerSpill(int n)
     h_true_ixnsAboveKEThresholdPerSpill->Fill(n);
 }
 
-void TruthHists::FillMuonKinematics(double cosL, double Elep, bool Numubar)
+void TruthHists::FillMuonKinematics(double cosL, double Elep, bool Numubar, bool passesTruthMx2)
 {
     h_true_CosL_zoomOut->Fill(cosL);
     if(Numubar)
@@ -50,7 +50,7 @@ void TruthHists::FillMuonKinematics(double cosL, double Elep, bool Numubar)
     if(!Numubar)
         h_true_CosLNumu_zoomOut->Fill(cosL);
 
-    if (cosL > 0.91 && Elep > 1) {
+    if (passesTruthMx2) {
         h_true_CosL->Fill(cosL);
         h_true_Elep->Fill(Elep);
     }

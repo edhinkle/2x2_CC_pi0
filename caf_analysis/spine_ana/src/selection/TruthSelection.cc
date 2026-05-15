@@ -12,7 +12,7 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
   for (const auto& nu : sr.mc.nu) {
 
     // Check if ixn is above KE threshold for detector
-    if (IxnAboveKEThreshold(nu, fDetector))
+    if (TrueIxnAboveKEThreshold(nu, fDetector))
       ++ixnsOverKEThreshold;
     
     //--------------------------------------------------------------------
@@ -51,8 +51,8 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     // Event-level truth summary quantities
     //--------------------------------------------------------------------
 
-    TruthInteractionSummary summary = BuildSummary(nu);
-
+    TruthInteractionSummary summary = BuildTruthSummary(nu);
+    
     // Fill histograms for number of pi0s
     hist.truth.FillPi0Multiplicity(summary.nPi0);
 
@@ -62,7 +62,7 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     hist.cuts.Count("Truth", "1 Pi0");
 
     // Fill histograms for muon kinematics
-    hist.truth.FillMuonKinematics(summary.muonCosL, summary.muonEnergy, summary.Numubar);
+    hist.truth.FillMuonKinematics(summary.muonCosL, summary.muonEnergy, summary.Numubar, summary.passesMx2);
 
     // Passes Mx2 signal definition
     if (!summary.passesMx2)
@@ -78,7 +78,7 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
 }
 
 // Helper method to build TruthInteractionSummary
-TruthInteractionSummary TruthSelection::BuildSummary(
+TruthInteractionSummary TruthSelection::BuildTruthSummary(
     const caf::SRTrueInteraction& nu) const
 {
   TruthInteractionSummary summary;
@@ -86,7 +86,7 @@ TruthInteractionSummary TruthSelection::BuildSummary(
   //--------------------------------------------------
   // Detector-level classifications
   //--------------------------------------------------
-  summary.KEOverThreshold = IxnAboveKEThreshold(nu, fDetector);
+  summary.KEOverThreshold = TrueIxnAboveKEThreshold(nu, fDetector);
 
   //--------------------------------------------------
   // Interaction-level info
@@ -96,6 +96,8 @@ TruthInteractionSummary TruthSelection::BuildSummary(
   summary.nuE = nu.E;
   summary.vertex   = nu.vtx;
   summary.Numubar = nu.pdg < 0;
+  summary.iscc    = nu.iscc;
+  summary.targetPDG = nu.targetPDG;
 
   //--------------------------------------------------
   // Loop over primaries
@@ -148,4 +150,34 @@ TruthInteractionSummary TruthSelection::BuildSummary(
        summary.muonEnergy > fSelCuts.minMuonEnergy);
 
   return summary;
+}
+
+// Check if truth interaction summary passes truth cuts for signal definition
+bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summary) const
+{
+  // Argon target only
+  if (summary.targetPDG != 1000180400)
+    return false;
+
+  // Active Volume Cut
+  if (!InModuleVolumes(summary.vertex, fDetector))
+    return false;
+
+  // Numu Cut
+  if (std::abs(summary.nuPDG) != 14)
+    return false;
+
+  // Fiducial Volume Cut
+  if (!InFiducialVolume(summary.vertex, fDetector))
+    return false;
+
+  // CC only
+  if (!summary.iscc)
+    return false;
+
+  // Only one pi0
+  if (summary.nPi0 != 1)
+    return false;
+
+  return true;
 }

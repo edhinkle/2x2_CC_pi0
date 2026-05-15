@@ -14,7 +14,7 @@ public:
     // Fill histograms for number of interactions above KE threshold per spill
     void FillInteractionsAboveKEThresholdPerSpill(int n);
 
-    void FillMuonKinematics(double cosL, double Elep, bool Numubar);
+    void FillMuonKinematics(double cosL, double Elep, bool Numubar, bool passesTruthMx2);
     void FillEnu(double Enu);
     void FillPi0Multiplicity(int nPi0);
 
