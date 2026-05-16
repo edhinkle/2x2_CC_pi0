@@ -56,13 +56,13 @@ namespace config {
         cfg.beam_x = config["beam"]["beam_x"].as<double>();
         cfg.beam_y = config["beam"]["beam_y"].as<double>();
         cfg.beam_z = config["beam"]["beam_z"].as<double>();
-        cfg.dir = TVector3(cfg.beam_x, cfg.beam_y, cfg.beam_z);
     
         // Get unit direction vector for XYZ
         auto beam_mag = TMath::Sqrt(cfg.beam_x * cfg.beam_x + cfg.beam_y * cfg.beam_y + cfg.beam_z * cfg.beam_z);
         cfg.beam_x = cfg.beam_x / beam_mag;
         cfg.beam_y = cfg.beam_y / beam_mag;
         cfg.beam_z = cfg.beam_z / beam_mag;
+        cfg.beam_dir = TVector3(cfg.beam_x, cfg.beam_y, cfg.beam_z);
     
         return cfg;
     }

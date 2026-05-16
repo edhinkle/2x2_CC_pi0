@@ -15,6 +15,7 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
   const auto& part = dlpixn.part.dlp[LArTrackIdx];
 
   result.LArTrackDir = ComputeDirection(part);
+  result.LArTrackLength = ComputeLength(part);
   result.trackIsBackward = IsBackwardTrack(part);
 
   // Check Track match in CAF track match branch (look at dot product between matches -- want close to 1)

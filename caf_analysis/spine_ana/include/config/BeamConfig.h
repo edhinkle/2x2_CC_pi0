@@ -3,7 +3,7 @@
 #include "TVector3.h"
 
 struct BeamConfig {
-    TVector3 dir; //(-3.34 degrees in Y)
+    TVector3 beam_dir; //(-3.34 degrees in Y)
     double beam_x;
     double beam_y;
     double beam_z;

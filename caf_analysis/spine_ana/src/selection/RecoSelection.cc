@@ -29,90 +29,44 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     // Fill histogram for reco vertex distribution (no cuts)
     hist.reco.FillRecoVertexXZNoCuts(reco_vtx.x, reco_vtx.z);
 
-    // Initialize MatchedInteractionSummary for this interaction
+    // Initialize MatchedInteractionSummary for this interaction -- only used if MC
     MatchedInteractionSummary matchSummary;
     // Match to Truth if MC And Check if signal
     if (fMcOnly) {
         matchSummary = BuildMatchedSummary(sr, dlpixn);
     }
     // Fill cutflow for matched interactions passing vertex cut and LAr cuts for signal definition
-    if (matchSummary.diffVertex < fSelCuts.maxTruthRecoVertexDiff) {
-        hist.cuts.Count("RecoMatchedValidVtx", "All");
-        if (matchSummary.passesLArCuts){
-            hist.cuts.Count("RecoMatchedSignal", "All");
-            if (matchSummary.passesMx2) {
-                hist.cuts.Count("RecoMatchedSignalwithMx2", "All");
-            }
-        }
-    }
+    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "All");
 
     // Active Volume Cut
     if (!InModuleVolumes(reco_vtx.vtx, fDetector))
       continue;
     hist.cuts.Count("Reco", "Active Volume");
-    if (matchSummary.diffVertex < fSelCuts.maxTruthRecoVertexDiff) {
-        hist.cuts.Count("RecoMatchedValidVtx", "Active Volume");
-        if (matchSummary.passesLArCuts){
-            hist.cuts.Count("RecoMatchedSignal", "Active Volume");
-            if (matchSummary.passesMx2) {
-                hist.cuts.Count("RecoMatchedSignalwithMx2", "Active Volume");
-            }
-        }
-    }
+    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Active Volume");
 
     // Fiducial Volume Cut
     if (!InFiducialVolume(reco_vtx.vtx, fDetector))
       continue;
     hist.cuts.Count("Reco", "Fiducial Volume");
-    if (matchSummary.diffVertex < fSelCuts.maxTruthRecoVertexDiff) {
-        hist.cuts.Count("RecoMatchedValidVtx", "Fiducial Volume");
-        if (matchSummary.passesLArCuts){
-            hist.cuts.Count("RecoMatchedSignal", "Fiducial Volume");
-            if (matchSummary.passesMx2) {
-                hist.cuts.Count("RecoMatchedSignalwithMx2", "Fiducial Volume");
-            }
-        }
-    } 
+    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Fiducial Volume");
 
     // Mx2 Matching Muon Cut
     Mx2MatchResult Mx2Matcher::MatchInteraction(nixn, dlpixn, sr);
     if (!Mx2MatchResult.isGoodMatch)
         continue;
     hist.cuts.Count("Reco", "Mx2 Muon Match");
-    if (matchSummary.diffVertex < fSelCuts.maxTruthRecoVertexDiff) {
-        hist.cuts.Count("RecoMatchedValidVtx", "Mx2 Muon Match");
-        if (matchSummary.passesLArCuts){
-            hist.cuts.Count("RecoMatchedSignal", "Mx2 Muon Match");
-            if (matchSummary.passesMx2) {
-                hist.cuts.Count("RecoMatchedSignalwithMx2", "Mx2 Muon Match");
-            }
-        }
-    } 
+    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Mx2 Muon Match");
 
     //--------------------------------------------------------------------
     // Event-level reco summary quantities
     //--------------------------------------------------------------------
 
-    RecoInteractionSummary summary = BuildRecoSummary(dlpixn);
+    RecoInteractionSummary recoSummary = BuildRecoSummary(dlpixn, Mx2MatchResult);
 
-    // Fill histograms for number of pi0s
-    hist.truth.FillPi0Multiplicity(summary.nPi0);
+    // TODO: Add Cut on Pi0s
 
-    // Only one pi0
-    if (summary.nPi0 != 1)
-      continue;
-    hist.cuts.Count("Truth", "1 Pi0");
-
-    // Fill histograms for muon kinematics
-    hist.truth.FillMuonKinematics(summary.muonCosL, summary.muonEnergy, summary.Numubar);
-
-    // Passes Mx2 signal definition
-    if (!summary.passesMx2)
-      continue;
-    hist.cuts.Count("Truth", "Muon Through Mx2");
-
-    // Fill histograms for neutrino energy
-    hist.truth.FillEnu(summary.nuE);
+    // Fill reco histograms
+    hist.reco.FillRecoCosMuonAngle(recoSummary.muonCosL);
 
   }
 
@@ -120,7 +74,8 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
 
 // Helper method to build RecoInteractionSummary
 RecoInteractionSummary RecoSelection::BuildRecoSummary(
-    const caf::SRInteraction& dlpixn) const
+    const caf::SRInteraction& dlpixn,
+    const Mx2MatchResult&) const
 {
   RecoInteractionSummary summary;
 
@@ -131,7 +86,12 @@ RecoInteractionSummary RecoSelection::BuildRecoSummary(
   //--------------------------------------------------
   // Interaction-level info
   //--------------------------------------------------
-  summary.vertex   = dlpixn.vtx;
+  summary.vertex = dlpixn.vtx;
+
+  //--------------------------------------------------
+  // Mx2 Match info
+  //--------------------------------------------------
+  summary.muonCosL = Mx2MatchResult.LArTrackDir.Dot(fBeam.beam_dir);
 
   //--------------------------------------------------
   // Loop over primaries
@@ -140,48 +100,38 @@ RecoInteractionSummary RecoSelection::BuildRecoSummary(
   for (const auto& part : dlpixn.part.dlp) {
 
     const int pdg = std::abs(part.pdg);
+    //TODO: Add pi0 accounting
 
     //----------------------------------------------
-    // Muon
+    // Showers
     //----------------------------------------------
 
-    if (pdg == 13) {
-
-      const auto& p4 = prim.p;
-
-      const double p =
-          std::sqrt(p4.px*p4.px +
-                    p4.py*p4.py +
-                    p4.pz*p4.pz);
-
-      summary.muonEnergy = p4.E;
-
-      const double dirX = p4.px / p;
-      const double dirY = p4.py / p;
-      const double dirZ = p4.pz / p;
-
-      summary.muonCosL =
-          dirX * fBeam.beamX +
-          dirY * fBeam.beamY +
-          dirZ * fBeam.beamZ;
-    }
-
-    //----------------------------------------------
-    // Pi0 counting
-    //----------------------------------------------
-
-    if (pdg == 111)
-      ++summary.nPi0;
+    //if (pdg == 13) {
+//
+    //  const auto& p4 = prim.p;
+//
+    //  const double p =
+    //      std::sqrt(p4.px*p4.px +
+    //                p4.py*p4.py +
+    //                p4.pz*p4.pz);
+//
+    //  summary.muonEnergy = p4.E;
+//
+    //  const double dirX = p4.px / p;
+    //  const double dirY = p4.py / p;
+    //  const double dirZ = p4.pz / p;
+//
+    //  summary.muonCosL =
+    //      dirX * fBeam.beamX +
+    //      dirY * fBeam.beamY +
+    //      dirZ * fBeam.beamZ;
+    //}
 
   }
 
   //--------------------------------------------------
   // Signal definition
   //--------------------------------------------------
-
-  summary.passesMx2 =
-      (summary.muonCosL > fSelCuts.minMuonCosL &&
-       summary.muonEnergy > fSelCuts.minMuonEnergy);
 
   return summary;
 }
@@ -220,6 +170,26 @@ MatchedInteractionSummary RecoSelection::BuildMatchedSummary(
     }
 
     return summary;
+}
+
+void RecoSelection::FillTruthMatchedCuts(const MatchedInteractionSummary& matchSummary,
+                     CutFlowManager& cuts,
+                     const std::string& recoCut)
+{
+    if (matchSummary.diffVertex >= fSelCuts.maxTruthRecoVertexDiff)
+        return;
+
+    cuts.Count("RecoMatchedValidVtx", recoCut);
+
+    if (!matchSummary.passesLArCuts)
+        return;
+
+    cuts.Count("RecoMatchedSignal", recoCut);
+
+    if (!matchSummary.passesMx2)
+        return;
+
+    cuts.Count("RecoMatchedSignalwithMx2", recoCut);
 }
 
 double RecoSelection::DiffPoints3D(const caf::SRVector3D& v1, const caf::SRVector3D& v2) const

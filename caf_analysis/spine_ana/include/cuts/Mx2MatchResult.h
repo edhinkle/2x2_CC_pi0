@@ -15,6 +15,7 @@ struct Mx2MatchResult {
   int LArTrackIdx = -1;
 
   TVector3 LArTrackDir;       // matched LAr direction
+  double LArTrackLength; // matched LAr length
 
   // Optional truth info (only if MC)
   int truthIxnMx2PartIdx = -1;

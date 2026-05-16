@@ -49,7 +49,7 @@ int caf_plotter(std::string input_file_list, std::string output_rootfile,
   int totalNuAr=0;
   int totalNuArFidVol=0;
   double offset = 0;
-  std::vector<int> goodEvents;
+  //std::vector<int> goodEvents;
   // Set a bunch of histograms and variables
   TFile fFlux("../fluxSyst/numiFluxSyst.root");
     TH1D* hflux_rhc_nue=(TH1D*)fFlux.Get("flux_prediction/hflux_rhc_nue");
@@ -263,7 +263,7 @@ rw.GenerateThrows(100);
   TH2D *recoVertex2DBadYZ = new TH2D("recoVertex2DBadYZ", "recoVertex2DBadYZ",
                                      70, -70, 70, 70, -70, 70);
 
-  TH1D *recoCosL = new TH1D("recoCosL", "recoCosL", 6, edges);
+  //TH1D *recoCosL = new TH1D("recoCosL", "recoCosL", 6, edges);
   TH1D *badRecoCosL = new TH1D("badRecoCosL", "badRecoCosL", 6, edges);
   TH1D *trueBacktrackedCosL_unbinned =
       new TH1D("trueBacktrackedCosL_unbinned", "trueBacktrackedCosL_unbinned",
@@ -649,8 +649,8 @@ rw.GenerateThrows(100);
       //      }
      // Calculate muon direction based on distance
       int npart=ndlarTrkCandidateVector.at(muonIndex);
-      auto start_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].start;
-      auto end_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].end;
+      //auto start_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].start;
+      //auto end_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].end;
       if (mcOnly==1){
                       int i=mx2IntCandidateVector.at(muonIndex); int j=mx2IdxCandidateVector.at(muonIndex); 
                       int  ixnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
@@ -670,24 +670,24 @@ rw.GenerateThrows(100);
           
       }
 
-      double dX = (end_pos.x - start_pos.x);
-      double dY = (end_pos.y - start_pos.y);
-      double dZ = (end_pos.z - start_pos.z);
-      double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
-      double dirX = dX / length;
-      double dirY = dY / length;
-      double dirZ = dZ / length;
-      
-      double cosLReco =
-          dirX * beam_x + dirY * beam_y + dirZ * beam_z;
+      //double dX = (end_pos.x - start_pos.x);
+      //double dY = (end_pos.y - start_pos.y);
+      //double dZ = (end_pos.z - start_pos.z);
+      //double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
+      //double dirX = dX / length;
+      //double dirY = dY / length;
+      //double dirZ = dZ / length;
+      //
+      //double cosLReco =
+      //    dirX * beam_x + dirY * beam_y + dirZ * beam_z;
       // If you got one matched to downstream Mx2, then it likely was the muon
 
       // Change the muon to make sure it is in the frame of the downward going beam
 
-      recoCosL->Fill(cosLReco);
+      //recoCosL->Fill(cosLReco);
 
 
-      goodEvents.push_back(n);
+      //goodEvents.push_back(n);
       double trueCosL = -999;
       // Now that we got a good reco interaction, just check the hadron info and muon info
       if (mcOnly) {
@@ -1342,7 +1342,7 @@ int main(int argc, char **argv) {
       //sumPOT = sr->beam.pulsepot / 1e13 + sumPOT;
 
       // ---------------------------
-      // 5a. Truth processing
+      // 5a. Truth Interaction Loop (if MC)
       // ---------------------------
       if (mcOnly) {
         TruthSelection truthSel(selectionCuts, beamInfo, detInfo);
@@ -1350,47 +1350,35 @@ int main(int argc, char **argv) {
       }
 
       // ---------------------------
-      // 4b. Reco interaction loop
+      // 5b. Reco interaction loop
       // ---------------------------
       RecoSelection recoSel(selectionCuts, beamInfo, detInfo, mcOnly);
       recoSel.SelectRecoInteractions(*sr, hist);
 
-      for (const auto& ixn : sr->common.ixn.dlp) {
+      // ---------------------------
+      // 4d. MC validation
+      // ---------------------------
+      if (mcOnly && match.isValid) {
 
-        // --- Vertex cut
-        if (!InFiducialVolume(ixn.vtx)) continue;
+        TruthInteractionSummary truth =
+            AnalyzeTruthInteraction(sr->mc.nu[match.index], cfg, beam);
 
-        // --- Truth match (if MC)
-        TruthMatch match;
-        if (mcOnly) {
-          match = FindBestTruthMatch(ixn, *sr);
-        }
+        hist.FillTruth(truth);
 
-        // --- Reco summary
-        RecoInteractionSummary reco =
-            AnalyzeRecoInteraction(ixn, *sr, cfg, beam);
+        // --- Response matrices
+        hist.FillResponse(reco, truth);
 
-        // --- MINERvA matching (muon candidate)
-        MinervaMatchResult muonMatch =
-            MatchMuonToMinerva(ixn, *sr, cfg);
-
-        if (!muonMatch.isValid) continue;
-
-        // --- Compute reco kinematics
-        reco.cosTheta = ComputeCosTheta(muonMatch.direction, beam);
-
-
+        // --- Efficiency / backtracking
+        EvaluateReconstructionPerformance(ixn, *sr, match, hist, cfg);
       }
 
+  
     // -------------------------------
     // 6. Finalize + write output
     // -------------------------------
     TFile *caf_out_file = new TFile(output_rootfile.c_str(), "recreate");
     hist.Write(caf_out_file);
     caf_out_file->Close();
-
-    // Run analysis
-    caf_plotter(input_file_list, output_rootfile, mcOnly, configFile);
 
     return 0;
 }

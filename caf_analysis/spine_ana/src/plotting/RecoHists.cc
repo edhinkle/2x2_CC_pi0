@@ -13,7 +13,14 @@ RecoHists::RecoHists()
     h_reco_VertexYNoCuts = new TH1D("h_reco_VertexYNoCuts", "h_reco_VertexYNoCuts", 140, -70, 70);
     h_reco_VertexZNoCuts = new TH1D("h_reco_VertexZNoCuts", "h_reco_VertexZNoCuts", 140, -70, 70);
 
+    // Reco cos(lepton) wrt beam
+    // Edges for CosL histograms
+    Double_t edges[7] = {0.91, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
 
+    // Muon kinematics
+    h_reco_CosL = new TH1D("reco_CosL", "reco_CosL", 6, edges); // Signal region (passes Mx2 cuts)
+    h_reco_CosL_zoomOut = new TH1D("reco_CosL_zoomOut", "reco_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
+ 
 }
 
 
@@ -27,6 +34,12 @@ void RecoHists::FillRecoVertexNoCuts(double x, double y, double z)
     h_reco_VertexYNoCuts->Fill(y);
     h_reco_VertexZNoCuts->Fill(z);
 }
+  
+void RecoHists::FillRecoCosMuonAngle(double cosL)
+{
+    h_reco_CosL_zoomOut->Fill(cosL);
+    h_reco_CosL->Fill(cosL);
+}
 
 
 void RecoHists::Write(TDirectory* dir)
@@ -37,5 +50,8 @@ void RecoHists::Write(TDirectory* dir)
     h_reco_VertexXNoCuts->Write();
     h_reco_VertexYNoCuts->Write();
     h_reco_VertexZNoCuts->Write();
+
+    h_reco_CosL_zoomOut->Write();
+    h_reco_CosL->Write();
 
 }

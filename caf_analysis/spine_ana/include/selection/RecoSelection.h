@@ -4,6 +4,7 @@
 #include "analysis/RecoInteractionSummary.h"
 #include "analysis/TruthInteractionSummary.h"
 #include "analysis/MatchedInteractionSummary.h"
+#include "cuts/Mx2MatchResult.h"
 #include "selection/TruthSelection.h"
 #include "plotting/HistogramManager.h"
 #include "duneanaobj/StandardRecord/StandardRecord.h" 
@@ -17,14 +18,19 @@ public:
                 bool mcOnly);
 
     void SelectRecoInteractions(const caf::StandardRecord& sr,
-                              HistogramManager& hist);
+                                HistogramManager& hist);
+    
+    void FillTruthMatchedCuts(const MatchedInteractionSummary& matchSummary,
+                              CutFlowManager& cuts,
+                              const std::string& recoCut);
 
     double DiffPoints3D(const caf::SRVector3D& v1, const caf::SRVector3D& v2) const;
 
 private:
 
     RecoInteractionSummary BuildRecoSummary(
-        const caf::SRInteraction& dlpixn);
+        const caf::SRInteraction& dlpixn,
+        const Mx2MatchResult&) const;
 
     MatchedInteractionSummary BuildMatchedSummary(
         const caf::StandardRecord& sr,

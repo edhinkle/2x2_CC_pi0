@@ -19,19 +19,18 @@ struct RecoInteractionSummary {
   // Muon kinematics
   // -----------------------------
 
-  double muonEnergy = -999.0;
   double muonCosL   = -999.0;
 
   // -----------------------------
   // Hadron content
   // -----------------------------
 
-  int nPi0        = 0;
+  //int nPi0        = 0;
 
-
+    //TODO: Add pi0 accounting
   // -----------------------------
   // Signal flags
   // -----------------------------
 
-  bool passesRecoMx2 = false;
+  
 };
