@@ -157,9 +157,9 @@ rw.GenerateThrows(100);
   //    "trueCosLNumu_zoomOut", "trueCosLNumu_zoomOut", 50, 0.8, 1);
   TH1D *trueBacktrackedCosL =
       new TH1D("trueBacktrackedCosL", "trueBacktrackedCosL", 6, edges);
-  TH1D *minervaMatchPDG = new TH1D("minervaMatchPDG", "minervaMatchPDG", 6000, -3000, 3000);
-  TH1D *minervaMatchE = new TH1D("minervaMatchE", "minervaMatchE", 50, 0, 20);
-  TH1D *minervaMatchCos = new TH1D("minervaMatchCos", "minervaMatchCos", 100, -1, 1);
+  //TH1D *minervaMatchPDG = new TH1D("minervaMatchPDG", "minervaMatchPDG", 6000, -3000, 3000);
+  //TH1D *minervaMatchE = new TH1D("minervaMatchE", "minervaMatchE", 50, 0, 20);
+  //TH1D *minervaMatchCos = new TH1D("minervaMatchCos", "minervaMatchCos", 100, -1, 1);
   TH1D *selPionE = new TH1D("selPionE", "selPionE", 15, 0, 0.2);
   TH1D *selProtonE = new TH1D("selProtonE", "selProtonE", 15, 0, 0.2);
 
@@ -648,27 +648,27 @@ rw.GenerateThrows(100);
 //
       //      }
      // Calculate muon direction based on distance
-      int npart=ndlarTrkCandidateVector.at(muonIndex);
+      //int npart=ndlarTrkCandidateVecstor.at(muonIndex);
       //auto start_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].start;
       //auto end_pos = sr->common.ixn.dlp[nixn].part.dlp[npart].end;
-      if (mcOnly==1){
-                      int i=mx2IntCandidateVector.at(muonIndex); int j=mx2IdxCandidateVector.at(muonIndex); 
-                      int  ixnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
-                         int       partMinerva =
-                          sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
-                      int typeMinerva =
-                          sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
-          if (typeMinerva==1){
-        //std::cout<<sr->mc.nu[maxEventIxn].prim[maxEventPar].pdg<<std::endl;
-        if (abs(sr->mc.nu[ixnMinerva].prim[partMinerva].pdg)==13) muons++;
-                if (abs(sr->mc.nu[ixnMinerva].prim[partMinerva].pdg)==211) pions++;}
-         else{
-        if (abs(sr->mc.nu[ixnMinerva].sec[partMinerva].pdg)==13) muons++;
-                if (abs(sr->mc.nu[ixnMinerva].sec[partMinerva].pdg)==211) pions++;
-
-         }
-          
-      }
+      //if (mcOnly==1){
+      //                int i=mx2IntCandidateVector.at(muonIndex); int j=mx2IdxCandidateVector.at(muonIndex); 
+      //                int  ixnMinerva=sr->nd.minerva.ixn[i].tracks[j].truth[0].ixn;
+      //                   int       partMinerva =
+      //                    sr->nd.minerva.ixn[i].tracks[j].truth[0].part;
+      //                int typeMinerva =
+      //                    sr->nd.minerva.ixn[i].tracks[j].truth[0].type;
+      //    if (typeMinerva==1){
+      //  //std::cout<<sr->mc.nu[maxEventIxn].prim[maxEventPar].pdg<<std::endl;
+      //  if (abs(sr->mc.nu[ixnMinerva].prim[partMinerva].pdg)==13) muons++;
+      //          if (abs(sr->mc.nu[ixnMinerva].prim[partMinerva].pdg)==211) pions++;}
+      //   else{
+      //  if (abs(sr->mc.nu[ixnMinerva].sec[partMinerva].pdg)==13) muons++;
+      //          if (abs(sr->mc.nu[ixnMinerva].sec[partMinerva].pdg)==211) pions++;
+//
+      //   }
+      //    
+      //}
 
       //double dX = (end_pos.x - start_pos.x);
       //double dY = (end_pos.y - start_pos.y);
@@ -691,85 +691,85 @@ rw.GenerateThrows(100);
       double trueCosL = -999;
       // Now that we got a good reco interaction, just check the hadron info and muon info
       if (mcOnly) {
-        if (maxEventTyp == 1) {
-          minervaMatchPDG->Fill(sr->mc.nu[maxEventIxn].prim[maxEventPar].pdg);
-          int minervaPDG = sr->mc.nu[maxEventIxn].prim[maxEventPar].pdg;
-          if (abs(minervaPDG) == 13) {
-            minervaMatchE->Fill(sr->mc.nu[maxEventIxn].prim[maxEventPar].p.E);
-            auto start_posMnv =
-                sr->mc.nu[maxEventIxn].prim[maxEventPar].start_pos;
-            auto end_posMnv = sr->mc.nu[maxEventIxn].prim[maxEventPar].end_pos;
+      //  if (maxEventTyp == 1) {
+          //minervaMatchPDG->Fill(sr->mc.nu[maxEventIxn].prim[maxEventPar].pdg);
+          //int minervaPDG = sr->mc.nu[maxEventIxn].prim[maxEventPar].pdg;
+       //   if (abs(minervaPDG) == 13) {
+            //minervaMatchE->Fill(sr->mc.nu[maxEventIxn].prim[maxEventPar].p.E);
+       //     auto start_posMnv =
+      //          sr->mc.nu[maxEventIxn].prim[maxEventPar].start_pos;
+            //auto end_posMnv = sr->mc.nu[maxEventIxn].prim[maxEventPar].end_pos;
 
-            double dX = (end_posMnv.x - start_posMnv.x);
-            double dY = (end_posMnv.y - start_posMnv.y);
-            double dZ = (end_posMnv.z - start_posMnv.z);
+            //double dX = (end_posMnv.x - start_posMnv.x);
+            //double dY = (end_posMnv.y - start_posMnv.y);
+            //double dZ = (end_posMnv.z - start_posMnv.z);
 
-            auto p = sr->mc.nu[maxEventIxn].prim[maxEventPar].p;
-            double length =
-                TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
-            cosL = p.pz / length;
+            //auto p = sr->mc.nu[maxEventIxn].prim[maxEventPar].p;
+            //double length =
+            //    TMath::Sqrt(p.px * p.px + p.py * p.py + p.pz * p.pz);
+            //cosL = p.pz / length;
 
-            if (abs(startZMuonCand - start_posMnv.z) < 5)
-              minervaMatchCos->Fill(cosL);
-          }
-        }
+        //    if (abs(startZMuonCand - start_posMnv.z) < 5)
+        //      minervaMatchCos->Fill(cosL);
+        //  }
+        //}
 
         // std::cout<<"counting hadrons (kaons are negligible)"<<std::endl;
-        if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
-            sr->mc.nu[biggestMatchIndex].targetPDG == 1000180400) {
-          for (int primaries = 0;
-               primaries < sr->mc.nu[biggestMatchIndex].prim.size();
-               primaries++) {
-            auto start_pos =
-                sr->mc.nu[biggestMatchIndex].prim[primaries].start_pos;
-            auto end_pos = sr->mc.nu[biggestMatchIndex].prim[primaries].end_pos;
-            // if (std::isnan(start_pos.z)) continue;
-            // std::cout<<"Got a position"<<std::endl;
-            auto p = sr->mc.nu[biggestMatchIndex].prim[primaries].p;
-            double dX = p.px; //(end_pos.x-start_pos.x);
-            double dY = p.py; //(end_pos.y-start_pos.y);
-            double dZ = p.pz; //(end_pos.z-start_pos.z);
-            double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
-            double dirX = dX / length;
-            double dirY = dY / length;
-            double dirZ = dZ / length;
-            double dXLen = (end_pos.x - start_pos.x);
-            double dYLen = (end_pos.y - start_pos.y);
-            double dZLen = (end_pos.z - start_pos.z);
-            double lengthPos =
-                TMath::Sqrt(dXLen * dXLen + dYLen * dYLen + dZLen * dZLen);
-
-            if (!std::isnan(start_pos.z) &&
-                (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
-                     211 /*||
-                            abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg)==13*/
-                 || abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
-                        2212)) {
-              trueTrkLen->Fill(lengthPos);
-              int cc = sr->mc.nu[biggestMatchIndex].iscc;
-              int mode = sr->mc.nu[biggestMatchIndex].mode;
-              if (cc == 1 && (mode == 1 || mode == 1001 || mode == 10))
-                trueTrkLenQE->Fill(lengthPos);
-              if (cc == 1 && (mode == 3 || mode == 4))
-                trueTrkLenNonQE->Fill(lengthPos);
-            }
-            if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 2212) {
-              trueProtonEWithRecoInt->Fill(
-                  sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.938272);
-              trueProtonWithRecoIntDirZ->Fill(dirZ);
-              trueProtonWithRecoIntDirX->Fill(dirX);
-              trueProtonWithRecoIntDirY->Fill(dirY);
-            }
-            if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 211) {
-              truePionEWithRecoInt->Fill(
-                  sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.13957);
-              truePionWithRecoIntDirZ->Fill(dirZ);
-              truePionWithRecoIntDirX->Fill(dirX);
-              truePionWithRecoIntDirY->Fill(dirY);
-            }
-
-          }
-        }
+        //if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
+        //    sr->mc.nu[biggestMatchIndex].targetPDG == 1000180400) {
+        //  for (int primaries = 0;
+        //       primaries < sr->mc.nu[biggestMatchIndex].prim.size();
+        //       primaries++) {
+        //    auto start_pos =
+        //        sr->mc.nu[biggestMatchIndex].prim[primaries].start_pos;
+        //    auto end_pos = sr->mc.nu[biggestMatchIndex].prim[primaries].end_pos;
+        //    // if (std::isnan(start_pos.z)) continue;
+        //    // std::cout<<"Got a position"<<std::endl;
+        //    auto p = sr->mc.nu[biggestMatchIndex].prim[primaries].p;
+        //    double dX = p.px; //(end_pos.x-start_pos.x);
+        //    double dY = p.py; //(end_pos.y-start_pos.y);
+        //    double dZ = p.pz; //(end_pos.z-start_pos.z);
+        //    double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
+        //    double dirX = dX / length;
+        //    double dirY = dY / length;
+        //    double dirZ = dZ / length;
+        //    double dXLen = (end_pos.x - start_pos.x);
+        //    double dYLen = (end_pos.y - start_pos.y);
+        //    double dZLen = (end_pos.z - start_pos.z);
+        //    double lengthPos =
+        //        TMath::Sqrt(dXLen * dXLen + dYLen * dYLen + dZLen * dZLen);
+//
+        //    if (!std::isnan(start_pos.z) &&
+        //        (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
+        //             211 /*||
+        //                    abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg)==13*/
+        //         || abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
+        //                2212)) {
+        //      trueTrkLen->Fill(lengthPos);
+        //      int cc = sr->mc.nu[biggestMatchIndex].iscc;
+        //      int mode = sr->mc.nu[biggestMatchIndex].mode;
+        //      if (cc == 1 && (mode == 1 || mode == 1001 || mode == 10))
+        //        trueTrkLenQE->Fill(lengthPos);
+        //      if (cc == 1 && (mode == 3 || mode == 4))
+        //        trueTrkLenNonQE->Fill(lengthPos);
+        //    }
+        //    if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 2212) {
+        //      trueProtonEWithRecoInt->Fill(
+        //          sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.938272);
+        //      trueProtonWithRecoIntDirZ->Fill(dirZ);
+        //      trueProtonWithRecoIntDirX->Fill(dirX);
+        //      trueProtonWithRecoIntDirY->Fill(dirY);
+        //    }
+        //    if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 211) {
+        //      truePionEWithRecoInt->Fill(
+        //          sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.13957);
+        //      truePionWithRecoIntDirZ->Fill(dirZ);
+        //      truePionWithRecoIntDirX->Fill(dirX);
+        //      truePionWithRecoIntDirY->Fill(dirY);
+        //    }
+//
+        //  }
+        //}
 
         for (long unsigned npart = 0;
              npart < sr->common.ixn.dlp[nixn].part.dlp.size();
@@ -1341,17 +1341,17 @@ int main(int argc, char **argv) {
       //totalPOT += GetSpillPOT(sr); TODO: Implement GetSpillPOT to extract POT from the spill record
       //sumPOT = sr->beam.pulsepot / 1e13 + sumPOT;
 
-      // ---------------------------
-      // 5a. Truth Interaction Loop (if MC)
-      // ---------------------------
+      // -------------------------------------------------------------
+      // 5a. Truth Interaction selection (if MC)
+      // -------------------------------------------------------------
       if (mcOnly) {
         TruthSelection truthSel(selectionCuts, beamInfo, detInfo);
         truthSel.SelectTruthInteractions(*sr, hist);
       }
 
-      // ---------------------------
-      // 5b. Reco interaction loop
-      // ---------------------------
+      // -------------------------------------------------------------
+      // 5b. Reco interaction selection (includes truth backtracking)
+      // -------------------------------------------------------------
       RecoSelection recoSel(selectionCuts, beamInfo, detInfo, mcOnly);
       recoSel.SelectRecoInteractions(*sr, hist);
 

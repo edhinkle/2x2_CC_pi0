@@ -11,8 +11,7 @@ public:
     // Filling histograms
     //------------------------------------------
     void FillRecoVertexNoCuts(double x, double y, double z);
-    void RecoHists::FillRecoCosMuonAngle(double cosL)
-    // Fill histograms for number of interactions above KE threshold per spill
+    void FillRecoCosMuonAngle(double cosL)
 
     void Write(TDirectory* dir);
 
@@ -28,8 +27,5 @@ private:
 
     TH1D *h_reco_CosL;
     TH1D *h_reco_CosL_zoomOut;
-
-    // 
-
 
 };

@@ -9,12 +9,13 @@
 class HistogramManager {
 public:
     HistogramManager()
-        : truth(), reco(), match(), cuts() {}
+        : truth(), reco(), truthMatch(), cuts() {}
 
     void Write(TFile* f);
 
     TruthHists truth;
     RecoHists reco;
-    MatchedHists match;
+    TruthMatchedHists truthMatch;
     CutFlowManager cuts;
+
 };

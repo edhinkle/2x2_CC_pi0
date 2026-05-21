@@ -15,7 +15,7 @@ public:
     RecoSelection(const config::SelectionConfig& cfg,
                 const config::BeamConfig& beam,
                 const config::DetectorConfig& detector,
-                bool mcOnly);
+                const bool mcOnly);
 
     void SelectRecoInteractions(const caf::StandardRecord& sr,
                                 HistogramManager& hist);
@@ -30,11 +30,17 @@ private:
 
     RecoInteractionSummary BuildRecoSummary(
         const caf::SRInteraction& dlpixn,
-        const Mx2MatchResult&) const;
+        const Mx2MatchResult& mx2MatchResult) const;
 
-    MatchedInteractionSummary BuildMatchedSummary(
+    MatchedInteractionSummary BuildMatchedIxnSummary(
         const caf::StandardRecord& sr,
         const caf::SRInteraction& dlpixn);
+
+    void FillParticleTruthMatching(const caf::StandardRecord& sr,
+                                   const caf::SRInteraction& dlpixn,
+                                   MatchedInteractionSummary& matchSummary,
+                                   RecoInteractionSummary& recoSummary,
+                                   const Mx2MatchResult& mx2MatchResult);
 
     const config::SelectionConfig& fSelCuts;
     const config::BeamConfig& fBeam;

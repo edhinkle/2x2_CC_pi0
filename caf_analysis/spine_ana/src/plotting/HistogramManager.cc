@@ -12,8 +12,8 @@ void HistogramManager::Write(TFile* f)
   TDirectory* recoDir = file->mkdir("reco");
   reco.Write(recoDir);
 
-  TDirectory* matchDir = file->mkdir("matched");
-  match.Write(matchDir);
+  TDirectory* truthMatchDir = file->mkdir("truthMatched");
+  truthMatch.Write(truthMatchDir);
 
   TDirectory* cutDir = file->mkdir("cutflows");
   cuts.Write(cutDir);

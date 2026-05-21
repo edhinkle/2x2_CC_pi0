@@ -8,7 +8,7 @@ public:
   Mx2Matcher(const config::SelectionConfig& cfg,
              const config::BeamConfig& beam,
              const config::DetectorConfig& detector,
-             bool mcOnly);
+             const bool mcOnly);
 
   Mx2MatchResult MatchInteraction(
       const int LArIxnIdx,

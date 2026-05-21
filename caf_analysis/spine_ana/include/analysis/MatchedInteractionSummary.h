@@ -18,4 +18,15 @@ struct MatchedInteractionSummary {
 
     bool passesLArCuts = false; // check if best-matched truth interaction passes truth cuts for signal definition
     bool passesMx2 = false; // check if best-matched truth interaction passes Mx2 signal definition cuts
+
+    // -----------------------------
+    // Truth Match Particle Info
+    // -----------------------------
+    bool isPrimary = false;
+    int truthMatchMx2TrackPDG = 0;
+    double truthMatchMx2TrackE = -1;
+    double truthMatchMx2TrackCosL = -999;
+    double truthMatchMx2TrackLArStartPosX = -999;
+    double truthMatchMx2TrackLArStartPosY = -999;
+    double truthMatchMx2TrackLArStartPosZ = -999;
 };

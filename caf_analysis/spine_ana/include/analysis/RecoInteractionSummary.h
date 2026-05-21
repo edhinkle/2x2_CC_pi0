@@ -20,6 +20,9 @@ struct RecoInteractionSummary {
   // -----------------------------
 
   double muonCosL   = -999.0;
+  double mx2MatchLArStartPosX = -999.0;
+  double mx2MatchLArStartPosY = -999.0;
+  double mx2MatchLArStartPosZ = -999.0;
 
   // -----------------------------
   // Hadron content
@@ -29,7 +32,7 @@ struct RecoInteractionSummary {
 
     //TODO: Add pi0 accounting
   // -----------------------------
-  // Signal flags
+  // Truth Match Info
   // -----------------------------
 
   

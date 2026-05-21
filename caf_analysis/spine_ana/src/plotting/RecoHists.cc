@@ -18,8 +18,8 @@ RecoHists::RecoHists()
     Double_t edges[7] = {0.91, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
 
     // Muon kinematics
-    h_reco_CosL = new TH1D("reco_CosL", "reco_CosL", 6, edges); // Signal region (passes Mx2 cuts)
-    h_reco_CosL_zoomOut = new TH1D("reco_CosL_zoomOut", "reco_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
+    h_reco_CosL = new TH1D("h_reco_CosL", "h_reco_CosL", 6, edges); // Signal region (passes Mx2 cuts)
+    h_reco_CosL_zoomOut = new TH1D("h_reco_CosL_zoomOut", "h_reco_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
  
 }
 
@@ -41,7 +41,9 @@ void RecoHists::FillRecoCosMuonAngle(double cosL)
     h_reco_CosL->Fill(cosL);
 }
 
-
+//------------------------------------------
+// Histogram Writing Method
+//------------------------------------------  
 void RecoHists::Write(TDirectory* dir)
 {
     dir->cd();

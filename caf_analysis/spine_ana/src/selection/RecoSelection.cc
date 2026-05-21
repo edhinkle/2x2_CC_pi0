@@ -32,30 +32,30 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     // Initialize MatchedInteractionSummary for this interaction -- only used if MC
     MatchedInteractionSummary matchSummary;
     // Match to Truth if MC And Check if signal
-    if (fMcOnly) {
+    if (fMCOnly) {
         matchSummary = BuildMatchedSummary(sr, dlpixn);
     }
     // Fill cutflow for matched interactions passing vertex cut and LAr cuts for signal definition
-    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "All");
+    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "All");
 
     // Active Volume Cut
     if (!InModuleVolumes(reco_vtx.vtx, fDetector))
       continue;
     hist.cuts.Count("Reco", "Active Volume");
-    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Active Volume");
+    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Active Volume");
 
     // Fiducial Volume Cut
     if (!InFiducialVolume(reco_vtx.vtx, fDetector))
       continue;
     hist.cuts.Count("Reco", "Fiducial Volume");
-    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Fiducial Volume");
+    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Fiducial Volume");
 
     // Mx2 Matching Muon Cut
     Mx2MatchResult Mx2Matcher::MatchInteraction(nixn, dlpixn, sr);
     if (!Mx2MatchResult.isGoodMatch)
         continue;
     hist.cuts.Count("Reco", "Mx2 Muon Match");
-    if (fMcOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Mx2 Muon Match");
+    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Mx2 Muon Match");
 
     //--------------------------------------------------------------------
     // Event-level reco summary quantities
@@ -63,6 +63,11 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
 
     RecoInteractionSummary recoSummary = BuildRecoSummary(dlpixn, Mx2MatchResult);
 
+    // Updated MatchedInteractionSummary with Particle Truth Matching from Mx2, etc.
+    if (fMCOnly) {
+        FillParticleTruthMatching(sr, dlpixn, matchSummary, recoSummary, Mx2MatchResult);
+        hist.truthMatch.FillTruthMatchMx2TrackInfo(matchSummary,recoSummary);
+    }
     // TODO: Add Cut on Pi0s
 
     // Fill reco histograms
@@ -75,7 +80,7 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
 // Helper method to build RecoInteractionSummary
 RecoInteractionSummary RecoSelection::BuildRecoSummary(
     const caf::SRInteraction& dlpixn,
-    const Mx2MatchResult&) const
+    const Mx2MatchResult& mx2MatchResult) const
 {
   RecoInteractionSummary summary;
 
@@ -91,7 +96,13 @@ RecoInteractionSummary RecoSelection::BuildRecoSummary(
   //--------------------------------------------------
   // Mx2 Match info
   //--------------------------------------------------
-  summary.muonCosL = Mx2MatchResult.LArTrackDir.Dot(fBeam.beam_dir);
+  summary.muonCosL = mx2MatchResult.LArTrackDir.Dot(fBeam.beam_dir);
+  const auto& mx2MatchLArTrack = dlpixn.part.dlp[mx2MatchResult.LArTrackIdx];
+  summary.mx2MatchLArStartPosX = mx2MatchLArTrack.start.x;
+  summary.mx2MatchLArStartPosY = mx2MatchLArTrack.start.y;
+  summary.mx2MatchLArStartPosZ = mx2MatchLArTrack.start.z;
+
+
 
   //--------------------------------------------------
   // Loop over primaries
@@ -137,7 +148,7 @@ RecoInteractionSummary RecoSelection::BuildRecoSummary(
 }
 
 // Helper method to build MatchedInteractionSummary
-MatchedInteractionSummary RecoSelection::BuildMatchedSummary(
+MatchedInteractionSummary RecoSelection::BuildMatchedIxnSummary(
     const caf::StandardRecord& sr,
     const caf::SRInteraction& dlpixn) const
 {
@@ -170,6 +181,46 @@ MatchedInteractionSummary RecoSelection::BuildMatchedSummary(
     }
 
     return summary;
+}
+
+void FillParticleTruthMatching(const caf::StandardRecord& sr,
+                               const caf::SRInteraction& dlpixn,
+                               MatchedInteractionSummary& matchSummary,
+                               RecoInteractionSummary& recoSummary,
+                               const Mx2MatchResult& mx2MatchResult)
+{
+    // --------------------------------------
+    // Mx2 Track Matching Truth Information
+    // --------------------------------------
+    if (mx2MatchResult.truthIxnMx2PartType == 1) { // Primary track
+        matchSummary.isPrimary=true;
+        matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].pdg;
+        auto mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].p;
+        mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
+    }
+    if (mx2MatchResult.truthIxnMx2PartType == 3) { // Secondary track
+        matchSummary.isPrimary=false;
+        matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].pdg;
+        auto mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].p;
+        mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
+    }
+    // Fill energy/cosL info
+    matchSummary.truthMatchMx2TrackE = mx2TrackMatchP.E;
+    double mx2TrackMatchPMag = TMath::Sqrt(mx2TrackMatchP.px * mx2TrackMatchP.px + 
+                                   mx2TrackMatchP.py * mx2TrackMatchP.py + 
+                                   mx2TrackMatchP.pz * mx2TrackMatchP.pz);
+    TVector3 mx2TrackMatchDir = (mx2TrackMatchP.px / mx2TrackMatchPMag,
+                                 mx2TrackMatchP.py / mx2TrackMatchPMag,
+                                 mx2TrackMatchP.pz / mx2TrackMatchPMag);
+    matchSummary.truthMatchMx2TrackCosL = mx2TrackMatchDir.Dot(fBeam.beam_dir);
+    // Fill Truth Match Start Points for LAr Track
+    matchSummary.truthMatchMx2TrackLArStartPosX = mx2TrackLArStartPos.x;
+    matchSummary.truthMatchMx2TrackLArStartPosY = mx2TrackLArStartPos.y;
+    matchSummary.truthMatchMx2TrackLArStartPosZ = mx2TrackLArStartPos.z;
+
+    // --------------------------------------
+    // Mx2 Track Matching Truth Information
+    // --------------------------------------
 }
 
 void RecoSelection::FillTruthMatchedCuts(const MatchedInteractionSummary& matchSummary,
