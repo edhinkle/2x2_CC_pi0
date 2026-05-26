@@ -18,6 +18,7 @@ public:
                                     RecoInteractionSummary& recoSummary);
 
     void FillTruthMatchDiffTruthRecoVertex(MatchedInteractionSummary& matchSummary);
+    void FillTruthMatchIxnShowerMultiplicity(MatchedInteractionSummary& matchSummary);
     void Write(TDirectory* dir);
 
 private:
@@ -42,5 +43,14 @@ private:
     TH1D *h_truthMatchSec_mx2TrackRecoDiffLArStartZ;
 
     TH1D *h_truthMatch_diffTruthRecoVertex;
+
+    TH1D *h_truthMatchIxn_PrimPi0Multiplicity;
+    TH1D *h_truthMatchIxn_SecPi0Multiplicity;
+    TH1D *h_truthMatchIxn_PrimShowerMultiplicity;
+    TH1D *h_truthMatchIxn_SecShowerMultiplicity;
+    TH1D *h_truthMatchIxn_PrimElectronMultiplicity;
+    TH1D *h_truthMatchIxn_SecElectronMultiplicity;
+    TH1D *h_truthMatchIxn_PrimPhotonMultiplicity;
+    TH1D *h_truthMatchIxn_SecPhotonMultiplicity;
 
 };

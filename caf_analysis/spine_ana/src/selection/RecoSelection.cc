@@ -66,14 +66,19 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     // Updated MatchedInteractionSummary with Particle Truth Matching from Mx2, etc.
     if (fMCOnly) {
         FillParticleTruthMatching(sr, dlpixn, matchSummary, recoSummary, Mx2MatchResult);
+        // Fill truth match Mx2 Track
         hist.truthMatch.FillTruthMatchMx2TrackInfo(matchSummary,recoSummary);
         hist.truthMatch.FillTruthMatchDiffTruthRecoVertex(matchSummary);
     }
     // TODO: Add Cut on Pi0s
 
+    // Fill histograms for shower multiplicity for best matched interaction
+    hist.truthMatch.FillTruthMatchIxnShowerMultiplicity(matchSummary);
+
     // Fill reco histograms
     hist.reco.FillRecoVertexWithCuts(recoSummary.vertex);
     hist.reco.FillRecoCosMuonAngle(recoSummary.muonCosL);
+    hist.reco.FillRecoShowerMultiplicity(recoSummary);
 
   }
 
@@ -117,6 +122,19 @@ RecoInteractionSummary RecoSelection::BuildRecoSummary(
     // Showers
     //----------------------------------------------
 
+    if (abs(pdg) == 11) {
+        if (part.primary == true)
+            ++summary.nPrimElectrons;
+        else
+            ++summary.nSecElectrons;
+    }
+
+    if (abs(pdg) == 22) {
+        if (part.primary == true)
+            ++summary.nPrimPhotons;
+        else
+            ++summary.nSecPhotons;
+    }
     //if (pdg == 13) {
 //
     //  const auto& p4 = prim.p;
@@ -171,12 +189,12 @@ MatchedInteractionSummary RecoSelection::BuildMatchedIxnSummary(
     // Fill in truth summary for best-matched interaction if it exists
     if (summary.bestMatchIndex != -999) {
         const auto& bestTruthIxn = sr.mc.nu[summary.bestMatchIndex];
-        summary.truthSummary = TruthSelection::BuildTruthSummary(bestTruthIxn);
+        summary.truthSummaryforBestMatch = TruthSelection::BuildTruthSummary(bestTruthIxn);
         
         // Get difference in truth and reco vertex positions for best-matched interaction
-        summary.diffTruthRecoVertex = DiffPoints3D(summary.truthSummary.vertex, dlpixn.vtx);
+        summary.diffTruthRecoVertex = DiffPoints3D(summary.truthSummaryforBestMatch.vertex, dlpixn.vtx);
         
-        summary.passesLArCuts = TruthSelection::IxnPassesTruthLArCuts(summary.truthSummary);
+        summary.passesLArCuts = TruthSelection::IxnPassesTruthLArCuts(summary.truthSummaryforBestMatch);
         summary.passesMx2 = summary.truthSummary.passesMx2;
     }
 
@@ -218,9 +236,6 @@ void FillParticleTruthMatching(const caf::StandardRecord& sr,
     matchSummary.truthMatchMx2TrackLArStartPosY = mx2TrackLArStartPos.y;
     matchSummary.truthMatchMx2TrackLArStartPosZ = mx2TrackLArStartPos.z;
 
-    // --------------------------------------
-    // Mx2 Track Matching Truth Information
-    // --------------------------------------
 }
 
 void RecoSelection::FillTruthMatchedCuts(const MatchedInteractionSummary& matchSummary,

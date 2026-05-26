@@ -12,7 +12,7 @@ struct MatchedInteractionSummary {
     // Check if rock interaction by looking at truth id
     bool isRockIxn = false;
 
-    TruthInteractionSummary truthSummary;
+    TruthInteractionSummary truthSummaryforBestMatch;
 
     double diffTruthRecoVertex = 999; // distance between reco and truth vertex for best match
 

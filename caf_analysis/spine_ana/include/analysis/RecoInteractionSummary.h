@@ -27,7 +27,10 @@ struct RecoInteractionSummary {
   // -----------------------------
   // Shower Info
   // -----------------------------
-
+  int nPrimElectrons = 0;
+  int nPrimPhotons = 0;
+  int nSecElectrons = 0;
+  int nSecPhotons = 0;
   // -----------------------------
   // Shower Truth Match Info
   // -----------------------------

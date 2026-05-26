@@ -39,6 +39,18 @@ TruthMatchedHists::TruthMatchedHists()
     h_truthMatch_diffTruthRecoVertex = 
       new TH1D("h_truthMatch_diffTruthRecoVertex", "h_truthMatch_diffTruthRecoVertex", 30, 0, 15);
 
+    // Truth match interaction pi0 multiplicity and shower multiplicity histograms
+    // Bins and edges for multiplicity histograms
+    int binsMult = 10;
+    Double_t edgesMult[11] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    h_truthMatchIxn_PrimPi0Multiplicity = new TH1D("h_truthMatchIxn_PrimPi0Multiplicity", "h_truthMatchIxn_PrimPi0Multiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_SecPi0Multiplicity = new TH1D("h_truthMatchIxn_SecPi0Multiplicity", "h_truthMatchIxn_SecPi0Multiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_PrimShowerMultiplicity = new TH1D("h_truthMatchIxn_PrimShowerMultiplicity", "h_truthMatchIxn_PrimShowerMultiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_SecShowerMultiplicity = new TH1D("h_truthMatchIxn_SecShowerMultiplicity", "h_truthMatchIxn_SecShowerMultiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_PrimElectronMultiplicity = new TH1D("h_truthMatchIxn_PrimElectronMultiplicity", "h_truthMatchIxn_PrimElectronMultiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_SecElectronMultiplicity = new TH1D("h_truthMatchIxn_SecElectronMultiplicity", "h_truthMatchIxn_SecElectronMultiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_PrimPhotonMultiplicity = new TH1D("h_truthMatchIxn_PrimPhotonMultiplicity", "h_truthMatchIxn_PrimPhotonMultiplicity", binsMult, edgesMult);
+    h_truthMatchIxn_SecPhotonMultiplicity = new TH1D("h_truthMatchIxn_SecPhotonMultiplicity", "h_truthMatchIxn_SecPhotonMultiplicity", binsMult, edgesMult);
 }
 
 
@@ -80,6 +92,23 @@ void TruthMatchedHists::FillTruthMatchDiffTruthRecoVertex(MatchedInteractionSumm
     h_truthMatch_diffTruthRecoVertex->Fill(matchSummary.diffTruthRecoVertex);
 }
 
+void TruthMatchedHists::FillTruthMatchIxnShowerMultiplicity(MatchedInteractionSummary& matchSummary)
+{
+    h_truthMatchIxn_PrimPi0Multiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimPi0);
+    h_truthMatchIxn_SecPi0Multiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecPi0);
+
+    int total_prim_showers = matchSummary.truthSummaryforBestMatch.nPrimElectron + matchSummary.truthSummaryforBestMatch.nPrimPhoton;
+    int total_sec_showers = matchSummary.truthSummaryforBestMatch.nSecElectron + matchSummary.truthSummaryforBestMatch.nSecPhoton;
+    h_truthMatchIxn_PrimShowerMultiplicity->Fill(total_prim_showers);
+    h_truthMatchIxn_SecShowerMultiplicity->Fill(total_sec_showers);
+
+    h_truthMatchIxn_PrimElectronMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimElectron);
+    h_truthMatchIxn_SecElectronMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecElectron);
+
+    h_truthMatchIxn_PrimPhotonMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimPhoton);
+    h_truthMatchIxn_SecPhotonMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecPhoton);
+}
+
 //------------------------------------------
 // Histogram Writing Method
 //------------------------------------------   
@@ -104,5 +133,14 @@ void TruthMatchedHists::Write(TDirectory* dir)
     h_truthMatchSec_mx2TrackRecoDiffLArStartZ->Write();
 
     h_truthMatch_diffTruthRecoVertex->Write();
+
+    h_truthMatchIxn_PrimPi0Multiplicity->Write();
+    h_truthMatchIxn_SecPi0Multiplicity->Write();
+    h_truthMatchIxn_PrimShowerMultiplicity->Write();
+    h_truthMatchIxn_SecShowerMultiplicity->Write();
+    h_truthMatchIxn_PrimElectronMultiplicity->Write();
+    h_truthMatchIxn_SecElectronMultiplicity->Write();
+    h_truthMatchIxn_PrimPhotonMultiplicity->Write();
+    h_truthMatchIxn_SecPhotonMultiplicity->Write();
 
 }
