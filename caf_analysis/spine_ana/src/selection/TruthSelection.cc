@@ -54,15 +54,18 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     TruthInteractionSummary summary = BuildTruthSummary(nu);
     
     // Fill histograms for number of pi0s
-    hist.truth.FillPi0Multiplicity(summary.nPi0);
+    hist.truth.FillPrimPi0Multiplicity(summary.nPrimPi0);
 
     // Only one pi0
-    if (summary.nPi0 != 1)
+    if (summary.nPrimPi0 != 1)
       continue;
     hist.cuts.Count("Truth", "1 Pi0");
 
-    // Fill histograms for muon kinematics
+    // Fill histograms for muon kinematics and secondary pi0 multiplicity before Mx2 cuts
     hist.truth.FillMuonKinematics(summary.muonCosL, summary.muonEnergy, summary.Numubar, summary.passesMx2);
+    hist.truth.FillSecPi0MultiplicityPreMx2(summary.nSecPi0);
+    hist.truth.FillShowerMultiplicityPreMx2(summary.nPrimElectrons, summary.nSecElectrons,
+                                            summary.nPrimPhotons, summary.nSecPhotons);
 
     // Passes Mx2 signal definition
     if (!summary.passesMx2)
@@ -71,6 +74,11 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
 
     // Fill histograms for neutrino energy
     hist.truth.FillEnu(summary.nuE);
+
+    // Fill post-Mx2 multiplicity histograms
+    hist.truth.FillSecPi0MultiplicityPostMx2(summary.nSecPi0);
+    hist.truth.FillShowerMultiplicityPostMx2(summary.nPrimElectrons, summary.nSecElectrons,
+                                             summary.nPrimPhotons, summary.nSecPhotons);
 
   }
   // Fill histograms for number of interactions above KE threshold for detector
@@ -136,8 +144,32 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
     // Pi0 counting
     //----------------------------------------------
 
-    if (pdg == 111)
-      ++summary.nPi0;
+    if (abs(pdg) == 111)
+      ++summary.nPrimPi0;
+
+    if (abs(pdg) == 11)
+      ++summary.nPrimElectrons;
+
+    if (abs(pdg) == 22)
+      ++summary.nPrimPhotons;
+
+  }
+
+  //--------------------------------------------------
+  // Loop over secondaries
+  //--------------------------------------------------
+  for (const auto& sec : nu.sec) {
+
+    const int pdg = std::abs(sec.pdg);
+
+    if (abs(pdg) == 111)
+      ++summary.nSecPi0;
+
+    if (abs(pdg) == 11)
+      ++summary.nSecElectrons;
+
+    if (abs(pdg) == 22)
+      ++summary.nSecPhotons;
 
   }
 
@@ -176,7 +208,7 @@ bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summar
     return false;
 
   // Only one pi0
-  if (summary.nPi0 != 1)
+  if (summary.nPrimPi0 != 1)
     return false;
 
   return true;

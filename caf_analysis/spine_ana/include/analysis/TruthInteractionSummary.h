@@ -30,10 +30,15 @@ struct TruthInteractionSummary {
   double muonCosL   = -999.0;
 
   // -----------------------------
-  // Hadron content
+  // Pi0/Shower counting
   // -----------------------------
 
-  int nPi0        = 0;
+  int nPrimPi0        = 0;
+  int nSecPi0        = 0;
+  int nPrimElectrons = 0;
+  int nPrimPhotons = 0;
+  int nSecElectrons = 0;
+  int nSecPhotons = 0;
 
 
   // -----------------------------
