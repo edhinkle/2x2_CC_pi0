@@ -17,6 +17,7 @@ public:
     void FillTruthMatchMx2TrackInfo(MatchedInteractionSummary& matchSummary,
                                     RecoInteractionSummary& recoSummary);
 
+    void FillTruthMatchDiffTruthRecoVertex(MatchedInteractionSummary& matchSummary);
     void Write(TDirectory* dir);
 
 private:
@@ -39,5 +40,7 @@ private:
     TH1D *h_truthMatchSec_mx2TrackRecoDiffLArStartY;
     TH1D *h_truthMatchPrim_mx2TrackRecoDiffLArStartZ;
     TH1D *h_truthMatchSec_mx2TrackRecoDiffLArStartZ;
+
+    TH1D *h_truthMatch_diffTruthRecoVertex;
 
 };

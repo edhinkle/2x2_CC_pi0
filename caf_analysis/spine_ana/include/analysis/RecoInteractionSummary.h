@@ -25,15 +25,16 @@ struct RecoInteractionSummary {
   double mx2MatchLArStartPosZ = -999.0;
 
   // -----------------------------
-  // Hadron content
+  // Shower Info
   // -----------------------------
+
+  // -----------------------------
+  // Shower Truth Match Info
+  // -----------------------------
+
 
   //int nPi0        = 0;
 
     //TODO: Add pi0 accounting
-  // -----------------------------
-  // Truth Match Info
-  // -----------------------------
-
   
 };

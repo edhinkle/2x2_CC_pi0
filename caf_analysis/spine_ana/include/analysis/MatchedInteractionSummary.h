@@ -14,7 +14,7 @@ struct MatchedInteractionSummary {
 
     TruthInteractionSummary truthSummary;
 
-    double diffVertex = 999; // distance between reco and truth vertex for best match
+    double diffTruthRecoVertex = 999; // distance between reco and truth vertex for best match
 
     bool passesLArCuts = false; // check if best-matched truth interaction passes truth cuts for signal definition
     bool passesMx2 = false; // check if best-matched truth interaction passes Mx2 signal definition cuts
@@ -22,7 +22,7 @@ struct MatchedInteractionSummary {
     // -----------------------------
     // Truth Match Particle Info
     // -----------------------------
-    bool isPrimary = false;
+    bool truthMatchMx2TrackisPrimary = false;
     int truthMatchMx2TrackPDG = 0;
     double truthMatchMx2TrackE = -1;
     double truthMatchMx2TrackCosL = -999;

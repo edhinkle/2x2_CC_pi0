@@ -27,7 +27,7 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     reco_vtx = dlpixn.vtx;
 
     // Fill histogram for reco vertex distribution (no cuts)
-    hist.reco.FillRecoVertexXZNoCuts(reco_vtx.x, reco_vtx.z);
+    hist.reco.FillRecoVertexNoCuts(reco_vtx.x, reco_vtx.y, reco_vtx.z);
 
     // Initialize MatchedInteractionSummary for this interaction -- only used if MC
     MatchedInteractionSummary matchSummary;
@@ -67,10 +67,12 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     if (fMCOnly) {
         FillParticleTruthMatching(sr, dlpixn, matchSummary, recoSummary, Mx2MatchResult);
         hist.truthMatch.FillTruthMatchMx2TrackInfo(matchSummary,recoSummary);
+        hist.truthMatch.FillTruthMatchDiffTruthRecoVertex(matchSummary);
     }
     // TODO: Add Cut on Pi0s
 
     // Fill reco histograms
+    hist.reco.FillRecoVertexWithCuts(recoSummary.vertex);
     hist.reco.FillRecoCosMuonAngle(recoSummary.muonCosL);
 
   }
@@ -101,8 +103,6 @@ RecoInteractionSummary RecoSelection::BuildRecoSummary(
   summary.mx2MatchLArStartPosX = mx2MatchLArTrack.start.x;
   summary.mx2MatchLArStartPosY = mx2MatchLArTrack.start.y;
   summary.mx2MatchLArStartPosZ = mx2MatchLArTrack.start.z;
-
-
 
   //--------------------------------------------------
   // Loop over primaries
@@ -174,7 +174,7 @@ MatchedInteractionSummary RecoSelection::BuildMatchedIxnSummary(
         summary.truthSummary = TruthSelection::BuildTruthSummary(bestTruthIxn);
         
         // Get difference in truth and reco vertex positions for best-matched interaction
-        summary.diffVertex = DiffPoints3D(summary.truthSummary.vertex, dlpixn.vtx);
+        summary.diffTruthRecoVertex = DiffPoints3D(summary.truthSummary.vertex, dlpixn.vtx);
         
         summary.passesLArCuts = TruthSelection::IxnPassesTruthLArCuts(summary.truthSummary);
         summary.passesMx2 = summary.truthSummary.passesMx2;
@@ -193,13 +193,13 @@ void FillParticleTruthMatching(const caf::StandardRecord& sr,
     // Mx2 Track Matching Truth Information
     // --------------------------------------
     if (mx2MatchResult.truthIxnMx2PartType == 1) { // Primary track
-        matchSummary.isPrimary=true;
+        matchSummary.truthMatchMx2TrackisPrimary=true;
         matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].pdg;
         auto mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].p;
         mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
     }
     if (mx2MatchResult.truthIxnMx2PartType == 3) { // Secondary track
-        matchSummary.isPrimary=false;
+        matchSummary.truthMatchMx2TrackisPrimary=false;
         matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].pdg;
         auto mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].p;
         mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
@@ -227,7 +227,7 @@ void RecoSelection::FillTruthMatchedCuts(const MatchedInteractionSummary& matchS
                      CutFlowManager& cuts,
                      const std::string& recoCut)
 {
-    if (matchSummary.diffVertex >= fSelCuts.maxTruthRecoVertexDiff)
+    if (matchSummary.diffTruthRecoVertex >= fSelCuts.maxTruthRecoVertexDiff)
         return;
 
     cuts.Count("RecoMatchedValidVtx", recoCut);

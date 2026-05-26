@@ -35,6 +35,9 @@ TruthMatchedHists::TruthMatchedHists()
     h_truthMatchSec_mx2TrackRecoDiffLArStartZ =
       new TH1D("h_truthMatchSec_mx2TrackRecoDiffLArStartZ", "h_truthMatchSec_mx2TrackRecoDiffLArStartZ", 60, -15, 15);
 
+    // Truth - Reco Diff in Vertex Position for Best Truth Match
+    h_truthMatch_diffTruthRecoVertex = 
+      new TH1D("h_truthMatch_diffTruthRecoVertex", "h_truthMatch_diffTruthRecoVertex", 30, 0, 15);
 
 }
 
@@ -45,7 +48,7 @@ TruthMatchedHists::TruthMatchedHists()
 void TruthMatchedHists::FillTruthMatchMx2TrackInfo(MatchedInteractionSummary& matchSummary,
                                                    RecoInteractionSummary& recoSummary)
 {
-    if (matchSummary.isPrimary){
+    if (matchSummary.truthMatchMx2TrackisPrimary){
         h_truthMatchPrim_mx2TrackPDG->Fill(matchSummary.truthMatchMx2TrackPDG);
         h_truthMatchPrim_mx2TrackE->Fill(matchSummary.truthMatchMx2TrackE);
         h_truthMatchPrim_mx2TrackCosL->Fill(matchSummary.truthMatchMx2TrackCosL);
@@ -61,7 +64,7 @@ void TruthMatchedHists::FillTruthMatchMx2TrackInfo(MatchedInteractionSummary& ma
         h_truthMatchSec_mx2TrackPDG->Fill(matchSummary.truthMatchMx2TrackPDG);
         h_truthMatchSec_mx2TrackE->Fill(matchSummary.truthMatchMx2TrackE);
         h_truthMatchSec_mx2TrackCosL->Fill(matchSummary.truthMatchMx2TrackCosL);
-        
+
         h_truthMatchSec_mx2TrackRecoDiffLArStartX->Fill(matchSummary.truthMatchMx2TrackLArStartPosX-
                                                         recoSummary.mx2MatchLArStartPosX);
         h_truthMatchSec_mx2TrackRecoDiffLArStartY->Fill(matchSummary.truthMatchMx2TrackLArStartPosY-
@@ -70,6 +73,11 @@ void TruthMatchedHists::FillTruthMatchMx2TrackInfo(MatchedInteractionSummary& ma
                                                         recoSummary.mx2MatchLArStartPosZ);
     }
 
+}
+
+void TruthMatchedHists::FillTruthMatchDiffTruthRecoVertex(MatchedInteractionSummary& matchSummary)
+{
+    h_truthMatch_diffTruthRecoVertex->Fill(matchSummary.diffTruthRecoVertex);
 }
 
 //------------------------------------------
@@ -94,5 +102,7 @@ void TruthMatchedHists::Write(TDirectory* dir)
     h_truthMatchSec_mx2TrackRecoDiffLArStartY->Write();
     h_truthMatchPrim_mx2TrackRecoDiffLArStartZ->Write();
     h_truthMatchSec_mx2TrackRecoDiffLArStartZ->Write();
+
+    h_truthMatch_diffTruthRecoVertex->Write();
 
 }

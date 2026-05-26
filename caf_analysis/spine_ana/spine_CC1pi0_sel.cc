@@ -715,61 +715,61 @@ rw.GenerateThrows(100);
         //}
 
         // std::cout<<"counting hadrons (kaons are negligible)"<<std::endl;
-        //if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
-        //    sr->mc.nu[biggestMatchIndex].targetPDG == 1000180400) {
-        //  for (int primaries = 0;
-        //       primaries < sr->mc.nu[biggestMatchIndex].prim.size();
-        //       primaries++) {
-        //    auto start_pos =
-        //        sr->mc.nu[biggestMatchIndex].prim[primaries].start_pos;
-        //    auto end_pos = sr->mc.nu[biggestMatchIndex].prim[primaries].end_pos;
-        //    // if (std::isnan(start_pos.z)) continue;
-        //    // std::cout<<"Got a position"<<std::endl;
-        //    auto p = sr->mc.nu[biggestMatchIndex].prim[primaries].p;
-        //    double dX = p.px; //(end_pos.x-start_pos.x);
-        //    double dY = p.py; //(end_pos.y-start_pos.y);
-        //    double dZ = p.pz; //(end_pos.z-start_pos.z);
-        //    double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
-        //    double dirX = dX / length;
-        //    double dirY = dY / length;
-        //    double dirZ = dZ / length;
-        //    double dXLen = (end_pos.x - start_pos.x);
-        //    double dYLen = (end_pos.y - start_pos.y);
-        //    double dZLen = (end_pos.z - start_pos.z);
-        //    double lengthPos =
-        //        TMath::Sqrt(dXLen * dXLen + dYLen * dYLen + dZLen * dZLen);
-//
-        //    if (!std::isnan(start_pos.z) &&
-        //        (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
-        //             211 /*||
-        //                    abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg)==13*/
-        //         || abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
-        //                2212)) {
-        //      trueTrkLen->Fill(lengthPos);
-        //      int cc = sr->mc.nu[biggestMatchIndex].iscc;
-        //      int mode = sr->mc.nu[biggestMatchIndex].mode;
-        //      if (cc == 1 && (mode == 1 || mode == 1001 || mode == 10))
-        //        trueTrkLenQE->Fill(lengthPos);
-        //      if (cc == 1 && (mode == 3 || mode == 4))
-        //        trueTrkLenNonQE->Fill(lengthPos);
-        //    }
-        //    if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 2212) {
-        //      trueProtonEWithRecoInt->Fill(
-        //          sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.938272);
-        //      trueProtonWithRecoIntDirZ->Fill(dirZ);
-        //      trueProtonWithRecoIntDirX->Fill(dirX);
-        //      trueProtonWithRecoIntDirY->Fill(dirY);
-        //    }
-        //    if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 211) {
-        //      truePionEWithRecoInt->Fill(
-        //          sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.13957);
-        //      truePionWithRecoIntDirZ->Fill(dirZ);
-        //      truePionWithRecoIntDirX->Fill(dirX);
-        //      truePionWithRecoIntDirY->Fill(dirY);
-        //    }
-//
-        //  }
-        //}
+        if (sr->mc.nu[biggestMatchIndex].prim.size() < 500 &&
+            sr->mc.nu[biggestMatchIndex].targetPDG == 1000180400) {
+          for (int primaries = 0;
+               primaries < sr->mc.nu[biggestMatchIndex].prim.size();
+               primaries++) {
+            auto start_pos =
+                sr->mc.nu[biggestMatchIndex].prim[primaries].start_pos;
+            auto end_pos = sr->mc.nu[biggestMatchIndex].prim[primaries].end_pos;
+            // if (std::isnan(start_pos.z)) continue;
+            // std::cout<<"Got a position"<<std::endl;
+            auto p = sr->mc.nu[biggestMatchIndex].prim[primaries].p;
+            double dX = p.px; //(end_pos.x-start_pos.x);
+            double dY = p.py; //(end_pos.y-start_pos.y);
+            double dZ = p.pz; //(end_pos.z-start_pos.z);
+            double length = TMath::Sqrt(dX * dX + dY * dY + dZ * dZ);
+            double dirX = dX / length;
+            double dirY = dY / length;
+            double dirZ = dZ / length;
+            double dXLen = (end_pos.x - start_pos.x);
+            double dYLen = (end_pos.y - start_pos.y);
+            double dZLen = (end_pos.z - start_pos.z);
+            double lengthPos =
+                TMath::Sqrt(dXLen * dXLen + dYLen * dYLen + dZLen * dZLen);
+
+            if (!std::isnan(start_pos.z) &&
+                (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
+                     211 /*||
+                            abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg)==13*/
+                 || abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) ==
+                        2212)) {
+              trueTrkLen->Fill(lengthPos);
+              int cc = sr->mc.nu[biggestMatchIndex].iscc;
+              int mode = sr->mc.nu[biggestMatchIndex].mode;
+              if (cc == 1 && (mode == 1 || mode == 1001 || mode == 10))
+                trueTrkLenQE->Fill(lengthPos);
+              if (cc == 1 && (mode == 3 || mode == 4))
+                trueTrkLenNonQE->Fill(lengthPos);
+            }
+            if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 2212) {
+              trueProtonEWithRecoInt->Fill(
+                  sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.938272);
+              trueProtonWithRecoIntDirZ->Fill(dirZ);
+              trueProtonWithRecoIntDirX->Fill(dirX);
+              trueProtonWithRecoIntDirY->Fill(dirY);
+            }
+            if (abs(sr->mc.nu[biggestMatchIndex].prim[primaries].pdg) == 211) {
+              truePionEWithRecoInt->Fill(
+                  sr->mc.nu[biggestMatchIndex].prim[primaries].p.E - 0.13957);
+              truePionWithRecoIntDirZ->Fill(dirZ);
+              truePionWithRecoIntDirX->Fill(dirX);
+              truePionWithRecoIntDirY->Fill(dirY);
+            }
+
+          }
+        }
 
         for (long unsigned npart = 0;
              npart < sr->common.ixn.dlp[nixn].part.dlp.size();
@@ -1152,7 +1152,7 @@ rw.GenerateThrows(100);
             << (recoCosL->GetEntries()-badRecoCosL->GetEntries()) / trueCosL->GetEntries() << ","
             << (recoCosL->GetEntries()-badRecoCosL->GetEntries())/recoCosL->GetEntries()<< "," <<recoCosL->GetEntries()<< std::endl;
   // Create output file and write your histograms
-  TFile *caf_out_file = new TFile(output_rootfile.c_str(), "recreate");
+  //TFile *caf_out_file = new TFile(output_rootfile.c_str(), "recreate");
   recoCosL->SetTitle(Form("%0.08f",Phi_nom));
 
   matchHistCosl->Write();

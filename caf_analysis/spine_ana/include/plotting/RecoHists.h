@@ -11,6 +11,7 @@ public:
     // Filling histograms
     //------------------------------------------
     void FillRecoVertexNoCuts(double x, double y, double z);
+    void FillRecoVertexWithCuts(caf::SRVector3D vertex);
     void FillRecoCosMuonAngle(double cosL)
 
     void Write(TDirectory* dir);
