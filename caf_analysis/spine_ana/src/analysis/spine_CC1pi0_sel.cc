@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     // -------------------------------
     if (argc != 5) {
         std::cout << "\n USAGE: " << argv[0]
-            << "input_caf_file_list output_root_file mcOnlyString\n"
+            << "input_caf_file_list output_root_file mcOnlyString configFilepath\n"
             << std::endl;
         return 1;
     }
