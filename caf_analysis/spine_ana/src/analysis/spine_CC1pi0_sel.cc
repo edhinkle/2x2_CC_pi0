@@ -22,6 +22,7 @@
 #include "io/CAFUtils.h"
 #include "plotting/HistogramManager.h"
 #include "selection/TruthSelection.h"
+#include "selection/RecoSelection.h"
 
 
 // Main macro method
