@@ -6,7 +6,12 @@
 // Define all reco histograms 
 RecoHists::RecoHists()
 {
-    
+    // Count spills processed
+    h_reco_TotalSpillsProcessed = new TH1D("h_reco_TotalSpillsProcessed", "h_reco_TotalSpillsProcessed", 1, 0, 1);
+
+    // Count total POT processed
+    h_reco_TotalPOT = new TH1D("h_reco_TotalPOT", "h_reco_TotalPOT", 1, 0, 1);
+        
     // All Reco interaction vertices (no cuts)
     h_reco_VertexXZNoCuts = new TH2D("h_reco_VertexXZNoCuts", "h_reco_VertexXZNoCuts", 70, -70, 70, 70, -70, 70);
     h_reco_VertexXNoCuts = new TH1D("h_reco_VertexXNoCuts", "h_reco_VertexXNoCuts", 140, -70, 70);
@@ -44,7 +49,17 @@ RecoHists::RecoHists()
 
 //------------------------------------------
 // Histogram Filling Methods
-//------------------------------------------    
+//------------------------------------------
+void RecoHists::FillTotalSpillsProcessed(int n)
+{
+    h_reco_TotalSpillsProcessed->Fill(0.5,n);
+}
+
+void RecoHists::FillTotalPOT(double pot)
+{
+    h_reco_TotalPOT->Fill(0.5, pot);
+}
+
 void RecoHists::FillRecoVertexNoCuts(double x, double y, double z)
 {
     h_reco_VertexXZNoCuts->Fill(x, z);
@@ -88,6 +103,9 @@ void RecoHists::FillRecoShowerMultiplicity(RecoInteractionSummary& recoSummary)
 void RecoHists::Write(TDirectory* dir)
 {
     dir->cd();
+
+    h_reco_TotalSpillsProcessed->Write();
+    h_reco_TotalPOT->Write();
 
     h_reco_VertexXZNoCuts->Write();
     h_reco_VertexXNoCuts->Write();

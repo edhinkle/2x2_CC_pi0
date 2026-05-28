@@ -106,6 +106,7 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
   summary.Numubar = nu.pdg < 0;
   summary.iscc    = nu.iscc;
   summary.targetPDG = nu.targetPDG;
+  summary.ixnMode = nu.mode;
 
   //--------------------------------------------------
   // Loop over primaries

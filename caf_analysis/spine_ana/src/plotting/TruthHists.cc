@@ -49,6 +49,8 @@ TruthHists::TruthHists()
     h_true_nSecShower_preMx2 = new TH1D("true_nSecShower_preMx2", "true_nSecShower_preMx2", binsMult, edgesMult);
     h_true_nSecShower_postMx2 = new TH1D("true_nSecShower_postMx2", "true_nSecShower_postMx2", binsMult, edgesMult);
 
+    h_true_IxnMode = new TH1D("true_IxnMode", "true_IxnMode");
+
 }
 
 
@@ -130,6 +132,12 @@ void TruthHists::FillShowerMultiplicityPostMx2(int nPrimElectron, int nSecElectr
     h_true_nSecShower_postMx2->Fill(total_sec_showers);
 }
 
+// Fill histogram for ixn mode 
+void TruthHists::FillIxnMode(int mode)
+{
+    h_true_IxnMode->Fill(mode);
+}
+
 void TruthHists::Write(TDirectory* dir)
 {
     dir->cd();
@@ -162,5 +170,7 @@ void TruthHists::Write(TDirectory* dir)
     h_true_nPrimShower_postMx2->Write();
     h_true_nSecShower_preMx2->Write();
     h_true_nSecShower_postMx2->Write();
+
+    h_true_IxnMode->Write();
 
 }

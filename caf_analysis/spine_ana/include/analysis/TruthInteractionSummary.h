@@ -19,6 +19,7 @@ struct TruthInteractionSummary {
   bool Numubar = false;
   bool iscc = false;
   int targetPDG = 0;
+  int ixnMode = -999; 
 
   caf::SRVector3D vertex;
 

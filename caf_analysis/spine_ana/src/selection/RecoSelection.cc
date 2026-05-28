@@ -66,14 +66,19 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     // Updated MatchedInteractionSummary with Particle Truth Matching from Mx2, etc.
     if (fMCOnly) {
         FillParticleTruthMatching(sr, dlpixn, matchSummary, recoSummary, Mx2MatchResult);
-        // Fill truth match Mx2 Track
+        // Fill truth match Mx2 Track (and muon from truth summary)
         hist.truthMatch.FillTruthMatchMx2TrackInfo(matchSummary,recoSummary);
         hist.truthMatch.FillTruthMatchDiffTruthRecoVertex(matchSummary);
+        // Fill histograms for shower multiplicity for best matched interaction
+        hist.truthMatch.FillTruthMatchIxnShowerMultiplicity(matchSummary,recoSummary);
+        // Fill histograms for counting ixn mode
+        hist.truthMatch.FillTruthMatchIxnIxnMode(matchSummary);
+        // Fill histograms for counting selected ixns where best match truth is rock
+        hist.truthMatch.FillTruthMatchIxnIsRock(matchSummary);
+        // Fill histograms for counting CC/NC, nu PDG for rock and non-rock truth-matched BKG
+        hist.truthMatch.FillTruthMatchIxnIsBkgCCnuPDG(matchSummary);
     }
     // TODO: Add Cut on Pi0s
-
-    // Fill histograms for shower multiplicity for best matched interaction
-    hist.truthMatch.FillTruthMatchIxnShowerMultiplicity(matchSummary);
 
     // Fill reco histograms
     hist.reco.FillRecoVertexWithCuts(recoSummary.vertex);

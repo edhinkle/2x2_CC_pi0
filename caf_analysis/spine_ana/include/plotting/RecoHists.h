@@ -11,6 +11,8 @@ public:
     //------------------------------------------
     // Filling histograms
     //------------------------------------------
+    void FillTotalSpillsProcessed(int n);
+    void FillTotalPOT(double pot);
     void FillRecoVertexNoCuts(double x, double y, double z);
     void FillRecoVertexWithCuts(caf::SRVector3D vertex);
     void FillRecoCosMuonAngle(double cosL);
@@ -23,6 +25,9 @@ private:
     //------------------------------------------
     // Histograms
     //------------------------------------------  
+    TH1D *h_reco_TotalSpillsProcessed;
+    TH1D *h_reco_TotalPOT;
+
     TH2D *h_reco_VertexXZNoCuts;  
     TH1D *h_reco_VertexXNoCuts;
     TH1D *h_reco_VertexYNoCuts;
