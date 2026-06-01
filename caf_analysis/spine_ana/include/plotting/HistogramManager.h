@@ -2,7 +2,7 @@
 
 #include "plotting/TruthHists.h"
 #include "plotting/RecoHists.h"
-#include "plotting/MatchedHists.h"
+#include "plotting/TruthMatchedHists.h"
 #include "plotting/CutFlowManager.h"
 
 
@@ -11,7 +11,7 @@ public:
     HistogramManager()
         : truth(), reco(), truthMatch(), cuts() {}
 
-    void Write(TFile* f);
+    void Write(TFile* file);
 
     TruthHists truth;
     RecoHists reco;

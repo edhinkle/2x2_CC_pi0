@@ -1,5 +1,3 @@
-#pragma once
-
 #include "plotting/TruthHists.h"
 
 // Define all truth histograms 
@@ -49,7 +47,7 @@ TruthHists::TruthHists()
     h_true_nSecShower_preMx2 = new TH1D("true_nSecShower_preMx2", "true_nSecShower_preMx2", binsMult, edgesMult);
     h_true_nSecShower_postMx2 = new TH1D("true_nSecShower_postMx2", "true_nSecShower_postMx2", binsMult, edgesMult);
 
-    h_true_IxnMode = new TH1D("true_IxnMode", "true_IxnMode");
+    h_true_IxnMode = new TH1D("true_IxnMode", "true_IxnMode",1100, 0, 1100); // Bins correspond to GENIE interaction modes
 
 }
 
@@ -99,11 +97,6 @@ void TruthHists::FillSecPi0MultiplicityPreMx2(int nSecPi0)
 void TruthHists::FillSecPi0MultiplicityPostMx2(int nSecPi0)
 {
     h_true_nSecPi0_postMx2->Fill(nSecPi0);
-}
-
-void TruthHists::FillSecPi0MultiplicityPreMx2(int nSecPi0)
-{
-    h_true_nSecPi0_preMx2->Fill(nSecPi0);
 }
 
 void TruthHists::FillShowerMultiplicityPreMx2(int nPrimElectron, int nSecElectron, 

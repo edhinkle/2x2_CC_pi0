@@ -36,12 +36,12 @@ detector:
   keThreshold: 0.01 # GeV
   minTrackLength: 3 # cm
   # Module boundaries (absolute values -- symmetric in XYZ); used for FV cuts
-  absModMinX: 3.069 # cm, minimum absolute value X position of modules
-  absModMaxX: 63.931 # cm, maximum absolute value X position of modules
-  absModMinY: 61.8543 # cm, minimum absolute value Y position of modules
-  absModMaxY: 61.8543 # cm, maximum absolute value Y position of modules
-  absModMinZ: 2.6837 # cm, minimum absolute value Z position of modules
-  absModMaxZ: 64.3163 # cm, maximum absolute value Z position of modules 
+  absModuleMinX: 3.069 # cm, minimum absolute value X position of modules
+  absModuleMaxX: 63.931 # cm, maximum absolute value X position of modules
+  absModuleMinY: 61.8543 # cm, minimum absolute value Y position of modules
+  absModuleMaxY: 61.8543 # cm, maximum absolute value Y position of modules
+  absModuleMinZ: 2.6837 # cm, minimum absolute value Z position of modules
+  absModuleMaxZ: 64.3163 # cm, maximum absolute value Z position of modules 
   # Mx2 boundaries from DUNE DocDB 32440
   mx2DownstreamZMin: 164.0 # cm
   mx2DownstreamZMax: 310.0 # cm

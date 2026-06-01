@@ -4,11 +4,10 @@
 
 #include <cmath>
 
-
 // Check if point is in module boundaries
-bool InModuleVolumes(
+bool DetectorCuts::InModuleVolumes(
     const caf::SRVector3D& pt,
-    const DetectorConfig& cfg)
+    const DetectorConfig& cfg) 
 {
   if (abs(pt.x) > cfg.absModuleXMax ||
       abs(pt.x) < cfg.absModuleXMin)
@@ -25,9 +24,9 @@ bool InModuleVolumes(
 }
 
 // Check if point is in fiducial volume of detector
-bool InFiducialVolume(
+bool DetectorCuts::InFiducialVolume(
     const caf::SRVector3D& pt,
-    const DetectorConfig& cfg)
+    const DetectorConfig& cfg) 
 {
   if (abs(pt.x) > cfg.absFiducialXMax ||
       abs(pt.x) < cfg.absFiducialXMin)
@@ -44,9 +43,9 @@ bool InFiducialVolume(
 }
 
 // Check if true interaction is above KE threshold for detector
-bool TrueIxnAboveKEThreshold(
+bool DetectorCuts::TrueIxnAboveKEThreshold(
     const caf::SRTrueInteraction& nu,
-    const DetectorConfig& cfg)
+    const DetectorConfig& cfg) 
 {
   // Check primaries
   for (const auto& prim : nu.prim) {
@@ -63,15 +62,15 @@ bool TrueIxnAboveKEThreshold(
 }
 
 // Check if true particle is over KE threshold for detector
-bool TrueParticleAboveKEThreshold(
+bool DetectorCuts::TrueParticleAboveKEThreshold(
     const caf::SRTrueParticle& part,
-    const DetectorConfig& cfg) 
+    const DetectorConfig& cfg)
 {
-  const int pdg = std::abs(part.pdg);
+
   auto start_pos = part.start_pos;
 
   if (!(InFiducialVolume(start_pos, cfg)))
-    continue;
+    return false;
 
   const double px = part.p.px;
   const double py = part.p.py;

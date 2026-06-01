@@ -1,6 +1,3 @@
-
-#pragma once
-
 #include "plotting/CutFlowManager.h"
 #include "TDirectory.h"
 
@@ -9,7 +6,7 @@ void CutFlowManager::Count(const std::string& flow,
                            const std::string& cut,
                            double weight)
 {
-  auto& cf = flows[flow];
+  auto& cf = cutFlows[flow];
 
   // If this cut has never been seen before, record its order
   if (cf.values.find(cut) == cf.values.end()) {
@@ -25,7 +22,7 @@ void CutFlowManager::Write(TDirectory* dir) const
 {
   dir->cd();
 
-  for (const auto& [flowName, cf] : flows) {
+  for (const auto& [flowName, cf] : cutFlows) {
 
     int nCuts = cf.order.size();
     if (nCuts == 0) continue;

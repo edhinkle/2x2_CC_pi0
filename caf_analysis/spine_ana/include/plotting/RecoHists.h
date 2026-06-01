@@ -33,6 +33,11 @@ private:
     TH1D *h_reco_VertexYNoCuts;
     TH1D *h_reco_VertexZNoCuts;
 
+    TH2D *h_reco_VertexXZWithCuts;  
+    TH1D *h_reco_VertexXWithCuts;
+    TH1D *h_reco_VertexYWithCuts;
+    TH1D *h_reco_VertexZWithCuts;
+
     TH1D *h_reco_CosL;
     TH1D *h_reco_CosL_zoomOut;
 

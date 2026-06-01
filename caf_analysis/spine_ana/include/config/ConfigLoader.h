@@ -2,9 +2,9 @@
 #pragma once
 
 #include <string>
-#include "SelectionConfig.h"
-#include "BeamConfig.h"
-#include "DetectorConfig.h"
+#include "config/SelectionConfig.h"
+#include "config/BeamConfig.h"
+#include "config/DetectorConfig.h"
 
 namespace config {
 

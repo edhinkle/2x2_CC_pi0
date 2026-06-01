@@ -4,7 +4,9 @@
 #include "analysis/RecoInteractionSummary.h"
 #include "analysis/TruthInteractionSummary.h"
 #include "analysis/MatchedInteractionSummary.h"
+#include "cuts/Mx2Matcher.h"
 #include "cuts/Mx2MatchResult.h"
+#include "cuts/DetectorCuts.h"
 #include "selection/TruthSelection.h"
 #include "plotting/HistogramManager.h"
 #include "duneanaobj/StandardRecord/StandardRecord.h" 
@@ -12,10 +14,11 @@
 class RecoSelection {
 public:
 
-    RecoSelection(const config::SelectionConfig& cfg,
-                const config::BeamConfig& beam,
-                const config::DetectorConfig& detector,
-                const bool mcOnly);
+    RecoSelection(const SelectionConfig& cfg,
+                const BeamConfig& beam,
+                const DetectorConfig& detector,
+                const bool mcOnly):
+                fSelCuts(cfg), fBeam(beam), fDetector(detector), fMCOnly(mcOnly) {};
 
     void SelectRecoInteractions(const caf::StandardRecord& sr,
                                 HistogramManager& hist);
@@ -24,7 +27,7 @@ public:
                               CutFlowManager& cuts,
                               const std::string& recoCut);
 
-    double DiffPoints3D(const caf::SRVector3D& v1, const caf::SRVector3D& v2) const;
+    static double DiffPoints3D(const caf::SRVector3D& v1, const caf::SRVector3D& v2);
 
 private:
 
@@ -34,7 +37,7 @@ private:
 
     MatchedInteractionSummary BuildMatchedIxnSummary(
         const caf::StandardRecord& sr,
-        const caf::SRInteraction& dlpixn);
+        const caf::SRInteraction& dlpixn) const;
 
     void FillParticleTruthMatching(const caf::StandardRecord& sr,
                                    const caf::SRInteraction& dlpixn,
@@ -42,8 +45,9 @@ private:
                                    RecoInteractionSummary& recoSummary,
                                    const Mx2MatchResult& mx2MatchResult);
 
-    const config::SelectionConfig& fSelCuts;
-    const config::BeamConfig& fBeam;
-    const config::DetectorConfig& fDetector;
+    const SelectionConfig& fSelCuts;
+    const BeamConfig& fBeam;
+    const DetectorConfig& fDetector;
     const bool fMCOnly;
+
 };

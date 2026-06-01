@@ -1,5 +1,3 @@
-#pragma once
-
 #include "plotting/RecoHists.h"
 #include "TDirectory.h"
 
@@ -68,7 +66,7 @@ void RecoHists::FillRecoVertexNoCuts(double x, double y, double z)
     h_reco_VertexZNoCuts->Fill(z);
 }
 
-void FillRecoVertexWithCuts(caf::SRVector3D vertex) 
+void RecoHists::FillRecoVertexWithCuts(caf::SRVector3D vertex) 
 {
     h_reco_VertexXZWithCuts->Fill(vertex.x, vertex.z);
     h_reco_VertexXWithCuts->Fill(vertex.x);
@@ -85,16 +83,16 @@ void RecoHists::FillRecoCosMuonAngle(double cosL)
 void RecoHists::FillRecoShowerMultiplicity(RecoInteractionSummary& recoSummary)
 {
 
-    int total_prim_showers = recoSummary.nPrimElectron + recoSummary.nPrimPhoton;
-    int total_sec_showers = recoSummary.nSecElectron + recoSummary.nSecPhoton;
+    int total_prim_showers = recoSummary.nPrimElectrons + recoSummary.nPrimPhotons;
+    int total_sec_showers = recoSummary.nSecElectrons + recoSummary.nSecPhotons;
     h_reco_PrimShowerMultiplicity->Fill(total_prim_showers);
     h_reco_SecShowerMultiplicity->Fill(total_sec_showers);
 
-    h_reco_PrimElectronMultiplicity->Fill(recoSummary.nPrimElectron);
-    h_reco_SecElectronMultiplicity->Fill(recoSummary.nSecElectron);
+    h_reco_PrimElectronMultiplicity->Fill(recoSummary.nPrimElectrons);
+    h_reco_SecElectronMultiplicity->Fill(recoSummary.nSecElectrons);
 
-    h_reco_PrimPhotonMultiplicity->Fill(recoSummary.nPrimPhoton);
-    h_reco_SecPhotonMultiplicity->Fill(recoSummary.nSecPhoton);
+    h_reco_PrimPhotonMultiplicity->Fill(recoSummary.nPrimPhotons);
+    h_reco_SecPhotonMultiplicity->Fill(recoSummary.nSecPhotons);
 }
 
 //------------------------------------------

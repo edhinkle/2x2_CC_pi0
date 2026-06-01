@@ -2,9 +2,14 @@
 # Compile the C++ code using g++. Partially based on https://github.com/rdiurba/2x2_trackMultStudies/blob/master/spineAna/compile.sh
 
 # Compile code
-g++ -std=c++17 -O2 -g -pedantic -Wall -I. -Iinclude `root-config --cflags --glibs` \
+g++ -std=c++17 -O2 -g -gdwarf-4 -pedantic -Wall -I. -Iinclude \
+  -I/cvmfs/dune.opensciencegrid.org/products/dune/duneanaobj/v03_06_01b/include \
+  -I./yaml-cpp/install/include \
+  `root-config --cflags --glibs` \
   src/analysis/spine_CC1pi0_sel.cc \
   src/config/ConfigLoader.cc \
+  src/cuts/DetectorCuts.cc \
+  src/cuts/Mx2Matcher.cc \
   src/io/CAFUtils.cc \
   src/plotting/HistogramManager.cc \
   src/plotting/CutFlowManager.cc \
@@ -13,6 +18,9 @@ g++ -std=c++17 -O2 -g -pedantic -Wall -I. -Iinclude `root-config --cflags --glib
   src/plotting/TruthMatchedHists.cc \
   src/selection/RecoSelection.cc \
   src/selection/TruthSelection.cc \
+  -L$DUNEANAOBJ_LIB \
+  -lduneanaobj_StandardRecord \
+  -L./yaml-cpp/install/lib64 \
   -lyaml-cpp \
   -o spine_CC1pi0_sel
 

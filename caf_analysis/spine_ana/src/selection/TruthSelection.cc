@@ -1,10 +1,13 @@
 #include "analysis/TruthInteractionSummary.h"
-#include "cuts/DetectorCuts.h"
 #include "selection/TruthSelection.h"
+
 
 void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
                                              HistogramManager& hist)
 {
+  //----------------------------------------------------------------------
+  // Initialize Object for Cuts (DetectorCuts, etc.)
+  //----------------------------------------------------------------------
   int ixnsOverKEThreshold = 0;
   //----------------------------------------------------------------------
   // Loop over truth neutrino interactions
@@ -12,7 +15,7 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
   for (const auto& nu : sr.mc.nu) {
 
     // Check if ixn is above KE threshold for detector
-    if (TrueIxnAboveKEThreshold(nu, fDetector))
+    if (DetectorCuts::TrueIxnAboveKEThreshold(nu, fDetector))
       ++ixnsOverKEThreshold;
     
     //--------------------------------------------------------------------
@@ -27,7 +30,7 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     hist.cuts.Count("Truth", "Argon Target");
 
     // Active Volume Cut
-    if (!InModuleVolumes(nu.vtx, fDetector))
+    if (!DetectorCuts::InModuleVolumes(nu.vtx, fDetector))
       continue;
     hist.cuts.Count("Truth", "Active Volume");
 
@@ -37,7 +40,7 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     hist.cuts.Count("Truth", "NuMu");
 
     // Fiducial Volume Cut
-    if (!InFiducialVolume(nu.vtx, fDetector))
+    if (!DetectorCuts::InFiducialVolume(nu.vtx, fDetector))
       continue;
     hist.cuts.Count("Truth", "Fiducial Volume");
 
@@ -94,7 +97,7 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
   //--------------------------------------------------
   // Detector-level classifications
   //--------------------------------------------------
-  summary.KEOverThreshold = TrueIxnAboveKEThreshold(nu, fDetector);
+  summary.KEOverThreshold = DetectorCuts::TrueIxnAboveKEThreshold(nu, fDetector);
 
   //--------------------------------------------------
   // Interaction-level info
@@ -136,9 +139,9 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
       const double dirZ = p4.pz / p;
 
       summary.muonCosL =
-          dirX * fBeam.beamX +
-          dirY * fBeam.beamY +
-          dirZ * fBeam.beamZ;
+          dirX * fBeam.beam_x +
+          dirY * fBeam.beam_y +
+          dirZ * fBeam.beam_z;
     }
 
     //----------------------------------------------
@@ -179,8 +182,8 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
   //--------------------------------------------------
 
   summary.passesMx2 =
-      (summary.muonCosL > fSelCuts.minMuonCosL &&
-       summary.muonEnergy > fSelCuts.minMuonEnergy);
+      (summary.muonCosL > fSelCuts.cosThetaCut &&
+       summary.muonEnergy > fSelCuts.muonEnergyCut);
 
   return summary;
 }
@@ -193,7 +196,7 @@ bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summar
     return false;
 
   // Active Volume Cut
-  if (!InModuleVolumes(summary.vertex, fDetector))
+  if (!DetectorCuts::InModuleVolumes(summary.vertex, fDetector))
     return false;
 
   // Numu Cut
@@ -201,7 +204,7 @@ bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summar
     return false;
 
   // Fiducial Volume Cut
-  if (!InFiducialVolume(summary.vertex, fDetector))
+  if (!DetectorCuts::InFiducialVolume(summary.vertex, fDetector))
     return false;
 
   // CC only

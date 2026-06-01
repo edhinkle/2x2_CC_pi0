@@ -53,14 +53,14 @@ int main(int argc, char **argv) {
     // -------------------------------
     // 3. Load configurations
     // -------------------------------
-    config::SelectionConfig selectionCuts = config::LoadSelectionConfig(configFilepath);
-    config::BeamConfig beamInfo = config::LoadBeamConfig(configFilepath);
-    config::DetectorConfig detInfo = config::LoadDetectorConfig(configFilepath);
+    SelectionConfig selectionCuts = config::LoadSelectionConfig(configFilepath);
+    BeamConfig beamInfo = config::LoadBeamConfig(configFilepath);
+    DetectorConfig detInfo = config::LoadDetectorConfig(configFilepath);
 
     // -------------------------------
     // 4. Initialize histograms
     // -------------------------------
-    HistogramManager hist(); //TODO : Pass flux info to get nom flux
+    HistogramManager hist; //TODO : Pass flux info to get nom flux
 
     // -------------------------------
     // 5. Load CAF chain + set up branch address/total spill/POT variables

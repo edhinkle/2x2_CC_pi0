@@ -1,5 +1,3 @@
-#pragma once
-
 #include "analysis/RecoInteractionSummary.h"
 #include "analysis/TruthInteractionSummary.h"
 #include "cuts/DetectorCuts.h"
@@ -7,16 +5,21 @@
 #include "cuts/Mx2Matcher.h"
 #include "cuts/Mx2MatchResult.h"
 
+
 void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
                                            HistogramManager& hist)
 {
   //----------------------------------------------------------------------
+  // Initialize Object for Mx2Matcher
+  //----------------------------------------------------------------------
+  Mx2Matcher mx2Matcher(fSelCuts, fBeam, fDetector, fMCOnly);
+  //----------------------------------------------------------------------
   // Loop over reco neutrino interactions
   //----------------------------------------------------------------------
-  for (long unsigned nixn = 0; nixn < sr->common.ixn.dlp.size(); nixn++) {
+  for (long unsigned nixn = 0; nixn < sr.common.ixn.dlp.size(); nixn++) {
 
     // Interaction index is necessary for matching tracks with Mx2
-    dlpixn = sr->common.ixn.dlp[nixn];
+    auto dlpixn = sr.common.ixn.dlp[nixn];
     
     //--------------------------------------------------------------------
     // Basic interaction bookkeeping
@@ -24,7 +27,7 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
 
     hist.cuts.Count("Reco", "All");
 
-    reco_vtx = dlpixn.vtx;
+    auto reco_vtx = dlpixn.vtx;
 
     // Fill histogram for reco vertex distribution (no cuts)
     hist.reco.FillRecoVertexNoCuts(reco_vtx.x, reco_vtx.y, reco_vtx.z);
@@ -33,26 +36,26 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     MatchedInteractionSummary matchSummary;
     // Match to Truth if MC And Check if signal
     if (fMCOnly) {
-        matchSummary = BuildMatchedSummary(sr, dlpixn);
+        matchSummary = BuildMatchedIxnSummary(sr, dlpixn);
     }
     // Fill cutflow for matched interactions passing vertex cut and LAr cuts for signal definition
     if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "All");
 
     // Active Volume Cut
-    if (!InModuleVolumes(reco_vtx.vtx, fDetector))
+    if (!DetectorCuts::InModuleVolumes(reco_vtx, fDetector))
       continue;
     hist.cuts.Count("Reco", "Active Volume");
     if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Active Volume");
 
     // Fiducial Volume Cut
-    if (!InFiducialVolume(reco_vtx.vtx, fDetector))
+    if (!DetectorCuts::InFiducialVolume(reco_vtx, fDetector))
       continue;
     hist.cuts.Count("Reco", "Fiducial Volume");
     if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Fiducial Volume");
 
     // Mx2 Matching Muon Cut
-    Mx2MatchResult Mx2Matcher::MatchInteraction(nixn, dlpixn, sr);
-    if (!Mx2MatchResult.isGoodMatch)
+    Mx2MatchResult mx2RecoMatch = mx2Matcher.MatchInteraction(nixn, dlpixn, sr);
+    if (!mx2RecoMatch.isGoodMatch)
         continue;
     hist.cuts.Count("Reco", "Mx2 Muon Match");
     if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Mx2 Muon Match");
@@ -61,11 +64,11 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     // Event-level reco summary quantities
     //--------------------------------------------------------------------
 
-    RecoInteractionSummary recoSummary = BuildRecoSummary(dlpixn, Mx2MatchResult);
+    RecoInteractionSummary recoSummary = BuildRecoSummary(dlpixn, mx2RecoMatch);
 
     // Updated MatchedInteractionSummary with Particle Truth Matching from Mx2, etc.
     if (fMCOnly) {
-        FillParticleTruthMatching(sr, dlpixn, matchSummary, recoSummary, Mx2MatchResult);
+        FillParticleTruthMatching(sr, dlpixn, matchSummary, recoSummary, mx2RecoMatch);
         // Fill truth match Mx2 Track (and muon from truth summary)
         hist.truthMatch.FillTruthMatchMx2TrackInfo(matchSummary,recoSummary);
         hist.truthMatch.FillTruthMatchDiffTruthRecoVertex(matchSummary);
@@ -194,19 +197,20 @@ MatchedInteractionSummary RecoSelection::BuildMatchedIxnSummary(
     // Fill in truth summary for best-matched interaction if it exists
     if (summary.bestMatchIndex != -999) {
         const auto& bestTruthIxn = sr.mc.nu[summary.bestMatchIndex];
-        summary.truthSummaryforBestMatch = TruthSelection::BuildTruthSummary(bestTruthIxn);
+        TruthSelection truthSel(fSelCuts, fBeam, fDetector);
+        summary.truthSummaryforBestMatch = truthSel.BuildTruthSummary(bestTruthIxn);
         
         // Get difference in truth and reco vertex positions for best-matched interaction
         summary.diffTruthRecoVertex = DiffPoints3D(summary.truthSummaryforBestMatch.vertex, dlpixn.vtx);
         
-        summary.passesLArCuts = TruthSelection::IxnPassesTruthLArCuts(summary.truthSummaryforBestMatch);
-        summary.passesMx2 = summary.truthSummary.passesMx2;
+        summary.passesLArCuts = truthSel.IxnPassesTruthLArCuts(summary.truthSummaryforBestMatch);
+        summary.passesMx2 = summary.truthSummaryforBestMatch.passesMx2;
     }
 
     return summary;
 }
 
-void FillParticleTruthMatching(const caf::StandardRecord& sr,
+void RecoSelection::FillParticleTruthMatching(const caf::StandardRecord& sr,
                                const caf::SRInteraction& dlpixn,
                                MatchedInteractionSummary& matchSummary,
                                RecoInteractionSummary& recoSummary,
@@ -215,16 +219,18 @@ void FillParticleTruthMatching(const caf::StandardRecord& sr,
     // --------------------------------------
     // Mx2 Track Matching Truth Information
     // --------------------------------------
+    auto mx2TrackMatchP = caf::SRLorentzVector();
+    auto mx2TrackLArStartPos = caf::SRVector3D();
     if (mx2MatchResult.truthIxnMx2PartType == 1) { // Primary track
         matchSummary.truthMatchMx2TrackisPrimary=true;
         matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].pdg;
-        auto mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].p;
+        mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].p;
         mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
     }
     if (mx2MatchResult.truthIxnMx2PartType == 3) { // Secondary track
         matchSummary.truthMatchMx2TrackisPrimary=false;
         matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].pdg;
-        auto mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].p;
+        mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].p;
         mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].sec[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
     }
     // Fill energy/cosL info
@@ -232,9 +238,9 @@ void FillParticleTruthMatching(const caf::StandardRecord& sr,
     double mx2TrackMatchPMag = TMath::Sqrt(mx2TrackMatchP.px * mx2TrackMatchP.px + 
                                    mx2TrackMatchP.py * mx2TrackMatchP.py + 
                                    mx2TrackMatchP.pz * mx2TrackMatchP.pz);
-    TVector3 mx2TrackMatchDir = (mx2TrackMatchP.px / mx2TrackMatchPMag,
-                                 mx2TrackMatchP.py / mx2TrackMatchPMag,
-                                 mx2TrackMatchP.pz / mx2TrackMatchPMag);
+    TVector3 mx2TrackMatchDir(mx2TrackMatchP.px / mx2TrackMatchPMag, 
+                              mx2TrackMatchP.py / mx2TrackMatchPMag,
+                              mx2TrackMatchP.pz / mx2TrackMatchPMag);
     matchSummary.truthMatchMx2TrackCosL = mx2TrackMatchDir.Dot(fBeam.beam_dir);
     // Fill Truth Match Start Points for LAr Track
     matchSummary.truthMatchMx2TrackLArStartPosX = mx2TrackLArStartPos.x;
@@ -263,7 +269,7 @@ void RecoSelection::FillTruthMatchedCuts(const MatchedInteractionSummary& matchS
     cuts.Count("RecoMatchedSignalwithMx2", recoCut);
 }
 
-double RecoSelection::DiffPoints3D(const caf::SRVector3D& v1, const caf::SRVector3D& v2) const
+double RecoSelection::DiffPoints3D(const caf::SRVector3D& v1, const caf::SRVector3D& v2) 
 {
     return TMath::Sqrt((v1.x - v2.x) * (v1.x - v2.x) +
                        (v1.y - v2.y) * (v1.y - v2.y) +

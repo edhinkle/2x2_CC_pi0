@@ -1,5 +1,3 @@
-#pragma once
-
 #include "plotting/TruthMatchedHists.h"
 #include "TDirectory.h"
 
@@ -12,7 +10,7 @@ TruthMatchedHists::TruthMatchedHists()
     // Truth match mx2Track histograms
     // PDG
     h_truthMatchPrim_mx2TrackPDG = new TH1D("h_truthMatchPrim_mx2TrackPDG", "h_truthMatchPrim_mx2TrackPDG", 6000, -3000, 3000);
-    h_truthMatchSec_mx2TrackPDG = new TH1D("h_truthMatchSec_mx2TrackPDG", "h_truthMatchSec_mx2TrackPDG", 6000, -3000, 3000)
+    h_truthMatchSec_mx2TrackPDG = new TH1D("h_truthMatchSec_mx2TrackPDG", "h_truthMatchSec_mx2TrackPDG", 6000, -3000, 3000);
     
     // Energy
     h_truthMatchPrim_mx2TrackE = new TH1D("h_truthMatchPrim_mx2TrackE", "h_truthMatchPrim_mx2TrackE", 50, 0, 20);
@@ -157,7 +155,7 @@ TruthMatchedHists::TruthMatchedHists()
     h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult", binsMult, edgesMult);
 
     // Ixn Mode for Best-Matched Interaction
-    h_truthMatchIxn_IxnMode = new TH1D("h_truthMatchIxn_IxnMode", "h_truthMatchIxn_IxnMode");
+    h_truthMatchIxn_IxnMode = new TH1D("h_truthMatchIxn_IxnMode", "h_truthMatchIxn_IxnMode", 1100, 0, 1100);
   
     // Is best matched truth ixn rock? (0 = no, 1 = yes)
     h_truthMatchIxn_IsRock = new TH1D("h_truthMatchIxn_IsRock", "h_truthMatchIxn_IsRock", 2, 0, 2);
@@ -228,114 +226,114 @@ void TruthMatchedHists::FillTruthMatchIxnShowerMultiplicity(MatchedInteractionSu
     h_truthMatchIxn_PrimPi0Multiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimPi0);
     h_truthMatchIxn_SecPi0Multiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecPi0);
 
-    int total_prim_showers_truthMatch = matchSummary.truthSummaryforBestMatch.nPrimElectron + matchSummary.truthSummaryforBestMatch.nPrimPhoton;
-    int total_sec_showers_truthMatch  = matchSummary.truthSummaryforBestMatch.nSecElectron + matchSummary.truthSummaryforBestMatch.nSecPhoton;
+    int total_prim_showers_truthMatch = matchSummary.truthSummaryforBestMatch.nPrimElectrons + matchSummary.truthSummaryforBestMatch.nPrimPhotons;
+    int total_sec_showers_truthMatch  = matchSummary.truthSummaryforBestMatch.nSecElectrons + matchSummary.truthSummaryforBestMatch.nSecPhotons;
     h_truthMatchIxn_PrimShowerMultiplicity->Fill(total_prim_showers_truthMatch);
     h_truthMatchIxn_SecShowerMultiplicity->Fill(total_sec_showers_truthMatch);
 
-    h_truthMatchIxn_PrimElectronMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimElectron);
-    h_truthMatchIxn_SecElectronMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecElectron);
+    h_truthMatchIxn_PrimElectronMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimElectrons);
+    h_truthMatchIxn_SecElectronMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecElectrons);
 
-    h_truthMatchIxn_PrimPhotonMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimPhoton);
-    h_truthMatchIxn_SecPhotonMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecPhoton);
+    h_truthMatchIxn_PrimPhotonMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nPrimPhotons);
+    h_truthMatchIxn_SecPhotonMultiplicity->Fill(matchSummary.truthSummaryforBestMatch.nSecPhotons);
 
     // Response in Reco Shower Multiplicity for Prim and Sec Showers for Best Matched Interaction (all interactions passing reco cuts)
-    int total_prim_showers_reco = recoSummary.nPrimElectron + recoSummary.nPrimPhoton;
-    int total_sec_showers_reco = recoSummary.nSecElectron + recoSummary.nSecPhoton;
+    int total_prim_showers_reco = recoSummary.nPrimElectrons + recoSummary.nPrimPhotons;
+    int total_sec_showers_reco = recoSummary.nSecElectrons + recoSummary.nSecPhotons;
 
     h_truthMatchIxn_Reco_PrimShowerResponseMult->Fill(total_prim_showers_reco, total_prim_showers_truthMatch);
     h_truthMatchIxn_Reco_SecShowerResponseMult->Fill(total_sec_showers_reco, total_sec_showers_truthMatch);
-    h_truthMatchIxn_Reco_PrimElectronResponseMult->Fill(recoSummary.nPrimElectron, matchSummary.truthSummaryforBestMatch.nPrimElectron);
-    h_truthMatchIxn_Reco_SecElectronResponseMult->Fill(recoSummary.nSecElectron, matchSummary.truthSummaryforBestMatch.nSecElectron);
-    h_truthMatchIxn_Reco_PrimPhotonResponseMult->Fill(recoSummary.nPrimPhoton, matchSummary.truthSummaryforBestMatch.nPrimPhoton);
-    h_truthMatchIxn_Reco_SecPhotonResponseMult->Fill(recoSummary.nSecPhoton, matchSummary.truthSummaryforBestMatch.nSecPhoton);
+    h_truthMatchIxn_Reco_PrimElectronResponseMult->Fill(recoSummary.nPrimElectrons, matchSummary.truthSummaryforBestMatch.nPrimElectrons);
+    h_truthMatchIxn_Reco_SecElectronResponseMult->Fill(recoSummary.nSecElectrons, matchSummary.truthSummaryforBestMatch.nSecElectrons);
+    h_truthMatchIxn_Reco_PrimPhotonResponseMult->Fill(recoSummary.nPrimPhotons, matchSummary.truthSummaryforBestMatch.nPrimPhotons);
+    h_truthMatchIxn_Reco_SecPhotonResponseMult->Fill(recoSummary.nSecPhotons, matchSummary.truthSummaryforBestMatch.nSecPhotons);
 
     // Fill reco shower multiplicity for best matched ixn truth signal/bkg histograms
     if (matchSummary.passesLArCuts && matchSummary.passesMx2 == true)
     {
         h_truthMatchIxn_TruthSignal_RecoPrimShowerMult->Fill(total_prim_showers_reco);
         h_truthMatchIxn_TruthSignal_RecoSecShowerMult->Fill(total_sec_showers_reco);
-        h_truthMatchIxn_TruthSignal_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-        h_truthMatchIxn_TruthSignal_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-        h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-        h_truthMatchIxn_TruthSignal_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+        h_truthMatchIxn_TruthSignal_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+        h_truthMatchIxn_TruthSignal_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+        h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+        h_truthMatchIxn_TruthSignal_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
 
         // All signal ixns are CC by definition -- check ixn mode
         if (matchSummary.truthSummaryforBestMatch.ixnMode == 1 || matchSummary.truthSummaryforBestMatch.ixnMode == 1001) {
           h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult->Fill(total_prim_showers_reco);
           h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult->Fill(total_sec_showers_reco);
-          h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-          h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-          h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-          h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+          h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+          h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+          h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+          h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
         else if (matchSummary.truthSummaryforBestMatch.ixnMode == 10) {
           h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult->Fill(total_prim_showers_reco);
           h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult->Fill(total_sec_showers_reco);
-          h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-          h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-          h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-          h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+          h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+          h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+          h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+          h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
         else if (matchSummary.truthSummaryforBestMatch.ixnMode == 3) {
           h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult->Fill(total_prim_showers_reco);
           h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult->Fill(total_sec_showers_reco);
-          h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-          h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-          h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-          h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+          h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+          h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+          h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+          h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
         else if (matchSummary.truthSummaryforBestMatch.ixnMode == 4) {
           h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult->Fill(total_prim_showers_reco);
           h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult->Fill(total_sec_showers_reco);
-          h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-          h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-          h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-          h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+          h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+          h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+          h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+          h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
         else if (matchSummary.truthSummaryforBestMatch.ixnMode == 5) {
           h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult->Fill(total_prim_showers_reco);
           h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult->Fill(total_sec_showers_reco);
-          h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-          h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-          h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-          h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+          h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+          h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+          h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+          h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
     }
     else {
         h_truthMatchIxn_TruthBkg_RecoPrimShowerMult->Fill(total_prim_showers_reco);
         h_truthMatchIxn_TruthBkg_RecoSecShowerMult->Fill(total_sec_showers_reco);
-        h_truthMatchIxn_TruthBkg_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-        h_truthMatchIxn_TruthBkg_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-        h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-        h_truthMatchIxn_TruthBkg_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+        h_truthMatchIxn_TruthBkg_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+        h_truthMatchIxn_TruthBkg_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+        h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+        h_truthMatchIxn_TruthBkg_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
 
         if (matchSummary.isRockIxn == true)
         {
             h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult->Fill(total_prim_showers_reco);
             h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult->Fill(total_sec_showers_reco);
-            h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-            h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-            h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-            h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+            h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+            h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+            h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+            h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
-        else if (matchSummary.truthSummaryforBestMatch.isCC == true)
+        else if (matchSummary.truthSummaryforBestMatch.iscc == true)
         {
             h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult->Fill(total_prim_showers_reco);
             h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult->Fill(total_sec_showers_reco);
-            h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-            h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-            h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-            h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+            h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+            h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+            h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+            h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
         else
         {
             h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult->Fill(total_prim_showers_reco);
             h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult->Fill(total_sec_showers_reco);
-            h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult->Fill(recoSummary.nPrimElectron);
-            h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult->Fill(recoSummary.nSecElectron);
-            h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhoton);
-            h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult->Fill(recoSummary.nSecPhoton);
+            h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult->Fill(recoSummary.nPrimElectrons);
+            h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult->Fill(recoSummary.nSecElectrons);
+            h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult->Fill(recoSummary.nPrimPhotons);
+            h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult->Fill(recoSummary.nSecPhotons);
         }
     }
 }
@@ -360,11 +358,11 @@ void TruthMatchedHists::FillTruthMatchIxnIsBkgCCnuPDG(MatchedInteractionSummary&
   }
   else if (matchSummary.isRockIxn == true)
   { 
-    h_truthMatchIxn_TruthBkgROCK_isCC->Fill(matchSummary.truthSummaryforBestMatch.isCC);
+    h_truthMatchIxn_TruthBkgROCK_isCC->Fill(matchSummary.truthSummaryforBestMatch.iscc);
     h_truthMatchIxn_TruthBkgROCK_nuPDG->Fill(matchSummary.truthSummaryforBestMatch.nuPDG);
   }
   else {
-    h_truthMatchIxn_TruthBkgNONROCK_isCC->Fill(matchSummary.truthSummaryforBestMatch.isCC);
+    h_truthMatchIxn_TruthBkgNONROCK_isCC->Fill(matchSummary.truthSummaryforBestMatch.iscc);
     h_truthMatchIxn_TruthBkgNONROCK_nuPDG->Fill(matchSummary.truthSummaryforBestMatch.nuPDG);
   }
 }

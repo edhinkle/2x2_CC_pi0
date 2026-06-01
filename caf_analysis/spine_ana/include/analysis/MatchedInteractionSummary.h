@@ -1,6 +1,6 @@
 #pragma once
 
-#include "selection/TruthInteractionSummary.h"
+#include "analysis/TruthInteractionSummary.h"
 #include "duneanaobj/StandardRecord/StandardRecord.h"
 
 struct MatchedInteractionSummary {

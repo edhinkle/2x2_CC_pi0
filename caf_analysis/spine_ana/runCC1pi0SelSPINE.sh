@@ -22,6 +22,12 @@ source compileCC1pi0SelSPINE.sh
 #./fakedata_dlp_sel ${INPUTFILELIST} testFakeDataHighEReweight.root 1
 #./fakedata_dlp_selLowE ${INPUTFILELIST} testFakeDataLowEReweight.root 1
 
+# Make output directory if it doesn't exist
+if [[ ! -d "${OUTPUTDIR}" ]]; then
+    mkdir -p "${OUTPUTDIR}"
+fi
+
+# Move output file to output directory
 mv ${OUTPUTFILE} ${OUTPUTDIR}
 #root -l -b -q unfoldGENIERW.C
 #root -l -b -q unfoldFluxRW.C 

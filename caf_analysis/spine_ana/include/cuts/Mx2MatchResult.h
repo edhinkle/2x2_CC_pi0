@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TVector3.h"
+
 struct Mx2MatchResult {
   bool trackIsBackward = false;
 

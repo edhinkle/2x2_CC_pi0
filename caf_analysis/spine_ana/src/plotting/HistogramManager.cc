@@ -1,10 +1,8 @@
-#pragma once
-
 #include "plotting/HistogramManager.h"
 
-void HistogramManager::Write(TFile* f)
+void HistogramManager::Write(TFile* file)
 {
-  f->cd();
+  file->cd();
 
   TDirectory* truthDir = file->mkdir("truth");
   truth.Write(truthDir);

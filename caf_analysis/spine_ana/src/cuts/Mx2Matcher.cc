@@ -22,7 +22,7 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
   // Returns -999. if no match, in which case Mx2 matching will not be attempted for this track
   result.trkMatchDotProdCAF = GetNDCAFTrkMatchDotProd(sr, part, LArIxnIdx); 
   if (result.trkMatchDotProdCAF < 0.)
-    continue;
+    return result;
 
   double bestMatchDotProd = -99.;
 
@@ -30,19 +30,22 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
 
     const auto& mx2Ixn = sr.nd.minerva.ixn[i];
 
-    for (int j = 0; j < mx2Ixn.ntracks; ++j) {
+    for (size_t j = 0; j < mx2Ixn.ntracks; ++j) {
 
       const auto& mx2Track = mx2Ixn.tracks[j];
       result.mx2TrackEndZ = mx2Track.end.z;
 
       // Check if track passes Mx2 NDCAFMaker matching criteria (necessary due to offsets between Mx2 and 2x2 in data)
+      caf::SRVector3D LArTrackStart;
+      caf::SRVector3D LArTrackEnd;
+      
       if (!result.trackIsBackward) {
-        caf::SRVector3D& LArTrackStart = part.start;
-        caf::SRVector3D& LArTrackEnd = part.end;
+        LArTrackStart = part.start;
+        LArTrackEnd = part.end;
       }
       else {
-        caf::SRVector3D& LArTrackStart = part.end;
-        caf::SRVector3D& LArTrackEnd = part.start;
+        LArTrackStart = part.end;
+        LArTrackEnd = part.start;
       }
       double NDCAFMatchDispl = 0; // only used as placeholder ptr for following method
       bool PassesMx2LArTrackMatch = PassesMx2NDCAFMakerCut(mx2Track, 
@@ -50,7 +53,7 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
                                                            LArTrackStart, 
                                                            LArTrackEnd, 
                                                            result.NDCAFMatchDotProd, 
-                                                           NDCAFMatchDispl)
+                                                           NDCAFMatchDispl);
       if (!PassesMx2LArTrackMatch) continue;
       // Set Mx2LArTrackMatchDispl to abs. value to protect vs. direction differences w/ trkmatch
       result.NDCAFMatchDotProd = abs(result.NDCAFMatchDotProd);
@@ -62,8 +65,8 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
       // TODO: Consider adding check to allow for vetoing interactions where
       //       there's a throughgoing muon (goes through Mx2 upstream and downstream)
       //       which could cause confusion with the muon from the neutrino
-      if (!Mx2TrackIsEnteringDownstream(trackMx2)) continue;
-      if (!Mx2TrackIsMuonCandidate(trackMx2)) continue; // check that it goes far enough in Mx2 DS in Z
+      if (!Mx2TrackIsEnteringDownstream(mx2Track)) continue;
+      if (!Mx2TrackIsMuonCandidate(mx2Track)) continue; // check that it goes far enough in Mx2 DS in Z
 
       if (result.NDCAFMatchDotProd > bestMatchDotProd) {
         bestMatchDotProd = result.NDCAFMatchDotProd;
@@ -85,7 +88,7 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
 }
 
 // Check if Track is a primary track of the interaction, starting near the vertex
-bool Mx2Matcher::IsPrimaryTrack(const caf::SRParticle& part, const caf::SRVector3D& vertex) const
+bool Mx2Matcher::IsPrimaryTrack(const caf::SRRecoParticle& part, const caf::SRVector3D& vertex) const
 {
     int pdg = part.pdg;
 
@@ -113,12 +116,12 @@ bool Mx2Matcher::IsVisibleTrack(const double length) const
 }
 
 // Check if track is exiting the detector (for Mx2 matching requirement)
-bool Mx2Matcher::IsExitingTrack(const caf::SRParticle& part) const
+bool Mx2Matcher::IsExitingTrack(const caf::SRRecoParticle& part) const
 {
   return (abs(part.start.z) > fDetector.absFiducialZMaxExiting || abs(part.end.z) > fDetector.absFiducialZMaxExiting);
 }
 
-bool Mx2Matcher::IsBackwardTrack(const caf::SRParticle& part) const
+bool Mx2Matcher::IsBackwardTrack(const caf::SRRecoParticle& part) const
 {
     // Check if track is backward-going based on start and end z positions
     return (part.end.z < part.start.z);
@@ -143,7 +146,7 @@ bool Mx2Matcher::Mx2TrackIsMuonCandidate(const caf::SRTrack& trackMx2) const
 }
 
 // Helper method to compute length of track
-double Mx2Matcher::ComputeLength(const caf::SRParticle& part) const
+double Mx2Matcher::ComputeLength(const caf::SRRecoParticle& part) const
 {
   auto dX = part.end.x - part.start.x;
   auto dY = part.end.y - part.start.y;
@@ -153,7 +156,7 @@ double Mx2Matcher::ComputeLength(const caf::SRParticle& part) const
 }
 
 // Helper method to compute direction of track
-TVector3 Mx2Matcher::ComputeDirection(const caf::SRParticle& part) const
+TVector3 Mx2Matcher::ComputeDirection(const caf::SRRecoParticle& part) const
 {
   double L = ComputeLength(part);
   if (L <= 0) return TVector3(0,0,0);
@@ -180,20 +183,21 @@ TVector3 Mx2Matcher::ComputeDirection(const caf::SRParticle& part) const
 
 
 // Helper method to get dot product of track extrapolation matching from trkmatch CAF branch
-double GetNDCAFTrkMatchDotProd(const caf::StandardRecord& sr, 
+double Mx2Matcher::GetNDCAFTrkMatchDotProd(const caf::StandardRecord& sr, 
+  const caf::SRRecoParticle& LArPart,
   const int LArIxnIdx)
 {
   double trkMatchDotProdCAF=-999;
-  for(int i=0; i<sr->nd.trkmatch.extrap.size(); i++)
+  for(size_t i=0; i<sr.nd.trkmatch.extrap.size(); i++)
   {
     // Check that you you are looking at the right interaction and that the track is reco (not truth)
-    if (sr->nd.trkmatch.extrap[i].larid.ixn==LArIxnIdx && sr->nd.trkmatch.extrap[i].larid.reco==1)
+    if (sr.nd.trkmatch.extrap[i].larid.ixn==LArIxnIdx && sr.nd.trkmatch.extrap[i].larid.reco==1)
       {
-        int trkMatchIdx=sr->nd.trkmatch.extrap[i].larid.idx;
+        int trkMatchIdx=sr.nd.trkmatch.extrap[i].larid.idx;
         // Check that the track matched in trkmatch is the same track as the one being considered in Mx2 matching (by comparing start and end z positions)
-        if (sr->nd.lar.dlp[LArIxnIdx].tracks[trkMatchIdx].start.z==part.start.z && sr->nd.lar.dlp[LArIxnIdx].tracks[trkMatchIdx].end.z==part.end.z)
+        if (sr.nd.lar.dlp[LArIxnIdx].tracks[trkMatchIdx].start.z==LArPart.start.z && sr.nd.lar.dlp[LArIxnIdx].tracks[trkMatchIdx].end.z==LArPart.end.z)
           {
-            double cosAnglDispl=abs(sr->nd.trkmatch.extrap[i].angdispl);
+            double cosAnglDispl=abs(sr.nd.trkmatch.extrap[i].angdispl);
             if (trkMatchDotProdCAF<cosAnglDispl) trkMatchDotProdCAF=cosAnglDispl;
           }
       }
@@ -208,10 +212,10 @@ double GetNDCAFTrkMatchDotProd(const caf::StandardRecord& sr,
 bool Mx2Matcher::PassesMx2NDCAFMakerCut(
       const caf::SRTrack& trackMx2, 
       const int LArIxnIdx,
-      const caf::SRVector3D LArStart,
-      const caf::SRVector3D LArEnd, 
+      const caf::SRVector3D& LArStart,
+      const caf::SRVector3D& LArEnd, 
       double &NDCAFMatchDotProd, 
-      double &residual);
+      double &residual)
 {
 
     double z_extr = fSelCuts.mx2MatchExtrapLocZ;
@@ -221,20 +225,20 @@ bool Mx2Matcher::PassesMx2NDCAFMakerCut(
     double d_thetay = fSelCuts.maxMx2MatchArctanDiffYZ;
 
     // Get LAr Track points
-    double x1_lar = LArStart.x
-    double x2_lar = LArEnd.x
-    double y1_lar = LArStart.y
-    double y2_lar = LArEnd.y
-    double z1_lar = LArStart.z
-    double z2_lar = LArEnd.z
+    double x1_lar = LArStart.x;
+    double x2_lar = LArEnd.x;
+    double y1_lar = LArStart.y;
+    double y2_lar = LArEnd.y;
+    double z1_lar = LArStart.z;
+    double z2_lar = LArEnd.z;
 
     // Get Mx2 Track points
-    double x1_minerva = track_minerva.start.x;
-    double x2_minerva = track_minerva.end.x;
-    double y1_minerva = track_minerva.start.y;
-    double y2_minerva = track_minerva.end.y;
-    double z1_minerva = track_minerva.start.z;
-    double z2_minerva = track_minerva.end.z;
+    double x1_minerva = trackMx2.start.x;
+    double x2_minerva = trackMx2.end.x;
+    double y1_minerva = trackMx2.start.y;
+    double y2_minerva = trackMx2.end.y;
+    double z1_minerva = trackMx2.start.z;
+    double z2_minerva = trackMx2.end.z;
 
     double dX=x2_lar-x1_lar;
     double dY=y2_lar-y1_lar;
@@ -279,7 +283,7 @@ bool Mx2Matcher::PassesMx2NDCAFMakerCut(
     NDCAFMatchDotProd = ((x2_minerva - x1_minerva) * (x2_lar - x1_lar) +
                 (y2_minerva - y1_minerva) * (y2_lar - y1_lar) +
                 (z2_minerva - z1_minerva) * (z2_lar - z1_lar)) /
-               (track_LarLen * track_minerva.len_cm); // angle between minerva and Lar tracks
+               (track_LarLen * trackMx2.len_cm); // angle between minerva and Lar tracks
 
     return (abs(delta_theta_x) < d_thetax && abs(delta_theta_y) < d_thetay && abs(dist_x) < d_x && abs(dist_y) < d_y);
 }
@@ -296,7 +300,7 @@ Mx2MatchResult Mx2Matcher::MatchInteraction(
 
     const auto& part = dlpixn.part.dlp[i];
 
-    if (!IsPrimaryTrack(part, dlpixn.vertex)) continue;
+    if (!IsPrimaryTrack(part, dlpixn.vtx)) continue;
     if (!IsVisibleTrack(ComputeLength(part))) continue;
     if (!IsExitingTrack(part)) continue;
 
@@ -307,6 +311,6 @@ Mx2MatchResult Mx2Matcher::MatchInteraction(
     }
   }
 
-  bestMatch.isGoodMatch = (best.NDCAFMatchDotProd > fSelCuts.mx2TrackMatchDotProdThreshold);
+  bestMatch.isGoodMatch = (bestMatch.NDCAFMatchDotProd > fSelCuts.mx2TrackMatchDotProdThreshold);
   return bestMatch;
 }

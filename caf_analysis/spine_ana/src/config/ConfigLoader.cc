@@ -1,6 +1,6 @@
 // ConfigLoader.cc
 #include "config/ConfigLoader.h"
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 
 namespace config {
 
@@ -8,7 +8,7 @@ namespace config {
         SelectionConfig cfg;
     
         // Load config yaml
-        YAML::Node config = YAML::LoadFile("config_data/CC1pi0.yaml");
+        YAML::Node config = YAML::LoadFile(path);
     
         cfg.cosThetaCut = config["selection"]["cosThetaCut"].as<double>();
         cfg.muonEnergyCut = config["selection"]["muonEnergyCut"].as<double>();
@@ -29,14 +29,14 @@ namespace config {
         cfg.minMx2TrackLength = config["selection"]["minMx2TrackLength"].as<double>();
 
         // Mx2 Track Start Limit
-        mx2EnterDownstreamAllowance = config["selection"]["mx2EnterDownstreamAllowance"].as<double>();
-        mx2DownstreamZMin = config["detector"]["mx2DownstreamZMin"].as<double>(); // cm
+        double mx2EnterDownstreamAllowance = config["selection"]["mx2EnterDownstreamAllowance"].as<double>();
+        double mx2DownstreamZMin = config["detector"]["mx2DownstreamZMin"].as<double>(); // cm
 
         cfg.maxMx2MatchTrackStartZ = mx2DownstreamZMin + mx2EnterDownstreamAllowance;
 
         // Mx2 Track End Limit (for muon)
-        mx2DistFromEndDownstreamZ = config["selection"]["mx2DistFromEndDownstreamZ"].as<double>();
-        mx2DownstreamZMax = config["detector"]["mx2DownstreamZMax"].as<double>(); // cm
+        double mx2DistFromEndDownstreamZ = config["selection"]["mx2DistFromEndDownstreamZ"].as<double>();
+        double mx2DownstreamZMax = config["detector"]["mx2DownstreamZMax"].as<double>(); // cm
 
         cfg.minMx2MatchTrackEndZ = mx2DownstreamZMax - mx2DistFromEndDownstreamZ;
 
@@ -50,7 +50,7 @@ namespace config {
         BeamConfig cfg;
     
         // Load config yaml
-        YAML::Node config = YAML::LoadFile("config_data/CC1pi0.yaml");
+        YAML::Node config = YAML::LoadFile(path);
     
         // Load from config yaml
         cfg.beam_x = config["beam"]["beam_x"].as<double>();
@@ -71,7 +71,7 @@ namespace config {
         DetectorConfig cfg;
     
         // Load config yaml
-        YAML::Node config = YAML::LoadFile("config_data/CC1pi0.yaml");
+        YAML::Node config = YAML::LoadFile(path);
     
         // Can we see the particle?
         cfg.keThreshold = config["detector"]["keThreshold"].as<double>();
@@ -87,13 +87,13 @@ namespace config {
         cfg.absModuleZMax = config["detector"]["absModuleMaxZ"].as<double>();
 
         // Then, get FV cuts
-        detFVCutAbsMinX = config["selection"]["detFVCutAbsMinX"].as<double>();
-        detFVCutAbsMaxX = config["selection"]["detFVCutAbsMaxX"].as<double>();
-        detFVCutAbsMinY = config["selection"]["detFVCutAbsMinY"].as<double>();
-        detFVCutAbsMaxY = config["selection"]["detFVCutAbsMaxY"].as<double>();
-        detFVCutAbsMinZ = config["selection"]["detFVCutAbsMinZ"].as<double>();
-        detFVCutAbsMaxZ = config["selection"]["detFVCutAbsMaxZ"].as<double>();
-        detFVCutAbsMaxZExiting = config["selection"]["detFVCutAbsMaxZExiting"].as<double>(); // Mx2 exiting track requirement
+        double detFVCutAbsMinX = config["selection"]["detFVCutAbsMinX"].as<double>();
+        double detFVCutAbsMaxX = config["selection"]["detFVCutAbsMaxX"].as<double>();
+        double detFVCutAbsMinY = config["selection"]["detFVCutAbsMinY"].as<double>();
+        double detFVCutAbsMaxY = config["selection"]["detFVCutAbsMaxY"].as<double>();
+        double detFVCutAbsMinZ = config["selection"]["detFVCutAbsMinZ"].as<double>();
+        double detFVCutAbsMaxZ = config["selection"]["detFVCutAbsMaxZ"].as<double>();
+        double detFVCutAbsMaxZExiting = config["selection"]["detFVCutAbsMaxZExiting"].as<double>(); // Mx2 exiting track requirement
 
         // Apply FV cuts
         cfg.absFiducialXMin = cfg.absModuleXMin + detFVCutAbsMinX;

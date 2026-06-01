@@ -2,6 +2,7 @@
 #include "io/CAFUtils.h"
 
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <TChain.h>
 
