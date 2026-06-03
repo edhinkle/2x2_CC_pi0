@@ -30,7 +30,7 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     auto reco_vtx = dlpixn.vtx;
 
     // Fill histogram for reco vertex distribution (no cuts)
-    hist.reco.FillRecoVertexNoCuts(reco_vtx.x, reco_vtx.y, reco_vtx.z);
+    hist.reco.FillRecoVertexNoCuts(reco_vtx);
 
     // Initialize MatchedInteractionSummary for this interaction -- only used if MC
     MatchedInteractionSummary matchSummary;

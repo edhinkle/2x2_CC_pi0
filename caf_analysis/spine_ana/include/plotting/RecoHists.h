@@ -13,7 +13,7 @@ public:
     //------------------------------------------
     void FillTotalSpillsProcessed(int n);
     void FillTotalPOT(double pot);
-    void FillRecoVertexNoCuts(double x, double y, double z);
+    void FillRecoVertexNoCuts(caf::SRVector3D vertex);
     void FillRecoVertexWithCuts(caf::SRVector3D vertex);
     void FillRecoCosMuonAngle(double cosL);
     void FillRecoShowerMultiplicity(RecoInteractionSummary& recoSummary);
@@ -28,12 +28,12 @@ private:
     TH1D *h_reco_TotalSpillsProcessed;
     TH1D *h_reco_TotalPOT;
 
-    TH2D *h_reco_VertexXZNoCuts;  
+    TH2D *h_reco_VertexZXNoCuts;  
     TH1D *h_reco_VertexXNoCuts;
     TH1D *h_reco_VertexYNoCuts;
     TH1D *h_reco_VertexZNoCuts;
 
-    TH2D *h_reco_VertexXZWithCuts;  
+    TH2D *h_reco_VertexZXWithCuts;  
     TH1D *h_reco_VertexXWithCuts;
     TH1D *h_reco_VertexYWithCuts;
     TH1D *h_reco_VertexZWithCuts;

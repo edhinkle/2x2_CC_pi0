@@ -6,7 +6,7 @@ TruthMatchedHists::TruthMatchedHists()
 {
 
     // Edges for CosL histograms
-    Double_t edges[7] = {0.91, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
+    Double_t edges[7] = {0.90, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
     // Truth match mx2Track histograms
     // PDG
     h_truthMatchPrim_mx2TrackPDG = new TH1D("h_truthMatchPrim_mx2TrackPDG", "h_truthMatchPrim_mx2TrackPDG", 6000, -3000, 3000);
@@ -54,105 +54,105 @@ TruthMatchedHists::TruthMatchedHists()
 
     // Truth match interaction pi0 multiplicity and shower multiplicity histograms
     // Bins and edges for multiplicity histograms
-    int binsMult = 10;
-    Double_t edgesMult[11] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    h_truthMatchIxn_PrimPi0Multiplicity = new TH1D("h_truthMatchIxn_PrimPi0Multiplicity", "h_truthMatchIxn_PrimPi0Multiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_SecPi0Multiplicity = new TH1D("h_truthMatchIxn_SecPi0Multiplicity", "h_truthMatchIxn_SecPi0Multiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_PrimShowerMultiplicity = new TH1D("h_truthMatchIxn_PrimShowerMultiplicity", "h_truthMatchIxn_PrimShowerMultiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_SecShowerMultiplicity = new TH1D("h_truthMatchIxn_SecShowerMultiplicity", "h_truthMatchIxn_SecShowerMultiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_PrimElectronMultiplicity = new TH1D("h_truthMatchIxn_PrimElectronMultiplicity", "h_truthMatchIxn_PrimElectronMultiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_SecElectronMultiplicity = new TH1D("h_truthMatchIxn_SecElectronMultiplicity", "h_truthMatchIxn_SecElectronMultiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_PrimPhotonMultiplicity = new TH1D("h_truthMatchIxn_PrimPhotonMultiplicity", "h_truthMatchIxn_PrimPhotonMultiplicity", binsMult, edgesMult);
-    h_truthMatchIxn_SecPhotonMultiplicity = new TH1D("h_truthMatchIxn_SecPhotonMultiplicity", "h_truthMatchIxn_SecPhotonMultiplicity", binsMult, edgesMult);
+    //int binsMult = 10;
+    //Double_t edgesMult[11] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    h_truthMatchIxn_PrimPi0Multiplicity = new TH1D("h_truthMatchIxn_PrimPi0Multiplicity", "h_truthMatchIxn_PrimPi0Multiplicity", 10, 0, 10);
+    h_truthMatchIxn_SecPi0Multiplicity = new TH1D("h_truthMatchIxn_SecPi0Multiplicity", "h_truthMatchIxn_SecPi0Multiplicity", 10, 0, 10);
+    h_truthMatchIxn_PrimShowerMultiplicity = new TH1D("h_truthMatchIxn_PrimShowerMultiplicity", "h_truthMatchIxn_PrimShowerMultiplicity", 20, 0, 20);
+    h_truthMatchIxn_SecShowerMultiplicity = new TH1D("h_truthMatchIxn_SecShowerMultiplicity", "h_truthMatchIxn_SecShowerMultiplicity", 20, 0, 20);
+    h_truthMatchIxn_PrimElectronMultiplicity = new TH1D("h_truthMatchIxn_PrimElectronMultiplicity", "h_truthMatchIxn_PrimElectronMultiplicity", 20, 0, 20);
+    h_truthMatchIxn_SecElectronMultiplicity = new TH1D("h_truthMatchIxn_SecElectronMultiplicity", "h_truthMatchIxn_SecElectronMultiplicity", 20, 0, 20);
+    h_truthMatchIxn_PrimPhotonMultiplicity = new TH1D("h_truthMatchIxn_PrimPhotonMultiplicity", "h_truthMatchIxn_PrimPhotonMultiplicity", 20, 0, 20);
+    h_truthMatchIxn_SecPhotonMultiplicity = new TH1D("h_truthMatchIxn_SecPhotonMultiplicity", "h_truthMatchIxn_SecPhotonMultiplicity", 20, 0, 20);
 
-    h_truthMatchIxn_Reco_PrimShowerResponseMult = new TH2D("h_truthMatchIxn_Reco_PrimShowerResponseMult", "h_truthMatchIxn_Reco_PrimShowerResponseMult", binsMult, edgesMult, binsMult, edgesMult);
-    h_truthMatchIxn_Reco_SecShowerResponseMult = new TH2D("h_truthMatchIxn_Reco_SecShowerResponseMult", "h_truthMatchIxn_Reco_SecShowerResponseMult", binsMult, edgesMult, binsMult, edgesMult);
-    h_truthMatchIxn_Reco_PrimElectronResponseMult = new TH2D("h_truthMatchIxn_Reco_PrimElectronResponseMult", "h_truthMatchIxn_Reco_PrimElectronResponseMult", binsMult, edgesMult, binsMult, edgesMult);
-    h_truthMatchIxn_Reco_SecElectronResponseMult = new TH2D("h_truthMatchIxn_Reco_SecElectronResponseMult", "h_truthMatchIxn_Reco_SecElectronResponseMult", binsMult, edgesMult, binsMult, edgesMult);
-    h_truthMatchIxn_Reco_PrimPhotonResponseMult = new TH2D("h_truthMatchIxn_Reco_PrimPhotonResponseMult", "h_truthMatchIxn_Reco_PrimPhotonResponseMult", binsMult, edgesMult, binsMult, edgesMult);
-    h_truthMatchIxn_Reco_SecPhotonResponseMult = new TH2D("h_truthMatchIxn_Reco_SecPhotonResponseMult", "h_truthMatchIxn_Reco_SecPhotonResponseMult", binsMult, edgesMult, binsMult, edgesMult);
+    h_truthMatchIxn_Reco_PrimShowerResponseMult = new TH2D("h_truthMatchIxn_Reco_PrimShowerResponseMult", "h_truthMatchIxn_Reco_PrimShowerResponseMult", 20, 0, 20, 20, 0, 20);
+    h_truthMatchIxn_Reco_SecShowerResponseMult = new TH2D("h_truthMatchIxn_Reco_SecShowerResponseMult", "h_truthMatchIxn_Reco_SecShowerResponseMult", 20, 0, 20, 20, 0, 20);
+    h_truthMatchIxn_Reco_PrimElectronResponseMult = new TH2D("h_truthMatchIxn_Reco_PrimElectronResponseMult", "h_truthMatchIxn_Reco_PrimElectronResponseMult", 20, 0, 20, 20, 0, 20);
+    h_truthMatchIxn_Reco_SecElectronResponseMult = new TH2D("h_truthMatchIxn_Reco_SecElectronResponseMult", "h_truthMatchIxn_Reco_SecElectronResponseMult", 20, 0, 20, 20, 0, 20);
+    h_truthMatchIxn_Reco_PrimPhotonResponseMult = new TH2D("h_truthMatchIxn_Reco_PrimPhotonResponseMult", "h_truthMatchIxn_Reco_PrimPhotonResponseMult", 20, 0, 20, 20, 0, 20);
+    h_truthMatchIxn_Reco_SecPhotonResponseMult = new TH2D("h_truthMatchIxn_Reco_SecPhotonResponseMult", "h_truthMatchIxn_Reco_SecPhotonResponseMult", 20, 0, 20, 20, 0, 20);
 
     // Reco Pi0, Shower, Electron, and Photon Multiplicity for Best-Matched Interaction
     // TRUTH MATCHED SIGNAL ONLY
-    h_truthMatchIxn_TruthSignal_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignal_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignal_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoSecShowerMult", "h_truthMatchIxn_TruthSignal_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignal_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignal_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignal_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoSecElectronMult", "h_truthMatchIxn_TruthSignal_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignal_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignal_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthSignal_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignal_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignal_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoSecShowerMult", "h_truthMatchIxn_TruthSignal_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignal_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignal_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignal_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoSecElectronMult", "h_truthMatchIxn_TruthSignal_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignal_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignal_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignal_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignal_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED SIGNAL CC QE ONLY
-    h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCQE_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCQE_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCQE_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCQE_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCQE_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCQE_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED SIGNAL CC MEC ONLY
-    h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCMEC_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED SIGNAL CC DIS ONLY
-    h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCDIS_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED SIGNAL CC RES ONLY
-    h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCRES_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCRES_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCRES_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCRES_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCRES_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCRES_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED SIGNAL CC COH ONLY
-    h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult", "h_truthMatchIxn_TruthSignalCCCOH_RecoSecPhotonMult", 20, 0, 20);
 
     // Pi0, Shower, Electron, and Photon Multiplicity for Best-Matched Interaction
     // TRUTH MATCHED BKG ONLY
-    h_truthMatchIxn_TruthBkg_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkg_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkg_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoSecShowerMult", "h_truthMatchIxn_TruthBkg_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkg_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkg_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkg_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoSecElectronMult", "h_truthMatchIxn_TruthBkg_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkg_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkg_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthBkg_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkg_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkg_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoSecShowerMult", "h_truthMatchIxn_TruthBkg_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkg_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkg_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkg_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoSecElectronMult", "h_truthMatchIxn_TruthBkg_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkg_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkg_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkg_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkg_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED BKG NC ONLY
-    h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult", "h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult", "h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkgNC_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult", "h_truthMatchIxn_TruthBkgNC_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkgNC_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult", "h_truthMatchIxn_TruthBkgNC_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkgNC_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgNC_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED BKG ROCK ONLY
-    h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult", "h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult", "h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkgROCK_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult", "h_truthMatchIxn_TruthBkgROCK_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkgROCK_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult", "h_truthMatchIxn_TruthBkgROCK_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkgROCK_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgROCK_RecoSecPhotonMult", 20, 0, 20);
 
     // TRUTH MATCHED BKG CC ONLY
-    h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult", "h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult", "h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult", binsMult, edgesMult);
-    h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult", binsMult, edgesMult);
+    h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult", "h_truthMatchIxn_TruthBkgCC_RecoPrimShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult", "h_truthMatchIxn_TruthBkgCC_RecoSecShowerMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult", "h_truthMatchIxn_TruthBkgCC_RecoPrimElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult", "h_truthMatchIxn_TruthBkgCC_RecoSecElectronMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult", "h_truthMatchIxn_TruthBkgCC_RecoPrimPhotonMult", 20, 0, 20);
+    h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult = new TH1D("h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult", "h_truthMatchIxn_TruthBkgCC_RecoSecPhotonMult", 20, 0, 20);
 
     // Ixn Mode for Best-Matched Interaction
     h_truthMatchIxn_IxnMode = new TH1D("h_truthMatchIxn_IxnMode", "h_truthMatchIxn_IxnMode", 1100, 0, 1100);
