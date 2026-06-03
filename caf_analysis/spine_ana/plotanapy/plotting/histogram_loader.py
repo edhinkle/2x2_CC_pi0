@@ -38,12 +38,12 @@ class HistogramLoader:
     MATCHED_DIR = "truthMatched"
     CUTFLOW_DIR = "cutflows"
     
-    def __init__(self, file_path: str | Path):
+    def __init__(self, file_path):
         """
         Initialize loader with a ROOT file.
         
         Args:
-            file_path: Path to ROOT file
+            file_path: Path to ROOT file (can be string or Path)
             
         Raises:
             FileNotFoundError: If file doesn't exist
@@ -81,9 +81,9 @@ class HistogramLoader:
             
             dir_obj = self.root_file[directory]
             # Get all keys in directory, filtering out subdirectories
-            return [key for key in dir_obj.keys() if not key.startswith("_")]
+            return [key for key in dir_obj.keys(cycle=False) if not key.startswith("_")]
         
-        return list(self.root_file.keys())
+        return list(self.root_file.keys(cycle=False))
     
     def _get_from_directory(self, directory: str) -> Dict[str, Any]:
         """
@@ -101,13 +101,14 @@ class HistogramLoader:
         if directory not in self.root_file:
             raise KeyError(
                 f"Directory '{directory}' not found. "
-                f"Available: {list(self.root_file.keys())}"
+                f"Available: {list(self.root_file.keys(cycle=False))}"
             )
         
         dir_obj = self.root_file[directory]
         loaded = {}
         
         for name in self.list_histograms(directory):
+            print("Loading histogram: {}/{}".format(directory, name))
             try:
                 hist_path = f"{directory}/{name}"
                 
@@ -314,7 +315,7 @@ class HistogramLoader:
         Returns:
             List of directory names
         """
-        return [key for key in self.root_file.keys() if not key.startswith("_")]
+        return [key for key in self.root_file.keys(cycle=False) if not key.startswith("_")]
     
     def close(self) -> None:
         """Close the ROOT file and clear cache."""

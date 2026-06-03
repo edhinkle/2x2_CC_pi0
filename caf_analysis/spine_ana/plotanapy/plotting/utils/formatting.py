@@ -19,6 +19,7 @@ PHYSICS_LABELS = {
     "cos_angle": r"$\cos(\theta)$",
     "energy": "Energy [MeV]",
     "E": "Energy [MeV]",
+    "frac": "Fraction of Events",
     "momentum": "Momentum [MeV/c]",
     "p": "Momentum [MeV/c]",
     "angle": r"Angle [$^\circ$]",
@@ -293,14 +294,14 @@ def add_text_box(ax, text: str, loc: str = "upper right",
     
     # Map location names to coordinates
     loc_map = {
-        "upper right": (0.98, 0.98),
-        "upper left": (0.02, 0.98),
-        "lower right": (0.98, 0.02),
-        "lower left": (0.02, 0.02),
+        "upper right": (0.96, 0.96),
+        "upper left": (0.04, 0.96),
+        "lower right": (0.96, 0.04),
+        "lower left": (0.04, 0.04),
         "center": (0.5, 0.5),
     }
     
-    x, y = loc_map.get(loc, (0.98, 0.98))
+    x, y = loc_map.get(loc, (0.96, 0.96))
     
     ax.text(x, y, text, transform=ax.transAxes, fontsize=fontsize,
            verticalalignment="top" if y > 0.5 else "bottom",
@@ -308,14 +309,13 @@ def add_text_box(ax, text: str, loc: str = "upper right",
            bbox=bbox_props, **kwargs)
 
 
-def add_colorbar(fig, im, ax: Optional[plt.Axes] = None,
+def add_colorbar(im, ax: Optional[plt.Axes] = None,
                 label: Optional[str] = None,
                 orientation: str = "vertical") -> mpl.colorbar.Colorbar:
     """
     Add colorbar to figure with consistent styling.
     
     Args:
-        fig: Matplotlib figure object
         im: Image object (returned from imshow, pcolormesh, etc.)
         ax: Axes object (required for constrained layout)
         label: Colorbar label
@@ -324,7 +324,7 @@ def add_colorbar(fig, im, ax: Optional[plt.Axes] = None,
     Returns:
         Colorbar object
     """
-    cbar = fig.colorbar(im, ax=ax, orientation=orientation)
+    cbar = plt.colorbar(im, ax=ax, orientation=orientation)
     
     if label:
         if orientation == "vertical":

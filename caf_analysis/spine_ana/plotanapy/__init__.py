@@ -1,6 +1,6 @@
 
 """
-CC 1pi0 Python plotting and utilities module.
+CC 1pi0 Python plotting utilities module.
 """
 
 __version__ = "0.1.0"
