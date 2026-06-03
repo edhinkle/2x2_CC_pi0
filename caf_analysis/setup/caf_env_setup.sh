@@ -100,5 +100,5 @@ setup sqlite v3_39_02_00
 #source ${NUSYST}/build/Linux/bin/setup.nusystematics.sh
 #export PATH=/global/u2/r/rdiurba/nusystematics/ndnusyst/ndnusyst-src/build/Linux/bin/:${PATH}
 
-source ../../2x2_sim/util/init.inc.sh
+#source ../../2x2_sim/util/init.inc.sh -- not necessary for analysis, just for running 2x2_sim
 

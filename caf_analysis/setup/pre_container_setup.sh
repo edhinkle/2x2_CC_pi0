@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Copied from 2x2_sim/util/prelude.inc.sh
+
+# Commented to prevent terminals failing when nonzero error code is thrown
+#set -o errexit
+#set -o pipefail
+
+setup_cuda() {
+    if [[ "$LMOD_SYSTEM_NAME" == "perlmutter" ]]; then
+        module load python/3.11
+        module load cudatoolkit/12.2
+    fi
+}
