@@ -1,5 +1,5 @@
 
-from plotanapy.plotting import HistogramLoader, RecoPlotter, TruthPlotter
+from plotanapy.plotting import HistogramLoader, RecoPlotter, TruthPlotter, SelectionPlotter
 from plotanapy.plotting.styles import apply_theme
 from plotanapy.plotting.utils import ParseYAML
 import argparse
@@ -30,7 +30,11 @@ if __name__ == '__main__':
                                sel_config=sel_config, \
                                beam_config=beam_config, \
                                det_config=det_config)
-    # cuflow_plotter = CuflowPlotter(loader.get_cuflow_histograms())
+    sel_plotter = SelectionPlotter(loader.get_cutflow_histograms(), \
+                                     sel_config=sel_config, \
+                                     beam_config=beam_config, \
+                                     det_config=det_config, \
+                                     mcOnly=args.mcOnly)
     if (args.mcOnly == '1'):
         truth_plotter = TruthPlotter(loader.get_truth_histograms(), \
                                      sel_config=sel_config, \
@@ -40,12 +44,12 @@ if __name__ == '__main__':
     
     # Generate all plots at once
     print("Plotting reco histograms...")
-    reco_plotter.plot_all(output_dir=args.all_plots_dir+"reco_plots")
-    #print("Plotting cuflow histograms...")
-    #cuflow_plotter.plot_all(output_dir=args.all_plots_dir+"cuflow_plots")
+    #reco_plotter.plot_all(output_dir=args.all_plots_dir+"reco_plots")
+    print("Plotting selection histograms...")
+    sel_plotter.plot_all(output_dir=args.all_plots_dir+"sel_plots")
     if (args.mcOnly == '1'):
         print("Plotting truth histograms...")
-        truth_plotter.plot_all(output_dir=args.all_plots_dir+"truth_plots")
+        #truth_plotter.plot_all(output_dir=args.all_plots_dir+"truth_plots")
     #    print("Plotting truth matched histograms...")
     #    truth_matched_plotter.plot_all(output_dir=args.all_plots_dir+"truth_matched_plots")
     

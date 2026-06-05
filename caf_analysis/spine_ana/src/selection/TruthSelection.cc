@@ -34,15 +34,15 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
       continue;
     hist.cuts.Count("Truth", "Active Volume");
 
+    //// Fiducial Volume Cut
+    //if (!DetectorCuts::InFiducialVolume(nu.vtx, fDetector))
+    //  continue;
+    //hist.cuts.Count("Truth", "Fiducial Volume");
+
     // Numu Cut
     if (std::abs(nu.pdg) != 14)
       continue;
     hist.cuts.Count("Truth", "NuMu");
-
-    // Fiducial Volume Cut
-    if (!DetectorCuts::InFiducialVolume(nu.vtx, fDetector))
-      continue;
-    hist.cuts.Count("Truth", "Fiducial Volume");
 
     // CC only
     if (!nu.iscc)
@@ -71,9 +71,9 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
                                             summary.nPrimPhotons, summary.nSecPhotons);
 
     // Passes Mx2 signal definition
-    if (!summary.passesMx2)
-      continue;
-    hist.cuts.Count("Truth", "Muon Through Mx2");
+    //if (!summary.passesMx2)
+    //  continue;
+    //hist.cuts.Count("Truth", "Muon Through Mx2");
 
     // Fill histograms for neutrino energy
     hist.truth.FillEnu(summary.nuE);
@@ -207,8 +207,8 @@ bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summar
     return false;
 
   // Fiducial Volume Cut
-  if (!DetectorCuts::InFiducialVolume(summary.vertex, fDetector))
-    return false;
+  //if (!DetectorCuts::InFiducialVolume(summary.vertex, fDetector))
+  //  return false;
 
   // CC only
   if (!summary.iscc)

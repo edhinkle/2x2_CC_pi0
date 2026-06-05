@@ -83,7 +83,7 @@ class HistogramPlotter(ABC):
                 ax: Optional[plt.Axes] = None,
                 label: Optional[str] = None, color: Optional[str] = None,
                 linestyle: str = '-', linewidth: float = 1.5,
-                alpha: float = 0.7, **kwargs) -> Tuple[plt.Figure, plt.Axes]:
+                alpha: float = 0.7, **kwargs) -> int:
         """
         Plot a 1D histogram.
         
@@ -132,9 +132,65 @@ class HistogramPlotter(ABC):
         
         return data.sum()
     
+    def plot_cutflow(self, hist_name: str, truth_events_total: Optional[int] = None,
+                     axes: Optional[plt.Axes] = None,
+                     label: Optional[str] = None, color: Optional[str] = None,
+                     linestyle: str = '-', linewidth: float = 1.5,
+                     alpha: float = 0.7, **kwargs) -> Tuple[plt.figure, plt.axes]:
+        """
+        Plot a cutflow histogram.
+        
+        Args:
+            hist_name: Name of the histogram to plot
+            truth_events_total: Number of true signal events for efficiency/purity
+            axes: Matplotlib axes to plot on (creates new if None)
+            label: Label for the histogram (uses hist_name if None)
+            color: Line/fill color
+            linestyle: Line style
+            linewidth: Line width
+            alpha: Transparency (0-1)
+            **kwargs: Additional arguments passed to matplotlib
+            
+        Returns:
+            Tuple of figure, axes
+        """
+        if axes is None:
+            fig, axes = plt.subplots(2,1,figsize=(10, 8), sharex=True, 
+                                           gridspec_kw={"height_ratios": [2, 1]})
+        else:
+            fig = axes[0].get_figure()
+        
+        hist = self.get_histogram(hist_name)
+        
+        # Extract histogram data (handles both TH1D and numpy arrays)
+        if hasattr(hist, 'to_numpy'):  # ROOT TH1D (loaded with uproot)
+            values = hist.values()
+            cut_labels = list(hist.axis().labels())
+            bin_edges = np.arange(len(values) + 1)
+            bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+            print(values, bin_centers)
+        else:  # numpy array or similar
+            data = np.asarray(hist)
+            bin_edges = np.arange(len(data) + 1)
+            bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+        
+        # Plot as histogram
+        axes[0].stairs(values, bin_edges, linewidth=2,label=label)
+        axes[0].set_yscale("log")
+        axes[0].set_xticks(np.arange(len(values)) + 0.5)
+        axes[0].set_xticklabels(cut_labels, rotation=45, ha="right")
+
+        # Event counts above each cut
+        for i, y in enumerate(values):
+
+            axes[0].text(i+0.5, y * 1.15, f"{int(y)}", ha="center", fontsize=12, rotation=0)
+
+        return fig, axes, cut_labels, values
+
+
     def plot_2d(self, hist_name: str = None, normalized: bool = True, 
                 ax: Optional[plt.Axes] = None,
-                cmap: str = 'cividis', **kwargs) -> Tuple[plt.Figure, plt.Axes]:
+                cmap: str = 'cividis', **kwargs) -> Tuple[mpl.collections.QuadMesh, int]:
         """
         Plot a 2D histogram as a heatmap.
         
