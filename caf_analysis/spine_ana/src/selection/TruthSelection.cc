@@ -78,6 +78,9 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     // Fill histograms for neutrino energy
     hist.truth.FillEnu(summary.nuE);
 
+    // Fill histogram for neutrino interaction mode
+    hist.truth.FillIxnMode(summary.ixnMode);
+
     // Fill post-Mx2 multiplicity histograms
     hist.truth.FillSecPi0MultiplicityPostMx2(summary.nSecPi0);
     hist.truth.FillShowerMultiplicityPostMx2(summary.nPrimElectrons, summary.nSecElectrons,

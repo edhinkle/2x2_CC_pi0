@@ -20,6 +20,7 @@ from .formatting import (
     PHYSICS_LABELS,
     HIST_DESCRIPTIONS,
 )
+from .parse_yaml import ParseYAML
 
 __all__ = [
     # Labeling functions
@@ -40,5 +41,7 @@ __all__ = [
     "add_stat_box",
     "format_title_with_info",
     # Advanced plotting
-    "create_ratio_plot"
+    "create_ratio_plot",
+    # Configuration parsing
+    "ParseYAML"
 ]

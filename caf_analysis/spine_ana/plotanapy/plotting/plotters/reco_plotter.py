@@ -30,8 +30,12 @@ class RecoPlotter(HistogramPlotter):
     - Shower multiplicities
     """
 
-    def __init__(self, hist_dict):
+    def __init__(self, hist_dict, sel_config, beam_config, det_config):
+        
         self.hist_dict = hist_dict
+        self.sel_config = sel_config
+        self.beam_config = beam_config
+        self.det_config = det_config
 
     
     def plot_total_data_counts(self, output_dir: Optional[str] = None) -> plt.Figure:

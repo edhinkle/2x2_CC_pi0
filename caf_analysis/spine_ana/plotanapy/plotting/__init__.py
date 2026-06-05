@@ -5,9 +5,9 @@ Plotting module for CC1pi0 histogram visualization.
 from .histogram_loader import HistogramLoader
 from .plotters import (
     HistogramPlotter,
-    RecoPlotter
+    RecoPlotter,
+    TruthPlotter
 )
-#    TruthPlotter,
 #    TruthMatchedPlotter,
 #    ComparisonPlotter,
 #)
@@ -15,9 +15,9 @@ from .plotters import (
 __all__ = [
     "HistogramLoader",
     "HistogramPlotter",
-    "RecoPlotter"
+    "RecoPlotter",
+    "TruthPlotter"
 ]
-#    "TruthPlotter",
 #    "TruthMatchedPlotter",
 #    "ComparisonPlotter",
 #]

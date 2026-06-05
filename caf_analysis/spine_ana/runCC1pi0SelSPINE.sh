@@ -7,7 +7,7 @@
 ####################################################################################
 
 # Run analysis, plotting, or both? 
-RUN_ANALYSIS=1
+RUN_ANALYSIS=0
 RUN_PLOTTING=1
 
 # Set parameters for running analysis
@@ -84,7 +84,7 @@ if [[ $RUN_PLOTTING -eq 1 ]]; then
 
         # Run plotting script
         echo "Plotting histograms from output file ${OUTPUTFILEPATH} with theme ${THEME}..."
-        python plotanapy/scripts/plot_histograms.py --root_file ${OUTPUTFILEPATH} --theme ${THEME} --all_plots_dir ${OUTPUTDIR} --mcOnly ${MCONLYSTRING}
+        python plotanapy/scripts/plot_histograms.py --root_file ${OUTPUTFILEPATH} --config_file ${CONFIGFILEPATH} --theme ${THEME} --all_plots_dir ${OUTPUTDIR} --mcOnly ${MCONLYSTRING}
 
 # EOF must be at the beginning of the line with no spaces before it or after it
 EOF2

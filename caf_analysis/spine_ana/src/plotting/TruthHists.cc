@@ -5,49 +5,49 @@ TruthHists::TruthHists()
 {
     
     // True interactions above KE threshold per spill
-    h_true_ixnsAboveKEThresholdPerSpill = new TH1D("true_ixnsAboveKEThresholdPerSpill", "true_ixnsAboveKEThresholdPerSpill", 10, 0, 10);
+    h_true_ixnsAboveKEThresholdPerSpill = new TH1D("h_true_ixnsAboveKEThresholdPerSpill", "h_true_ixnsAboveKEThresholdPerSpill", 10, 0, 10);
 
     // Edges for CosL histograms
     Double_t edges[7] = {0.90, 0.96, 0.98, 0.9887, 0.994, 0.9974, 1};
 
     // True muon kinematics
-    h_true_CosL = new TH1D("true_CosL", "true_CosL", 6, edges); // Signal region (passes Mx2 cuts)
-    h_true_CosL_zoomOut = new TH1D("true_CosL_zoomOut", "true_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
+    h_true_CosL = new TH1D("h_true_CosL", "h_true_CosL", 6, edges); // Signal region (passes Mx2 cuts)
+    h_true_CosL_zoomOut = new TH1D("h_true_CosL_zoomOut", "h_true_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
     h_true_CosLNumubar_zoomOut = new TH1D(
-      "trueCosLNumubar_zoomOut", "trueCosLNumubar_zoomOut", 50, 0.8, 1); // Numubar events passing initial cuts
+      "h_true_CosLNumubar_zoomOut", "h_true_CosLNumubar_zoomOut", 50, 0.8, 1); // Numubar events passing initial cuts
     h_true_CosLNumu_zoomOut = new TH1D(
-      "trueCosLNumu_zoomOut", "trueCosLNumu_zoomOut", 50, 0.8, 1); // Numu events passing initial cuts
-    h_true_Elep = new TH1D("true_Elep", "true_Elep", 50, 0, 20); // Signal region (passes Mx2 cuts)
+      "h_true_CosLNumu_zoomOut", "h_true_CosLNumu_zoomOut", 50, 0.8, 1); // Numu events passing initial cuts
+    h_true_Elep = new TH1D("h_true_Elep", "h_true_Elep", 50, 0, 20); // Signal region (passes Mx2 cuts)
 
     // True neutrino energy
-    h_true_Enu = new TH1D("true_Enu", "true_Enu", 100, 0, 20);
+    h_true_Enu = new TH1D("h_true_Enu", "h_true_Enu", 100, 0, 20);
 
     // Bins and edges for multiplicity histograms
     //int binsMult = 10;
     //Double_t edgesMult[11] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
     // pi0 multiplicity
-    h_true_nPrimPi0 = new TH1D("true_nPrimPi0", "true_nPrimPi0", 10, 0, 10);
-    h_true_nSecPi0_preMx2 = new TH1D("true_nSecPi0_preMx2", "true_nSecPi0_preMx2", 10, 0, 10);
-    h_true_nSecPi0_postMx2 = new TH1D("true_nSecPi0_postMx2", "true_nSecPi0_postMx2", 10, 0, 10);
+    h_true_nPrimPi0 = new TH1D("h_true_nPrimPi0", "h_true_nPrimPi0", 10, 0, 10);
+    h_true_nSecPi0_preMx2 = new TH1D("h_true_nSecPi0_preMx2", "h_true_nSecPi0_preMx2", 10, 0, 10);
+    h_true_nSecPi0_postMx2 = new TH1D("h_true_nSecPi0_postMx2", "h_true_nSecPi0_postMx2", 10, 0, 10);
 
     // shower multiplicity
-    h_true_nPrimElectron_preMx2 = new TH1D("true_nPrimElectron_preMx2", "true_nPrimElectron_preMx2", 20, 0, 20);
-    h_true_nPrimElectron_postMx2 = new TH1D("true_nPrimElectron_postMx2", "true_nPrimElectron_postMx2", 20, 0, 20);
-    h_true_nSecElectron_preMx2 = new TH1D("true_nSecElectron_preMx2", "true_nSecElectron_preMx2", 20, 0, 20);
-    h_true_nSecElectron_postMx2 = new TH1D("true_nSecElectron_postMx2", "true_nSecElectron_postMx2", 20, 0, 20);
+    h_true_nPrimElectron_preMx2 = new TH1D("h_true_nPrimElectron_preMx2", "h_true_nPrimElectron_preMx2", 20, 0, 20);
+    h_true_nPrimElectron_postMx2 = new TH1D("h_true_nPrimElectron_postMx2", "h_true_nPrimElectron_postMx2", 20, 0, 20);
+    h_true_nSecElectron_preMx2 = new TH1D("h_true_nSecElectron_preMx2", "h_true_nSecElectron_preMx2", 20, 0, 20);
+    h_true_nSecElectron_postMx2 = new TH1D("h_true_nSecElectron_postMx2", "h_true_nSecElectron_postMx2", 20, 0, 20);
 
-    h_true_nPrimPhoton_preMx2 = new TH1D("true_nPrimPhoton_preMx2", "true_nPrimPhoton_preMx2", 20, 0, 20);
-    h_true_nPrimPhoton_postMx2 = new TH1D("true_nPrimPhoton_postMx2", "true_nPrimPhoton_postMx2", 20, 0, 20);
-    h_true_nSecPhoton_preMx2 = new TH1D("true_nSecPhoton_preMx2", "true_nSecPhoton_preMx2", 20, 0, 20);
-    h_true_nSecPhoton_postMx2 = new TH1D("true_nSecPhoton_postMx2", "true_nSecPhoton_postMx2", 20, 0, 20);
+    h_true_nPrimPhoton_preMx2 = new TH1D("h_true_nPrimPhoton_preMx2", "h_true_nPrimPhoton_preMx2", 20, 0, 20);
+    h_true_nPrimPhoton_postMx2 = new TH1D("h_true_nPrimPhoton_postMx2", "h_true_nPrimPhoton_postMx2", 20, 0, 20);
+    h_true_nSecPhoton_preMx2 = new TH1D("h_true_nSecPhoton_preMx2", "h_true_nSecPhoton_preMx2", 20, 0, 20);
+    h_true_nSecPhoton_postMx2 = new TH1D("h_true_nSecPhoton_postMx2", "h_true_nSecPhoton_postMx2", 20, 0, 20);
 
-    h_true_nPrimShower_preMx2 = new TH1D("true_nPrimShower_preMx2", "true_nPrimShower_preMx2", 20, 0, 20);
-    h_true_nPrimShower_postMx2 = new TH1D("true_nPrimShower_postMx2", "true_nPrimShower_postMx2", 20, 0, 20);
-    h_true_nSecShower_preMx2 = new TH1D("true_nSecShower_preMx2", "true_nSecShower_preMx2", 20, 0, 20);
-    h_true_nSecShower_postMx2 = new TH1D("true_nSecShower_postMx2", "true_nSecShower_postMx2", 20, 0, 20);
+    h_true_nPrimShower_preMx2 = new TH1D("h_true_nPrimShower_preMx2", "h_true_nPrimShower_preMx2", 20, 0, 20);
+    h_true_nPrimShower_postMx2 = new TH1D("h_true_nPrimShower_postMx2", "h_true_nPrimShower_postMx2", 20, 0, 20);
+    h_true_nSecShower_preMx2 = new TH1D("h_true_nSecShower_preMx2", "h_true_nSecShower_preMx2", 20, 0, 20);
+    h_true_nSecShower_postMx2 = new TH1D("h_true_nSecShower_postMx2", "h_true_nSecShower_postMx2", 20, 0, 20);
 
-    h_true_IxnMode = new TH1D("true_IxnMode", "true_IxnMode",1100, 0, 1100); // Bins correspond to GENIE interaction modes
+    h_true_IxnMode = new TH1D("h_true_IxnMode", "h_true_IxnMode",1100, 0, 1100); // Bins correspond to GENIE interaction modes
 
 }
 

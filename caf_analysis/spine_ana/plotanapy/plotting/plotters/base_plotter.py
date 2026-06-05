@@ -16,19 +16,32 @@ class HistogramPlotter(ABC):
     Attributes:
         hist_dict (Dict): Dictionary mapping histogram names to histogram objects
         style_config (Dict): Configuration for plot styling
+        sel_config (Dict): Selection configuration parameters
+        beam_config (Dict): Beam configuration parameters
+        det_config (Dict): Detector configuration parameters
     """
     
     def __init__(self, hist_dict: Optional[Dict[str, Any]] = None, 
-                 style_config: Optional[Dict[str, Any]] = None):
+                 style_config: Optional[Dict[str, Any]] = None,
+                 sel_config: Optional[Dict[str, Any]] = None,
+                 beam_config: Optional[Dict[str, Any]] = None,
+                 det_config: Optional[Dict[str, Any]] = None):
         """
         Initialize the plotter.
         
         Args:
             hist_dict: Dictionary of histograms (name -> histogram object)
             style_config: Configuration dictionary for styling options
+            sel_config: Selection configuration parameters
+            beam_config: Beam configuration parameters
+            det_config: Detector configuration parameters
         """
         self.hist_dict = hist_dict or {}
         self.style_config = style_config or {}
+        self.sel_config = sel_config or {}
+        self.beam_config = beam_config or {}
+        self.det_config = det_config or {}
+
     
     def load_histograms(self, hist_dict: Dict[str, Any]) -> None:
         """
