@@ -7,19 +7,16 @@ from .plotters import (
     HistogramPlotter,
     RecoPlotter,
     TruthPlotter,
+    TruthMatchedPlotter,
     SelectionPlotter
 )
-#    TruthMatchedPlotter,
-#    ComparisonPlotter,
-#)
+
 
 __all__ = [
     "HistogramLoader",
     "HistogramPlotter",
     "RecoPlotter",
     "TruthPlotter",
+    "TruthMatchedPlotter",
     "SelectionPlotter"
 ]
-#    "TruthMatchedPlotter",
-#    "ComparisonPlotter",
-#]

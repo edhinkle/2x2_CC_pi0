@@ -7,7 +7,7 @@
 ####################################################################################
 
 # Run analysis, plotting, or both? 
-RUN_ANALYSIS=0
+RUN_ANALYSIS=1
 RUN_PLOTTING=1
 
 # Set parameters for running analysis

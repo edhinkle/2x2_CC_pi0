@@ -14,7 +14,7 @@ namespace config {
         cfg.muonEnergyCut = config["selection"]["muonEnergyCut"].as<double>();
 
         cfg.minTruthIxnOverlap = config["selection"]["minTruthIxnOverlap"].as<double>();
-        cfg.minRockIxnTruthId = config["selection"]["minRockIxnTruthId"].as<double>();
+        cfg.maxRockIxnTruthId = config["selection"]["maxRockIxnTruthId"].as<double>();
         cfg.maxTruthRecoVertexDiff = config["selection"]["maxTruthRecoVertexDiff"].as<double>();
     
         cfg.maxMx2TrackVertexDiff = config["selection"]["maxMx2TrackVertexDiff"].as<double>();

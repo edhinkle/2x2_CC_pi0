@@ -33,11 +33,13 @@ PHYSICS_LABELS = {
     "vertex_x": "Vertex X [cm]",
     "vertex_y": "Vertex Y [cm]",
     "vertex_z": "Vertex Z [cm]",
+    "vertex_diff": "Vertex Difference [cm]",
     "position_x": "X Position [cm]",
     "position_y": "Y Position [cm]",
     "position_z": "Z Position [cm]",
     "pot": "POT",
     "pot_count": "Protons on Target",
+    "pdg": "Particle PDG"
 }
 
 # Common histogram titles/descriptions

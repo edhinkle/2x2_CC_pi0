@@ -162,11 +162,11 @@ TruthMatchedHists::TruthMatchedHists()
 
     // Check if best matched truth ixn is CC/NC, nue/numu if it's rock
     h_truthMatchIxn_TruthBkgROCK_isCC = new TH1D("h_truthMatchIxn_TruthBkgROCK_isCC", "h_truthMatchIxn_TruthBkgROCK_isCC", 2, 0, 2);
-    h_truthMatchIxn_TruthBkgROCK_nuPDG = new TH1D("h_truthMatchIxn_TruthBkgROCK_nuPDG", "h_truthMatchIxn_TruthBkgROCK_nuPDG", 2, 0, 2);
+    h_truthMatchIxn_TruthBkgROCK_nuPDG = new TH1D("h_truthMatchIxn_TruthBkgROCK_nuPDG", "h_truthMatchIxn_TruthBkgROCK_nuPDG", 40, -20, 20);
 
     // Check if best matched truth ixn is CC/NC, nue/numu if it's not rock
     h_truthMatchIxn_TruthBkgNONROCK_isCC = new TH1D("h_truthMatchIxn_TruthBkgNONROCK_isCC", "h_truthMatchIxn_TruthBkgNONROCK_isCC", 2, 0, 2);
-    h_truthMatchIxn_TruthBkgNONROCK_nuPDG = new TH1D("h_truthMatchIxn_TruthBkgNONROCK_nuPDG", "h_truthMatchIxn_TruthBkgNONROCK_nuPDG", 2, 0, 2);
+    h_truthMatchIxn_TruthBkgNONROCK_nuPDG = new TH1D("h_truthMatchIxn_TruthBkgNONROCK_nuPDG", "h_truthMatchIxn_TruthBkgNONROCK_nuPDG", 40, -20, 20);
 }
 
 
@@ -207,7 +207,8 @@ void TruthMatchedHists::FillTruthMatchMx2TrackInfo(MatchedInteractionSummary& ma
     }
 
     // Info from best-matched truth interaction muon
-    if (matchSummary.passesMx2 == true) h_truthMatchIxn_MuonCosL->Fill(matchSummary.truthSummaryforBestMatch.muonCosL);
+    //if (matchSummary.passesMx2 == true) h_truthMatchIxn_MuonCosL->Fill(matchSummary.truthSummaryforBestMatch.muonCosL);
+    h_truthMatchIxn_MuonCosL->Fill(matchSummary.truthSummaryforBestMatch.muonCosL);
     h_truthMatchIxn_MuonCosL_unbinned->Fill(matchSummary.truthSummaryforBestMatch.muonCosL);
     h_truthMatchIxn_MuonCosL_zoomOut->Fill(matchSummary.truthSummaryforBestMatch.muonCosL);
     h_truthMatchIxn_MuonE->Fill(matchSummary.truthSummaryforBestMatch.muonEnergy);
@@ -249,7 +250,7 @@ void TruthMatchedHists::FillTruthMatchIxnShowerMultiplicity(MatchedInteractionSu
     h_truthMatchIxn_Reco_SecPhotonResponseMult->Fill(recoSummary.nSecPhotons, matchSummary.truthSummaryforBestMatch.nSecPhotons);
 
     // Fill reco shower multiplicity for best matched ixn truth signal/bkg histograms
-    if (matchSummary.passesLArCuts && matchSummary.passesMx2 == true)
+    if (matchSummary.passesLArCuts)// && matchSummary.passesMx2 == true)
     {
         h_truthMatchIxn_TruthSignal_RecoPrimShowerMult->Fill(total_prim_showers_reco);
         h_truthMatchIxn_TruthSignal_RecoSecShowerMult->Fill(total_sec_showers_reco);
@@ -353,7 +354,7 @@ void TruthMatchedHists::FillTruthMatchIxnIsRock(MatchedInteractionSummary& match
 // Fill histogram for counting CC/NC, nu PDG for rock and non-rock BKG
 void TruthMatchedHists::FillTruthMatchIxnIsBkgCCnuPDG(MatchedInteractionSummary& matchSummary)
 {
-  if (matchSummary.passesLArCuts && matchSummary.passesMx2 == true) {
+  if (matchSummary.passesLArCuts) {// && matchSummary.passesMx2 == true) {
     return; // only want to fill for interactions that fail reco cuts (i.e. are in bkg)
   }
   else if (matchSummary.isRockIxn == true)

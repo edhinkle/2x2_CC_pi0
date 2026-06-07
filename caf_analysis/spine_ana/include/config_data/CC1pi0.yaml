@@ -3,7 +3,7 @@ selection:
   cosThetaCut: 0.91 
   muonEnergyCut: 1 # GeV
   minTruthIxnOverlap: 0.5 # Minimum overlap to consider Reco/Truth Ixn match successful
-  minRockIxnTruthId: 1000000000 # Minimum truth ID to consider an interaction a rock interaction
+  maxRockIxnTruthId: 1000000000 # Minimum truth ID to consider an interaction a rock interaction
   maxTruthRecoVertexDiff: 20.0 # cm, maximum distance between truth and reco vertex for a successful match
   maxMx2TrackVertexDiff: 5.0 # cm, maximum distance between track start and vertex for Mx2 matching candidate
   maxTrkMatchMx2MatchDiff: 0.001 # max difference in dot product between trkmatch (CAF branch) matched track dot product & dot product bewteen Mx2 track and 2x2 track

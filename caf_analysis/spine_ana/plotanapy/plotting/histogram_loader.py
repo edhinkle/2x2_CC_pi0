@@ -215,7 +215,7 @@ class HistogramLoader:
         """
         return self._get_from_directory(self.TRUTH_DIR)
     
-    def get_matched_histograms(self) -> Dict[str, Any]:
+    def get_truth_matched_histograms(self) -> Dict[str, Any]:
         """
         Load all TruthMatchedHists histograms from "matched" directory.
         

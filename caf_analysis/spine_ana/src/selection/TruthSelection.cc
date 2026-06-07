@@ -107,6 +107,7 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
   //--------------------------------------------------
 
   summary.nuPDG    = nu.pdg;
+  //std::cout<<"[DEBUG]: nu.pdg for Truth Ixns: "<<summary.nuPDG<<std::endl;
   summary.nuE = nu.E;
   summary.vertex   = nu.vtx;
   summary.Numubar = nu.pdg < 0;
