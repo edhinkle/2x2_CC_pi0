@@ -4,7 +4,7 @@ This repository is used to run analyses related to CC $\nu_\mu$ events in the 2x
 
 ## CAF Analysis
 
-The analysis directory is split into `setup` and `spine_ana` (analysis) subdirectories. This analysis is designed to be run on the NERSC Perlmutter system. Scripts in `setup` must be run before running the analysis scripts. Prior to this, two other repositories must be installed inside the `2x2_CC_pi0` repository. First, the `2x2_sim` repository (https://github.com/DUNE/2x2_sim) must be cloned inside the main folder of `2x2_CC_pi0` (one level above `caf_analysis`). Second, `yaml-cpp` (https://github.com/jbeder/yaml-cpp.git) must be cloned inside the `caf_analysis/spine_ana` directory and built: 
+The analysis directory is split into `setup` and `spine_ana` (analysis) subdirectories. This analysis is designed to be run on the NERSC Perlmutter system. Prior to running the analysis, `yaml-cpp` (https://github.com/jbeder/yaml-cpp.git) must be cloned inside the `caf_analysis/spine_ana` directory and built: 
 
     cd yaml-cpp
     mkdir build && cd build
@@ -14,7 +14,7 @@ The analysis directory is split into `setup` and `spine_ana` (analysis) subdirec
 
 ### `setup`
 
-The three scripts in this directory are used to set up the environment necessary to run the CAF Analysis. `setup_container.sh` sets up an SL7 container and is run first, followed by `setup_caf.sh`. Currently, `setup_general.sh` is extraneous and included for reference as the repository grows. 
+The two scripts in this directory are used to set up the environment necessary to run the CAF Analysis. `pre_container_setup.sh` defines how Python and CUDA are set up on NERSC. `caf_env_setup.sh` loads environment variables for running the analysis in a Fermilab SL7 container. Both scripts are run as part of the main analysis script (`runCC1pi0SelSPINE.sh`) and don't need to be run separately by the analyzer. 
 
 ### `spine_ana`
 
