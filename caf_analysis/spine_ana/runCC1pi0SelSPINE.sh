@@ -34,8 +34,8 @@ fi
 ##################################### ANALYSIS #####################################
 ####################################################################################
 if [[ $RUN_ANALYSIS -eq 1 ]]; then
-    # Invoke Fermilab SL7 container to compile and run analysis code on CAFs
-    shifter --image=fermilab/fnal-wn-sl7:latest --module=cvmfs,gpu /bin/bash << EOF1
+    # Invoke Fermilab SL7 container to compile and run analysis code on CAFs (old container name: fermilab/fnal-wn-sl7:latest)
+    shifter --image=fermilab/fnal-dev-sl7:latest --module=cvmfs,gpu /bin/bash << EOF1
 
         # Set up environment for analysis code
         source /environment
