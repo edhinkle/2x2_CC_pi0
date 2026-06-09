@@ -115,4 +115,18 @@ namespace config {
         return cfg;
     }
 
+    FluxSystConfig LoadFluxSystConfig(const std::string& path) {
+        FluxSystConfig cfg;
+    
+        // Load config yaml
+        YAML::Node config = YAML::LoadFile(path);
+
+        cfg.binFilePath = config["flux_syst"]["binFilePath"].as<std::string>();
+        cfg.fluxFilePath = config["flux_syst"]["fluxFilePath"].as<std::string>();
+
+        return cfg;
+
+    }
+    
+
 } // namespace config

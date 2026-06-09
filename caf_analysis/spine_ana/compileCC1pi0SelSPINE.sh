@@ -18,6 +18,7 @@ g++ -std=c++17 -O2 -g -gdwarf-4 -pedantic -Wall -I. -Iinclude \
   src/plotting/TruthMatchedHists.cc \
   src/selection/RecoSelection.cc \
   src/selection/TruthSelection.cc \
+  src/systematics/flux/FluxCovarianceReweight.cc \
   -L$DUNEANAOBJ_LIB \
   -lduneanaobj_StandardRecord \
   -L./yaml-cpp/install/lib64 \

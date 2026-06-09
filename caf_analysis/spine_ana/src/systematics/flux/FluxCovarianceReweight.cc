@@ -1,6 +1,6 @@
 // Copied from: https://github.com/rdiurba/2x2_trackMultStudies/blob/master/spineAna/FluxCovarianceReweight.cc
 
-#include "FluxCovarianceReweight.h"
+#include "systematics/flux/FluxCovarianceReweight.h"
 
 #include "TFile.h"
 #include "TH2D.h"
@@ -16,9 +16,9 @@
 // =====================================================
 // Load binning
 // =====================================================
-bool FluxCovarianceReweight::LoadBinning(const char* binfile)
+bool FluxCovarianceReweight::LoadBinning()
 {
-    std::ifstream fin("flux_covariance_binning_NuMI_GeV.txt");
+    std::ifstream fin(fFluxSyst.binFilePath.c_str());
     if (!fin.is_open()) {
         std::cerr << "ERROR: cannot open binning file\n";
         return false;
@@ -46,7 +46,7 @@ bool FluxCovarianceReweight::LoadBinning(const char* binfile)
 bool FluxCovarianceReweight::LoadCovariance()
 {
 
-    TFile* f = TFile::Open("numiFluxSyst.root", "READ");
+    TFile* f = TFile::Open(fFluxSyst.fluxFilePath.c_str(), "READ");
     if (!f || f->IsZombie()) return false;
     TH2D* h=nullptr;
     f->GetObject("hcov_hadProd_abs", h);
@@ -69,7 +69,7 @@ bool FluxCovarianceReweight::LoadCovariance()
     f->GetObject("hflux_rhc_numu_ppfx_corrected", hflux_rhc_numu);
     f->GetObject("hflux_rhc_numubar_ppfx_corrected", hflux_rhc_numubar);
 
-    LoadBinning("flux_covariance_binning_NuMI_GeV.txt");
+    LoadBinning();
 
     LoadFluxHistograms(
       hflux_fhc_nue,
@@ -122,9 +122,9 @@ bool FluxCovarianceReweight::LoadCovariance()
 bool FluxCovarianceReweight::LoadCombinedCovariance()
 {
     // Load hadron production covariance (FHC + RHC)
-    TFile* f = TFile::Open("numiFluxSystFull.root", "READ");
+    TFile* f = TFile::Open(fFluxSyst.fluxFilePath.c_str(), "READ");
     if (!f || f->IsZombie()) {
-        std::cerr << "ERROR: could not open numiFluxSyst.root\n";
+        std::cerr << "ERROR: could not open " << fFluxSyst.fluxFilePath << "\n";
         return false;
     }
     
@@ -166,7 +166,7 @@ bool FluxCovarianceReweight::LoadCombinedCovariance()
 
     
     // Load binning and flux
-    LoadBinning("flux_covariance_binning_NuMI_GeV.txt");
+    LoadBinning();
     LoadFluxHistograms(
         hflux_fhc_nue,
         hflux_fhc_nuebar,

@@ -6,6 +6,7 @@
 #include "TMatrixDSym.h"
 #include "TVectorD.h"
 #include "TH1D.h"
+#include "config/ConfigLoader.h"
 
 #include <vector>
 
@@ -24,10 +25,11 @@ struct FluxBin {
 // -------------------------------------
 class FluxCovarianceReweight {
 public:
-    FluxCovarianceReweight() {}
+    FluxCovarianceReweight(const FluxSystConfig& cfg):
+                           fFluxSyst(cfg) {};
 
     // Binning & covariance
-    bool LoadBinning(const char* binfile);
+    bool LoadBinning();
     bool LoadCovariance();
     void AddDiagonalEpsilon(double rel = 1e-8);
 
@@ -93,6 +95,8 @@ public:
     void FillAllThrowsForBin(int binIndex, Double_t* out) const;
     bool LoadCombinedCovariance();
 private:
+    const FluxSystConfig& fFluxSyst;
+
     std::vector<FluxBin> fBins;       // Binning including FHC/RHC
     std::vector<TVectorD> fThrows;    // Generated throws
     TMatrixDSym fCov;                 // Covariance matrix

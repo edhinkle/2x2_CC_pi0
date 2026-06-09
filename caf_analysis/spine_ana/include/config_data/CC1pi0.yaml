@@ -47,3 +47,6 @@ detector:
   mx2DownstreamZMax: 310.0 # cm
   mx2UpstreamZMin: -240.0 # cm
   mx2UpstreamZMax: -190.0 # cm
+flux_syst: # file paths must be changed for each analyzer
+  binFilePath: "/global/cfs/cdirs/dune/users/ehinkle/nd_prototypes_ana/2x2_CC_pi0/caf_analysis/spine_ana/include/config_data/flux_covariance_binning_NuMI_GeV.txt"
+  fluxFilePath: "/global/cfs/cdirs/dune/users/ehinkle/nd_prototypes_ana/2x2_CC_pi0/caf_analysis/spine_ana/include/config_data/numiFluxSystFull.root"

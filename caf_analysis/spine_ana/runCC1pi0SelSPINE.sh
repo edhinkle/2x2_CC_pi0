@@ -8,7 +8,7 @@
 
 # Run analysis, plotting, or both? 
 RUN_ANALYSIS=1
-RUN_PLOTTING=1
+RUN_PLOTTING=0
 
 # Set parameters for running analysis
 INPUTFILELIST="$(pwd)/include/config_data/MiniRun65FileList.txt"

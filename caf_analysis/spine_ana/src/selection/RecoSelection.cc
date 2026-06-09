@@ -224,7 +224,7 @@ void RecoSelection::FillParticleTruthMatching(const caf::StandardRecord& sr,
     if (mx2MatchResult.truthIxnMx2PartType == 1) { // Primary track
         matchSummary.truthMatchMx2TrackisPrimary=true;
         matchSummary.truthMatchMx2TrackPDG = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].pdg;
-        std::cout<<"[DEBUG] Truth Match Track PDG "<<matchSummary.truthMatchMx2TrackPDG<<std::endl;
+        //std::cout<<"[DEBUG] Truth Match Track PDG "<<matchSummary.truthMatchMx2TrackPDG<<std::endl;
         mx2TrackMatchP = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].p;
         mx2TrackLArStartPos = sr.mc.nu[mx2MatchResult.truthIxnMx2IxnIdx].prim[mx2MatchResult.truthIxnMx2PartIdx].start_pos;
     }

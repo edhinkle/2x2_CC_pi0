@@ -57,6 +57,8 @@ int main(int argc, char **argv) {
     BeamConfig beamInfo = config::LoadBeamConfig(configFilepath);
     DetectorConfig detInfo = config::LoadDetectorConfig(configFilepath);
 
+    FluxSystConfig fluxSyst = config::LoadFluxSystConfig(configFilepath);
+
     // -------------------------------
     // 4. Initialize histograms
     // -------------------------------
