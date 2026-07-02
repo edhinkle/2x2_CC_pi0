@@ -8,14 +8,18 @@
 
 # Run analysis, plotting, or both? 
 RUN_ANALYSIS=1
-RUN_PLOTTING=0
+RUN_PLOTTING=1
 
 # Set parameters for running analysis
+RUN_NAME="testCC1pi0SelSPINE_MATCHOLD"
 INPUTFILELIST="$(pwd)/include/config_data/MiniRun65FileList.txt"
-OUTPUTFILE="testCC1pi0SelSPINE.root"
+OUTPUTFILE="${RUN_NAME}.root"
 MCONLYSTRING="1"
 CONFIGFILEPATH="$(pwd)/include/config_data/CC1pi0.yaml"
-OUTPUTDIR="$(pwd)/outputs/"
+OUTPUTDIR="$(pwd)/outputs/${RUN_NAME}/"
+
+# Name for saving configuration file used for this run (for reproducibility)
+CONFIGFILE_SAVE_NAME="${RUN_NAME}_config.yaml"
 
 # Additional plotting-only parameters
 OUTPUTFILEPATH="${OUTPUTDIR}${OUTPUTFILE}"
@@ -65,6 +69,15 @@ EOF1
 
     # Move new output file to output directory
     mv ${OUTPUTFILE} ${OUTPUTDIR} 
+
+    # Delete config file in output directory if it already exists (e.g. from a previous run)
+    if [[ -f "${OUTPUTDIR}/${CONFIGFILE_SAVE_NAME}" ]]; then
+        rm -f "${OUTPUTDIR}/${CONFIGFILE_SAVE_NAME}"
+    fi
+
+    # Copy new config file to output directory
+    cp ${CONFIGFILEPATH} ${OUTPUTDIR}/${CONFIGFILE_SAVE_NAME}
+
 fi
 
 ####################################################################################
