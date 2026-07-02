@@ -23,8 +23,8 @@ selection:
   detFVCutAbsMaxZExiting: 2.3163 # cm
   # Mx2 hand-matching cuts
   minMx2TrackLength: 10.0 # cm
-  mx2EnterDownstreamAllowance: 6.0 # cm -- distance into downstream Mx2 track is allowed to start (Z) and still be considered for match to 2x2
-  mx2DistFromEndDownstreamZ: 40.0 # cm -- distance into downstream Mx2 track is allowed to end (Z) and still be considered as muon match in 2x2
+  mx2EnterDownstreamAllowance: 10.0 # cm -- distance into downstream Mx2 track is allowed to start (Z) and still be considered for match to 2x2
+  mx2DistFromEndDownstreamZ: 80.0 # cm -- distance into downstream Mx2 track is allowed to end (Z) and still be considered as muon match in 2x2
   # Mx2 Match Tracks Dot Product Threshold
   mx2TrackMatchDotProdThreshold: 0.99
 beam:

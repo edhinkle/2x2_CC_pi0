@@ -47,12 +47,12 @@ if __name__ == '__main__':
     
     # Generate all plots at once
     print("Plotting reco histograms...")
-    #reco_plotter.plot_all(output_dir=args.all_plots_dir+"reco_plots")
+    reco_plotter.plot_all(output_dir=args.all_plots_dir+"reco_plots")
     print("Plotting selection histograms...")
-    #sel_plotter.plot_all(output_dir=args.all_plots_dir+"sel_plots")
+    sel_plotter.plot_all(output_dir=args.all_plots_dir+"sel_plots")
     if (args.mcOnly == '1'):
         print("Plotting truth histograms...")
-        #truth_plotter.plot_all(output_dir=args.all_plots_dir+"truth_plots")
+        truth_plotter.plot_all(output_dir=args.all_plots_dir+"truth_plots")
         print("Plotting truth matched histograms...")
         truth_matched_plotter.plot_all(output_dir=args.all_plots_dir+"truth_matched_plots")
     
