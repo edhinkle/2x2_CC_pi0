@@ -4,12 +4,12 @@
 #include "plotting/RecoHists.h"
 #include "plotting/TruthMatchedHists.h"
 #include "plotting/CutFlowManager.h"
+#include "plotting/FluxSystHists.h"
 
 
 class HistogramManager {
 public:
-    HistogramManager()
-        : truth(), reco(), truthMatch(), cuts() {}
+    explicit HistogramManager(int nThrowsFlux, double nominalIntegratedFlux);
 
     void Write(TFile* file);
 
@@ -17,5 +17,10 @@ public:
     RecoHists reco;
     TruthMatchedHists truthMatch;
     CutFlowManager cuts;
+    FluxSystHists fluxSyst;
+
+private:
+    int fNThrowsFlux;
+    double fNominalIntegratedFlux;
 
 };

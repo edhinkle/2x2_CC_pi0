@@ -70,6 +70,12 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     hist.truth.FillShowerMultiplicityPreMx2(summary.nPrimElectrons, summary.nSecElectrons,
                                             summary.nPrimPhotons, summary.nSecPhotons);
 
+    // Flux systematics throws and histogram filling
+    auto weights = fFluxSyst.GetWeights(summary.nuPDG, summary.nuE, fFluxSyst.IsRHC());
+    for (int k=0; k<fFluxSyst.GetNThrows(); ++k) {
+      hist.fluxSyst.FillTrue(k, summary.muonCosL, weights[k]);
+    }
+
     // Passes Mx2 signal definition
     //if (!summary.passesMx2)
     //  continue;

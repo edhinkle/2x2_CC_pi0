@@ -23,6 +23,7 @@
 #include "plotting/HistogramManager.h"
 #include "selection/TruthSelection.h"
 #include "selection/RecoSelection.h"
+#include "systematics/flux/FluxSystManager.h"
 
 
 // Main macro method
@@ -57,15 +58,20 @@ int main(int argc, char **argv) {
     BeamConfig beamInfo = config::LoadBeamConfig(configFilepath);
     DetectorConfig detInfo = config::LoadDetectorConfig(configFilepath);
 
-    FluxSystConfig fluxSyst = config::LoadFluxSystConfig(configFilepath);
+    FluxSystConfig fluxSystInfo = config::LoadFluxSystConfig(configFilepath);
 
     // -------------------------------
-    // 4. Initialize histograms
-    // -------------------------------
-    HistogramManager hist; //TODO : Pass flux info to get nom flux
+    // 4. Initialize systematics
+    // -------------------------------   
+    FluxSystManager fluxSystManager(fluxSystInfo);
 
     // -------------------------------
-    // 5. Load CAF chain + set up branch address/total spill/POT variables
+    // 5. Initialize histograms
+    // -------------------------------
+    HistogramManager hist(fluxSystInfo.nThrows, fluxSystManager.GetNominalIntegratedFlux()); 
+
+    // -------------------------------
+    // 6. Load CAF chain + set up branch address/total spill/POT variables
     // -------------------------------
     TChain* caf_chain = io::BuildCAFChain(input_file_list);
     
@@ -88,7 +94,7 @@ int main(int argc, char **argv) {
     double totalPOT = 0;
 
     // -------------------------------
-    // 6. Loop over spills
+    // 7. Loop over spills
     // -------------------------------
     for (long i = 0; i < Nentries; ++i) {
       
@@ -97,25 +103,30 @@ int main(int argc, char **argv) {
       totalPOT = sr->beam.pulsepot / 1e13 + totalPOT;
 
       // -------------------------------------------------------------
-      // 6a. Truth Interaction selection (if MC)
+      // 7a. Truth Interaction selection (if MC)
       // -------------------------------------------------------------
       if (mcOnly) {
-        TruthSelection truthSel(selectionCuts, beamInfo, detInfo);
+        TruthSelection truthSel(selectionCuts, beamInfo, detInfo, fluxSystManager);
         truthSel.SelectTruthInteractions(*sr, hist);
       }
 
       // -------------------------------------------------------------
-      // 6b. Reco interaction selection (includes truth backtracking)
+      // 7b. Reco interaction selection (includes truth backtracking)
       // -------------------------------------------------------------
-      RecoSelection recoSel(selectionCuts, beamInfo, detInfo, mcOnly);
+      RecoSelection recoSel(selectionCuts, beamInfo, detInfo, fluxSystManager, mcOnly);
       recoSel.SelectRecoInteractions(*sr, hist);
     }
     // -------------------------------
-    // 7. Fill Total POT histogram after looping over spills
+    // 8. Fill Total POT histogram after looping over spills
     // -------------------------------
     hist.reco.FillTotalPOT(totalPOT);
+    // ----------------------------------------------------------------------------
+    // 9. Finalize flux systematics histograms including profiles from throw hists
+    // ----------------------------------------------------------------------------
+    hist.fluxSyst.SetThrowFluxTitles(fluxSystManager.GetIntegratedFluxThrows());
+    hist.fluxSyst.Finalize(); // builds profiles from completed throw histograms
     // -------------------------------
-    // 8. Finalize + write output
+    // 10. Finalize + write output
     // -------------------------------
     TFile *caf_out_file = new TFile(output_rootfile.c_str(), "recreate");
     hist.Write(caf_out_file);

@@ -9,7 +9,7 @@ struct SelectionConfig {
 
     // Minimum overlap to consider Reco/Truth Ixn match successful
     double minTruthIxnOverlap;
-    double maxRockIxnTruthId;
+    double minRockIxnTruthId;
     double maxTruthRecoVertexDiff;
 
     // Mx2 Matching cuts (Allowances vertex and track Match)

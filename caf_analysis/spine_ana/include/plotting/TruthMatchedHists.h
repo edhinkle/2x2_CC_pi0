@@ -9,11 +9,11 @@
 
 class TruthMatchedHists {
 public:
-    TruthMatchedHists();
+    TruthMatchedHists(double nominalIntegratedFlux);
 
-    //------------------------------------------
+    //--------------------------------------------------------
     // Filling histograms
-    //------------------------------------------
+    //--------------------------------------------------------
     void FillTruthMatchMx2TrackInfo(MatchedInteractionSummary& matchSummary,
                                     RecoInteractionSummary& recoSummary);
 
@@ -23,13 +23,23 @@ public:
     void FillTruthMatchIxnIxnMode(MatchedInteractionSummary& matchSummary);
     void FillTruthMatchIxnIsRock(MatchedInteractionSummary& matchSummary);
     void FillTruthMatchIxnIsBkgCCnuPDG(MatchedInteractionSummary& matchSummary);
+
+    //--------------------------------------------------------
+    // Get methods for copying histograms for systematics
+    //--------------------------------------------------------
+    const TH1D* GetTruthMatchCosL() const { return h_truthMatchIxn_MuonCosL_zoomOut; }
+    const TH2D* GetRespCosL() const { return h_truthMatchIxn_Reco_responseMuonCosL; }
+
+    //--------------------------------------------------------
+    // Write histograms to file
+    //--------------------------------------------------------
     void Write(TDirectory* dir);
 
 private:
 
-    //------------------------------------------
+    //--------------------------------------------------------
     // Histograms
-    //------------------------------------------ 
+    //--------------------------------------------------------
     // Mx2 Matched Track Info (Mx2 match track)
     TH1D *h_truthMatchPrim_mx2TrackPDG;
     TH1D *h_truthMatchSec_mx2TrackPDG;
@@ -177,5 +187,6 @@ private:
     TH1D *h_truthMatchIxn_TruthBkgNONROCK_isCC;
     TH1D *h_truthMatchIxn_TruthBkgNONROCK_nuPDG;
 
+    double fNominalIntegratedFlux;
 
 };

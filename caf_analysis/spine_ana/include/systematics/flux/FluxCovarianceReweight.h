@@ -34,16 +34,16 @@ public:
     void AddDiagonalEpsilon(double rel = 1e-8);
 
     // Throw generation
-    bool GenerateThrows(int nThrows, int seed = 0);
-    bool GenerateThrows2(int nThrows, int seed = 0);
+    bool GenerateThrows(int nThrows, int seed, bool isRHC, int PDG, bool nuSignMatters);
+    bool GenerateThrows2(int nThrows, int seed, bool isRHC, int PDG, bool nuSignMatters);
     TMatrixD ReconstructCovarianceFromThrows() const;
     std::vector<double> GetRelativeUncertaintyFromCovariance() const;
     // Accessors
     double GetWeightFast(int ithrow, int binIndex) const;
-    int    GetBinIndex(int pdg, double Enu) const;
-    int    FindBinIndex(int pdg, double Enu) const;
-    double GetWeight(int ithrow, int pdg, double Enu) const;
-    const TVectorD& GetAllWeights(int pdg, double Enu) const;
+    int    GetBinIndex(int pdg, double Enu, bool isRHC) const;
+    int    FindBinIndex(int pdg, double Enu, bool isRHC) const;
+    double GetWeight(int ithrow, int pdg, double Enu, bool isRHC) const;
+    const TVectorD& GetAllWeights(int pdg, double Enu, bool isRHC) const;
 
     double GetFluxWeight(int fluxBin, int universe) const;
     // Nominal flux
@@ -55,7 +55,8 @@ public:
     const std::vector<double>& GetIntegratedFluxThrows() const {
         return fIntegratedFluxThrows;
     }
-    void ComputeIntegratedFluxes();
+    void ComputeIntegratedFluxes(bool isRHC, int PDG, bool nuSignMatters);
+    std::pair<int, int> GetBinRangeForBeamModeAndPDG(bool isRHC, int PDG, bool nuSignMatters) const;
 
     // Load 8 histograms for FHC & RHC
     void LoadFluxHistograms(

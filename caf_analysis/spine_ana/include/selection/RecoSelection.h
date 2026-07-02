@@ -9,6 +9,7 @@
 #include "cuts/DetectorCuts.h"
 #include "selection/TruthSelection.h"
 #include "plotting/HistogramManager.h"
+#include "systematics/flux/FluxSystManager.h"
 #include "duneanaobj/StandardRecord/StandardRecord.h" 
 
 class RecoSelection {
@@ -16,9 +17,10 @@ public:
 
     RecoSelection(const SelectionConfig& cfg,
                 const BeamConfig& beam,
-                const DetectorConfig& detector,
+                const DetectorConfig& detector, 
+                const FluxSystManager& fluxSyst,
                 const bool mcOnly):
-                fSelCuts(cfg), fBeam(beam), fDetector(detector), fMCOnly(mcOnly) {};
+                fSelCuts(cfg), fBeam(beam), fDetector(detector), fFluxSyst(fluxSyst), fMCOnly(mcOnly) {};
 
     void SelectRecoInteractions(const caf::StandardRecord& sr,
                                 HistogramManager& hist);
@@ -48,6 +50,7 @@ private:
     const SelectionConfig& fSelCuts;
     const BeamConfig& fBeam;
     const DetectorConfig& fDetector;
+    const FluxSystManager& fFluxSyst;
     const bool fMCOnly;
 
 };

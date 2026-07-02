@@ -2,7 +2,8 @@
 #include "TDirectory.h"
 
 // Define all reco histograms 
-RecoHists::RecoHists()
+RecoHists::RecoHists(double nominalIntegratedFlux)
+    : fNominalIntegratedFlux(nominalIntegratedFlux)
 {
     // Count spills processed
     h_reco_TotalSpillsProcessed = new TH1D("h_reco_TotalSpillsProcessed", "h_reco_TotalSpillsProcessed", 1, 0, 1);
@@ -30,7 +31,10 @@ RecoHists::RecoHists()
     // Muon kinematics
     h_reco_CosL = new TH1D("h_reco_CosL", "h_reco_CosL", 6, edges); // Signal region (passes Mx2 cuts)
     h_reco_CosL_zoomOut = new TH1D("h_reco_CosL_zoomOut", "h_reco_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
- 
+    h_reco_CosL->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+    h_reco_CosL_zoomOut->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+
+
     // Shower multiplicity
     // Bins and edges for multiplicity histograms
     //int binsMult = 20;

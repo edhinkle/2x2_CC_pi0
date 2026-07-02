@@ -1,7 +1,8 @@
 #include "plotting/TruthHists.h"
 
 // Define all truth histograms 
-TruthHists::TruthHists()
+TruthHists::TruthHists(double nominalIntegratedFlux)
+    : fNominalIntegratedFlux(nominalIntegratedFlux)
 {
     
     // True interactions above KE threshold per spill
@@ -13,6 +14,9 @@ TruthHists::TruthHists()
     // True muon kinematics
     h_true_CosL = new TH1D("h_true_CosL", "h_true_CosL", 6, edges); // Signal region (passes Mx2 cuts)
     h_true_CosL_zoomOut = new TH1D("h_true_CosL_zoomOut", "h_true_CosL_zoomOut", 50, 0.8, 1); // All events passing initial cuts
+    h_true_CosL->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+    h_true_CosL_zoomOut->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+    
     h_true_CosLNumubar_zoomOut = new TH1D(
       "h_true_CosLNumubar_zoomOut", "h_true_CosLNumubar_zoomOut", 50, 0.8, 1); // Numubar events passing initial cuts
     h_true_CosLNumu_zoomOut = new TH1D(

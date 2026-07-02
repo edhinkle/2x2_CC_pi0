@@ -239,7 +239,7 @@ bool FluxCovarianceReweight::LoadCombinedCovariance()
 // =====================================================
 // Generate correlated throws
 // =====================================================
-bool FluxCovarianceReweight::GenerateThrows(int nThrows, int seed)
+bool FluxCovarianceReweight::GenerateThrows(int nThrows, int seed, bool isRHC, int PDG, bool nuSignMatters)
 {
     LoadCombinedCovariance(); 
     TRandom3 rng(seed);
@@ -272,7 +272,7 @@ bool FluxCovarianceReweight::GenerateThrows(int nThrows, int seed)
     }
 
     std::cout << "Generated " << nThrows << " throws\n";
-    ComputeIntegratedFluxes();
+    ComputeIntegratedFluxes(isRHC, PDG, nuSignMatters);
 
     TMatrixD test=(TMatrixD) ReconstructCovarianceFromThrows();
 
@@ -287,10 +287,10 @@ bool FluxCovarianceReweight::GenerateThrows(int nThrows, int seed)
 // =====================================================
 // Find bin index
 // =====================================================
-int FluxCovarianceReweight::FindBinIndex(int pdg, double Enu) const
+int FluxCovarianceReweight::FindBinIndex(int pdg, double Enu, bool isRHC) const
 {
     for (size_t i = 0; i < fBins.size(); ++i)
-        if (fBins[i].Contains(pdg, Enu,1))
+        if (fBins[i].Contains(pdg, Enu, static_cast<int>(isRHC)))
             return i;
 
     return -1;
@@ -301,18 +301,19 @@ int FluxCovarianceReweight::FindBinIndex(int pdg, double Enu) const
 // =====================================================
 double FluxCovarianceReweight::GetWeight(int ithrow,
                                           int pdg,
-                                          double Enu) const
+                                          double Enu,
+                                          bool isRHC) const
 {
     if (ithrow < 0 || ithrow >= (int)fThrows.size())
         return 1.0;
 
-    int idx = FindBinIndex(pdg, Enu);
+    int idx = FindBinIndex(pdg, Enu, isRHC);
     if (idx < 0)
         return 1.0;
 
     return fThrows[ithrow](idx);
 }
-bool FluxCovarianceReweight::GenerateThrows2(int nThrows, int seed)
+bool FluxCovarianceReweight::GenerateThrows2(int nThrows, int seed, bool isRHC, int PDG, bool nuSignMatters)
 {
     TRandom3 rng(seed);
 
@@ -364,17 +365,18 @@ bool FluxCovarianceReweight::GenerateThrows2(int nThrows, int seed)
 
         fThrows.push_back(delta);
     }
-       ComputeIntegratedFluxes();
+       ComputeIntegratedFluxes(isRHC, PDG, nuSignMatters);
 
     //std::cout << "Generated " << nThrows << " throws using eigen decomposition\n";
     return true;
 }
 const TVectorD& FluxCovarianceReweight::GetAllWeights(int pdg,
-                                                       double Enu) const
+                                                       double Enu,
+                                                       bool isRHC) const
 {
     static TVectorD unity;  // fallback
 
-    int idx = FindBinIndex(pdg, Enu);
+    int idx = FindBinIndex(pdg, Enu, isRHC);
     if (idx < 0) {
         unity.ResizeTo(fThrows.size());
         unity = 1.0;
@@ -402,9 +404,9 @@ void FluxCovarianceReweight::AddDiagonalEpsilon(double rel)
 
     std::cout << "Added diagonal epsilon = " << eps << "\n";
 }
-int FluxCovarianceReweight::GetBinIndex(int pdg, double Enu) const
+int FluxCovarianceReweight::GetBinIndex(int pdg, double Enu, bool isRHC) const
 {
-    return FindBinIndex(pdg, Enu);
+    return FindBinIndex(pdg, Enu, isRHC);
 }
 
 double FluxCovarianceReweight::GetWeightFast(int ithrow,
@@ -499,7 +501,7 @@ std::vector<double> FluxCovarianceReweight::BuildFluxBinCenterVector(
     TH1D* h_rhc_numubar
 ) const {
     std::vector<double> w;
-    w.reserve(628); // total bins
+    w.reserve(static_cast<int>(fBins.size())); // total bins
 
     TH1D* hists[8] = {h_fhc_nue, h_fhc_nuebar, h_fhc_numu, h_fhc_numubar,
                       h_rhc_nue, h_rhc_nuebar, h_rhc_numu, h_rhc_numubar};
@@ -522,7 +524,7 @@ TVectorD FluxCovarianceReweight::BuildNominalFluxVector(
     TH1D* h_rhc_numu,
     TH1D* h_rhc_numubar
 ) const {
-    TVectorD fluxNom(628);
+    TVectorD fluxNom(static_cast<int>(fBins.size()));
     int bin = 0;
 
     TH1D* hists[8] = {h_fhc_nue, h_fhc_nuebar, h_fhc_numu, h_fhc_numubar,
@@ -551,7 +553,7 @@ void FluxCovarianceReweight::LoadFluxHistograms(
     TH1D* h_rhc_numu,
     TH1D* h_rhc_numubar
 ) {
-    const int NBINS = 628;
+    const int NBINS = static_cast<int>(fBins.size());
 
     fNominalFlux.ResizeTo(NBINS);
     fFluxBinCenter.clear();
@@ -569,18 +571,64 @@ void FluxCovarianceReweight::LoadFluxHistograms(
     }
 }
 
+std::pair<int, int> FluxCovarianceReweight::GetBinRangeForBeamModeAndPDG(bool isRHC, int PDG, bool nuSignMatters) const {
+       
+    int nBins = static_cast<int>(fBins.size());
+    // Get start and end bin indices based on isRHC and PDG if needed
+    int startBin = 0;
+    int endBin = nBins;
+
+    // We only want to integrate over relevant bins based on the beam mode (FHC or RHC)
+    if (!isRHC) {
+        endBin = nBins / 2; // FHC bins
+    } else {
+        startBin = nBins / 2; // RHC bins
+    } 
+
+    // If PDG is specified, we can further filter bins based on PDG 
+    if (PDG != -1) {
+        int minIdx = -1;
+        int maxIdx = -1;
+        if (nuSignMatters) {
+            // If neutrino sign matters, we can filter based on PDG
+            // For example, PDG 14 (nu_mu) and -14 (anti-nu_mu)
+            for (int i = startBin; i < endBin; ++i) {
+                if (fBins[i].pdg == PDG) {
+                    if (minIdx == -1) minIdx = i;
+                    maxIdx = i;
+                }
+            }
+        } else {
+            // If neutrino sign does not matter, we can consider both nu and anti-nu for the given PDG
+            for (int i = startBin; i < endBin; ++i) {
+                if (abs(fBins[i].pdg) == PDG) {
+                    if (minIdx == -1) minIdx = i;
+                    maxIdx = i;
+                }
+            }
+        }
+        startBin = (minIdx != -1) ? minIdx : startBin;
+        endBin = (maxIdx != -1) ? maxIdx + 1 : endBin; // +1 because endBin is isn't considered below
+    }
+    return {startBin, endBin};
+}
 
 
-void FluxCovarianceReweight::ComputeIntegratedFluxes()
+void FluxCovarianceReweight::ComputeIntegratedFluxes(bool isRHC, int PDG, bool nuSignMatters)
 {
     const int nUniv = (int)fThrows.size();
-    const int nBins = fThrows[1].GetNrows();
+    //const int nBins = fThrows[1].GetNrows();
     //GetRelativeUncertaintyFromCovariance();
-    
+
+    // Get start and end bin indices based on isRHC and PDG if needed
+    std::pair<int, int> binRange = GetBinRangeForBeamModeAndPDG(isRHC, PDG, nuSignMatters);
+    int startBin = binRange.first; 
+    int endBin = binRange.second;
+
     // Nominal
     fIntegratedFluxNominal = 0.0;
-    for (int b = 386; b < nBins; ++b){
-            if (fFluxBinCenter[b]<2) continue;
+    for (int b = startBin; b < endBin; ++b){
+            //if (fFluxBinCenter[b]<2) continue; // from CC numu inclusive sel ... not sure if we want to exclude these bins
         fIntegratedFluxNominal +=
             fNominalFlux[b];// * fFluxBinCenter[b];
 
@@ -590,8 +638,8 @@ void FluxCovarianceReweight::ComputeIntegratedFluxes()
     fIntegratedFluxThrows.assign(nUniv, 0.0);
 
     for (int u = 0; u < nUniv; ++u) {
-        for (int b = 386; b < nBins; ++b) {
-            if (fFluxBinCenter[b]<2) continue;
+        for (int b = startBin; b < endBin; ++b) {
+            //if (fFluxBinCenter[b]<2) continue; // from CC numu inclusive sel ... not sure if we want to exclude these bins
           //  if (b>506 && b<527){  
            //     continue;}
             fIntegratedFluxThrows[u] +=

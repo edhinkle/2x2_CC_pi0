@@ -5,11 +5,11 @@
 
 class TruthHists {
 public:
-    TruthHists();
+    TruthHists(double nominalIntegratedFlux);
 
-    //------------------------------------------
+    //--------------------------------------------------------
     // Filling histograms
-    //------------------------------------------
+    //--------------------------------------------------------
 
     // Fill histograms for number of interactions above KE threshold per spill
     void FillInteractionsAboveKEThresholdPerSpill(int n);
@@ -24,13 +24,22 @@ public:
     void FillShowerMultiplicityPostMx2(int nPrimElectron, int nSecElectron, 
                                        int nPrimPhoton, int nSecPhoton);
     void FillIxnMode(int mode);
+
+    //--------------------------------------------------------
+    // Get methods for copying histograms for systematics
+    //--------------------------------------------------------
+    const TH1D* GetTrueCosL() const { return h_true_CosL_zoomOut; }
+
+    //--------------------------------------------------------
+    // Write histograms to file
+    //--------------------------------------------------------
     void Write(TDirectory* dir);
 
 private:
 
-    //------------------------------------------
+    //--------------------------------------------------------
     // Histograms
-    //------------------------------------------    
+    //--------------------------------------------------------    
 
     TH1D* h_true_ixnsAboveKEThresholdPerSpill;
 
@@ -62,5 +71,7 @@ private:
     TH1D* h_true_nSecShower_postMx2;
 
     TH1D* h_true_IxnMode;
+
+    double fNominalIntegratedFlux;
 
 };

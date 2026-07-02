@@ -2,7 +2,8 @@
 #include "TDirectory.h"
 
 // Define all truth match histograms 
-TruthMatchedHists::TruthMatchedHists()
+TruthMatchedHists::TruthMatchedHists(double nominalIntegratedFlux)
+    : fNominalIntegratedFlux(nominalIntegratedFlux)
 {
 
     // Edges for CosL histograms
@@ -28,6 +29,11 @@ TruthMatchedHists::TruthMatchedHists()
     h_truthMatchIxn_MuonCosL = new TH1D("h_truthMatchIxn_MuonCosL", "h_truthMatchIxn_MuonCosL", 6, edges);
     h_truthMatchIxn_MuonCosL_unbinned = new TH1D("h_truthMatchIxn_MuonCosL_unbinned", "h_truthMatchIxn_MuonCosL_unbinned", 100, -1, 1);
     h_truthMatchIxn_MuonCosL_zoomOut = new TH1D("h_truthMatchIxn_MuonCosL_zoomOut", "h_truthMatchIxn_MuonCosL_zoomOut", 50, 0.8, 1);
+    h_truthMatchIxn_MuonCosL->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+    h_truthMatchIxn_MuonCosL_unbinned->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+    h_truthMatchIxn_MuonCosL_zoomOut->SetTitle(Form("%0.08f", fNominalIntegratedFlux));
+
+    
     h_truthMatchIxn_MuonE = new TH1D("h_truthMatchIxn_MuonE", "h_truthMatchIxn_MuonE", 50, 0, 20);
     h_truthMatchIxn_Reco_responseMuonCosL =
       new TH2D("h_truthMatchIxn_Reco_responseMuonCosL", "h_truthMatchIxn_Reco_responseMuonCosL", 6, edges, 6, edges);

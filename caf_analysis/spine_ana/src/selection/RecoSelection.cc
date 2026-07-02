@@ -79,7 +79,19 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
         // Fill histograms for counting selected ixns where best match truth is rock
         hist.truthMatch.FillTruthMatchIxnIsRock(matchSummary);
         // Fill histograms for counting CC/NC, nu PDG for rock and non-rock truth-matched BKG
-        hist.truthMatch.FillTruthMatchIxnIsBkgCCnuPDG(matchSummary);
+        hist.truthMatch.FillTruthMatchIxnIsBkgCCnuPDG(matchSummary); 
+
+        // Fill flux systematics throws and histogram filling
+        auto weights = fFluxSyst.GetWeights(matchSummary.truthSummaryforBestMatch.nuPDG,
+                                            matchSummary.truthSummaryforBestMatch.nuE, 
+                                            fFluxSyst.IsRHC());
+        for (int k=0; k<fFluxSyst.GetNThrows(); ++k) {
+          hist.fluxSyst.FillReco(k, recoSummary.muonCosL, weights[k]);
+          hist.fluxSyst.FillTruthMatch(k, matchSummary.truthSummaryforBestMatch.muonCosL, weights[k]);
+          hist.fluxSyst.FillResponse(k, recoSummary.muonCosL, 
+                                        matchSummary.truthSummaryforBestMatch.muonCosL, weights[k]);
+
+        }
     }
     // TODO: Add Cut on Pi0s
 
@@ -190,14 +202,14 @@ MatchedInteractionSummary RecoSelection::BuildMatchedIxnSummary(
     }
 
     // Check if truth match is a rock interaction by looking at truth id
-    if(sr.mc.nu[summary.bestMatchIndex].id < fSelCuts.maxRockIxnTruthId) {
+    if(sr.mc.nu[summary.bestMatchIndex].id > fSelCuts.minRockIxnTruthId) {
       summary.isRockIxn = true;
     }
 
     // Fill in truth summary for best-matched interaction if it exists
     if (summary.bestMatchIndex != -999) {
         const auto& bestTruthIxn = sr.mc.nu[summary.bestMatchIndex];
-        TruthSelection truthSel(fSelCuts, fBeam, fDetector);
+        TruthSelection truthSel(fSelCuts, fBeam, fDetector, fFluxSyst);
         summary.truthSummaryforBestMatch = truthSel.BuildTruthSummary(bestTruthIxn);
         
         // Get difference in truth and reco vertex positions for best-matched interaction

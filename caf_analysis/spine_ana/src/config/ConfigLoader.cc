@@ -14,7 +14,7 @@ namespace config {
         cfg.muonEnergyCut = config["selection"]["muonEnergyCut"].as<double>();
 
         cfg.minTruthIxnOverlap = config["selection"]["minTruthIxnOverlap"].as<double>();
-        cfg.maxRockIxnTruthId = config["selection"]["maxRockIxnTruthId"].as<double>();
+        cfg.minRockIxnTruthId = config["selection"]["minRockIxnTruthId"].as<double>();
         cfg.maxTruthRecoVertexDiff = config["selection"]["maxTruthRecoVertexDiff"].as<double>();
     
         cfg.maxMx2TrackVertexDiff = config["selection"]["maxMx2TrackVertexDiff"].as<double>();
@@ -121,8 +121,21 @@ namespace config {
         // Load config yaml
         YAML::Node config = YAML::LoadFile(path);
 
+        // File paths
         cfg.binFilePath = config["flux_syst"]["binFilePath"].as<std::string>();
         cfg.fluxFilePath = config["flux_syst"]["fluxFilePath"].as<std::string>();
+        
+        // Enable systematics? 
+        cfg.enableFluxSyst = config["flux_syst"]["enableFluxSyst"].as<bool>();
+
+        // Number of universes + seed
+        cfg.nThrows = config["flux_syst"]["nThrows"].as<int>();
+        cfg.seed = config["flux_syst"]["seed"].as<int>();
+
+        // Flux Systematics info/settings
+        cfg.isRHC = config["flux_syst"]["isRHC"].as<bool>();
+        cfg.signalNuPDG = config["flux_syst"]["signalNuPDG"].as<int>();
+        cfg.nuSignMatters = config["flux_syst"]["nuSignMatters"].as<bool>();
 
         return cfg;
 

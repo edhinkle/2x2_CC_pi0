@@ -6,11 +6,11 @@
 
 class RecoHists {
 public:
-    RecoHists();
+    RecoHists(double nominalIntegratedFlux);
 
-    //------------------------------------------
+    //--------------------------------------------------------
     // Filling histograms
-    //------------------------------------------
+    //--------------------------------------------------------
     void FillTotalSpillsProcessed(int n);
     void FillTotalPOT(double pot);
     void FillRecoVertexNoCuts(caf::SRVector3D vertex);
@@ -18,13 +18,21 @@ public:
     void FillRecoCosMuonAngle(double cosL);
     void FillRecoShowerMultiplicity(RecoInteractionSummary& recoSummary);
 
+    //--------------------------------------------------------
+    // Get methods for copying histograms for systematics
+    //--------------------------------------------------------
+    const TH1D* GetRecoCosL() const { return h_reco_CosL_zoomOut; }
+
+    //--------------------------------------------------------
+    // Write histograms to file
+    //--------------------------------------------------------
     void Write(TDirectory* dir);
 
 private:
 
-    //------------------------------------------
+    //--------------------------------------------------------
     // Histograms
-    //------------------------------------------  
+    //--------------------------------------------------------  
     TH1D *h_reco_TotalSpillsProcessed;
     TH1D *h_reco_TotalPOT;
 
@@ -47,5 +55,7 @@ private:
     TH1D *h_reco_SecElectronMultiplicity;
     TH1D *h_reco_PrimPhotonMultiplicity;
     TH1D *h_reco_SecPhotonMultiplicity;
+
+    double fNominalIntegratedFlux;
 
 };

@@ -3,7 +3,7 @@ selection:
   cosThetaCut: 0.91 
   muonEnergyCut: 1 # GeV
   minTruthIxnOverlap: 0.5 # Minimum overlap to consider Reco/Truth Ixn match successful
-  maxRockIxnTruthId: 1000000000 # Minimum truth ID to consider an interaction a rock interaction
+  minRockIxnTruthId: 1E9 # Minimum truth ID to consider an interaction a rock interaction
   maxTruthRecoVertexDiff: 20.0 # cm, maximum distance between truth and reco vertex for a successful match
   maxMx2TrackVertexDiff: 5.0 # cm, maximum distance between track start and vertex for Mx2 matching candidate
   maxTrkMatchMx2MatchDiff: 0.001 # max difference in dot product between trkmatch (CAF branch) matched track dot product & dot product bewteen Mx2 track and 2x2 track
@@ -50,3 +50,9 @@ detector:
 flux_syst: # file paths must be changed for each analyzer
   binFilePath: "/global/cfs/cdirs/dune/users/ehinkle/nd_prototypes_ana/2x2_CC_pi0/caf_analysis/spine_ana/include/config_data/flux_covariance_binning_NuMI_GeV.txt"
   fluxFilePath: "/global/cfs/cdirs/dune/users/ehinkle/nd_prototypes_ana/2x2_CC_pi0/caf_analysis/spine_ana/include/config_data/numiFluxSystFull.root"
+  enableFluxSyst: True # run with flux systematics on? 
+  nThrows: 1000 # number of universes
+  seed: 0 # random seed for generating universes
+  isRHC: True # whether to use RHC or FHC flux
+  signalNuPDG: 14 # PDG code of signal neutrino (14 = numu, -14 = numubar)
+  nuSignMatters: False # whether to consider neutrino sign when applying flux systematics
