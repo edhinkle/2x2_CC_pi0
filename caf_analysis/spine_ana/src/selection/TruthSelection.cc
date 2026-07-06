@@ -25,29 +25,65 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     hist.cuts.Count("Truth", "All");
 
     // Argon target only
-    if (nu.targetPDG != 1000180400)
-      continue;
-    hist.cuts.Count("Truth", "Argon Target");
+    if (fSelCuts.enableArgonTargetCutTruth)
+    {
+      if (nu.targetPDG != 1000180400)
+        continue;
+      hist.cuts.Count("Truth", "Argon Target");
+    }
 
     // Active Volume Cut
-    if (!DetectorCuts::InModuleVolumes(nu.vtx, fDetector))
-      continue;
-    hist.cuts.Count("Truth", "Active Volume");
+    if (fSelCuts.enableAVCutTruth)
+    {
+      if (!DetectorCuts::InModuleVolumes(nu.vtx, fDetector))
+        continue;
+      hist.cuts.Count("Truth", "Active Volume");
+    } 
 
     //// Fiducial Volume Cut
-    //if (!DetectorCuts::InFiducialVolume(nu.vtx, fDetector))
-    //  continue;
-    //hist.cuts.Count("Truth", "Fiducial Volume");
+    if (fSelCuts.enableFVCutTruth)
+    {
+      if (!DetectorCuts::InFiducialVolume(nu.vtx, fDetector))
+        continue;
+      hist.cuts.Count("Truth", "Fiducial Volume");
+    }
 
-    // Numu Cut
-    if (std::abs(nu.pdg) != 14)
-      continue;
-    hist.cuts.Count("Truth", "NuMu");
+    // Neutrino Flavor Cut
+    if (fSelCuts.enableNuFlavorCutTruth)
+    {
+      int nuPDG = nu.pdg;
+      int signalPDG = fSelCuts.signalNuPDG;
+      std::string flavorCutName = "Nu Flavor";
+      if (signalPDG == 14) flavorCutName = "NuMu";
+      if (!fSelCuts.nuSignMatters)
+      {
+        nuPDG = std::abs(nuPDG);
+        signalPDG = std::abs(signalPDG);
+        if (signalPDG == 14) flavorCutName = "NuMu";
+        if (signalPDG == 12) flavorCutName = "NuE";
+      }
+      else {
+        if (signalPDG == 14) flavorCutName = "NuMu";
+        if (signalPDG == -14) flavorCutName = "NuMuBar";
+        if (signalPDG == 12) flavorCutName = "NuE";
+        if (signalPDG == -12) flavorCutName = "NuEBar";
+      }
+      if (nuPDG != signalPDG)
+        continue;
+      hist.cuts.Count("Truth", flavorCutName);
+    }
 
     // CC only
-    if (!nu.iscc)
-      continue;
-    hist.cuts.Count("Truth", "CC");
+    if (fSelCuts.enableCCorNCCutTruth)
+    {
+      std::string CCorNCCutName = "CC";
+      if (fSelCuts.signalIsCC && !fSelCuts.signalIsNC) CCorNCCutName = "CC";
+      if (!fSelCuts.signalIsCC && fSelCuts.signalIsNC) CCorNCCutName = "NC";
+      if (fSelCuts.signalIsCC && fSelCuts.signalIsNC) CCorNCCutName = "CC or NC";
+      if (!(fSelCuts.signalIsCC && nu.iscc) && !(fSelCuts.signalIsNC && !nu.iscc))
+        continue;
+      hist.cuts.Count("Truth", CCorNCCutName);
+    }
 
 
     //--------------------------------------------------------------------
@@ -59,10 +95,21 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     // Fill histograms for number of pi0s
     hist.truth.FillPrimPi0Multiplicity(summary.nPrimPi0);
 
+    // Passes Mx2 signal definition
+    if (fSelCuts.enableMx2MatchCutTruth)
+    {
+      if (!summary.passesMx2)
+        continue;
+      hist.cuts.Count("Truth", "Muon Through Mx2");
+    }
+
     // Only one pi0
-    if (summary.nPrimPi0 != 1)
-      continue;
-    hist.cuts.Count("Truth", "1 Pi0");
+    if (fSelCuts.enable1pi0CutTruth)
+    {
+      if (summary.nPrimPi0 != 1)
+        continue;
+      hist.cuts.Count("Truth", "1 Pi0");
+    }
 
     // Fill histograms for muon kinematics and secondary pi0 multiplicity before Mx2 cuts
     hist.truth.FillMuonKinematics(summary.muonCosL, summary.muonEnergy, summary.Numubar, summary.passesMx2);
@@ -75,11 +122,6 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
     for (int k=0; k<fFluxSyst.GetNThrows(); ++k) {
       hist.fluxSyst.FillTrue(k, summary.muonCosL, weights[k]);
     }
-
-    // Passes Mx2 signal definition
-    //if (!summary.passesMx2)
-    //  continue;
-    //hist.cuts.Count("Truth", "Muon Through Mx2");
 
     // Fill histograms for neutrino energy
     hist.truth.FillEnu(summary.nuE);
@@ -202,27 +244,39 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
 bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summary) const
 {
   // Argon target only
-  if (summary.targetPDG != 1000180400)
+  if (fSelCuts.enableArgonTargetCutTruth && summary.targetPDG != 1000180400)
     return false;
 
   // Active Volume Cut
-  if (!DetectorCuts::InModuleVolumes(summary.vertex, fDetector))
+  if (fSelCuts.enableAVCutTruth && !DetectorCuts::InModuleVolumes(summary.vertex, fDetector))
     return false;
 
-  // Numu Cut
-  if (std::abs(summary.nuPDG) != 14)
+  // Neutrino flavor Cut
+  int nuPDG = summary.nuPDG;
+  int signalPDG = fSelCuts.signalNuPDG;
+  if (!fSelCuts.nuSignMatters)
+  {
+    nuPDG = std::abs(nuPDG);
+    signalPDG = std::abs(signalPDG);
+  }
+
+  if (fSelCuts.enableNuFlavorCutTruth && nuPDG != signalPDG)
     return false;
 
   // Fiducial Volume Cut
-  //if (!DetectorCuts::InFiducialVolume(summary.vertex, fDetector))
-  //  return false;
+  if (fSelCuts.enableFVCutTruth && !DetectorCuts::InFiducialVolume(summary.vertex, fDetector))
+    return false;
 
-  // CC only
-  if (!summary.iscc)
+  // CC or NC only
+  if (fSelCuts.enableCCorNCCutTruth && !(fSelCuts.signalIsCC && summary.iscc) && !(fSelCuts.signalIsNC && !summary.iscc))
     return false;
 
   // Only one pi0
-  if (summary.nPrimPi0 != 1)
+  if (fSelCuts.enable1pi0CutTruth && summary.nPrimPi0 != 1)
+    return false;
+
+  // Passes Mx2 signal definition
+  if (fSelCuts.enableMx2MatchCutTruth && !summary.passesMx2)
     return false;
 
   return true;

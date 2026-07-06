@@ -11,7 +11,7 @@ RUN_ANALYSIS=1
 RUN_PLOTTING=1
 
 # Set parameters for running analysis
-RUN_NAME="testCC1pi0SelSPINE_MATCHOLD"
+RUN_NAME="testCC1pi0SelSPINE_SelCutsinConfig"
 INPUTFILELIST="$(pwd)/include/config_data/MiniRun65FileList.txt"
 OUTPUTFILE="${RUN_NAME}.root"
 MCONLYSTRING="1"

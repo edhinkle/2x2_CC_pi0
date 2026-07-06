@@ -1,4 +1,22 @@
 selection: 
+  # Enable Cuts -- Truth
+  enableArgonTargetCutTruth: True # enable truth-level argon target cut
+  enableAVCutTruth: True # enable truth-level AV cut
+  enableFVCutTruth: True # enable truth-level FV cut
+  enableNuFlavorCutTruth: True # enable truth-level numu cut
+  enableCCorNCCutTruth: True # enable truth-level CC or NC cut
+  enableMx2MatchCutTruth: False # enable Mx2 matching cut (approx for truth)
+  enable1pi0CutTruth: True # enable truth-level 1pi0 cut
+  # Enable Cuts -- Reco
+  enableAVCutReco: True # enable reco-level AV cut
+  enableFVCutReco: True # enable reco-level FV cut
+  enableMx2MatchCutReco: True # enable Mx2 matching cut
+  enable1pi0CutReco: True # enable reco-level 1pi0 cut (two showers for now)
+  # Truth Signal Definition CC vs. NC and numu vs. nue
+  signalNuPDG: 14 # PDG code of signal neutrino (14 = numu, -14 = numubar)
+  nuSignMatters: False # whether to consider neutrino sign when making selections and applying flux systematics
+  signalIsCC: True # select CC ixns?
+  signalIsNC: False # select NC ixns?
   # Selection cuts for Mx2 matching
   cosThetaCut: 0.91 
   muonEnergyCut: 1 # GeV
@@ -13,18 +31,18 @@ selection:
   maxMx2MatchArctanDiffXZ: 0.08 # rad, allowance for differnce in arctangent in X/Z plane for LAr and Mx2 tracks
   maxMx2MatchArctanDiffYZ: 0.09 # rad, allowance for differnce in arctangent in Y/Z plane for LAr and Mx2 tracks
   # FV cuts -- matching CC numu inclusive (Richie) for now
-  detFVCutAbsMinX: 1.931 # cm
-  detFVCutAbsMaxX: 4.931 # cm
-  detFVCutAbsMinY: 4.8543 # cm
-  detFVCutAbsMaxY: 4.8543 # cm
-  detFVCutAbsMinZ: 2.3163 # cm
-  detFVCutAbsMaxZ: 4.8163 # cm
+  detFVCutAbsMinX: 5.0 #1.931 # cm
+  detFVCutAbsMaxX: 5.0 #4.931 # cm
+  detFVCutAbsMinY: 5.0 #4.8543 # cm
+  detFVCutAbsMaxY: 5.0 #4.8543 # cm
+  detFVCutAbsMinZ: 5.0 #2.3163 # cm
+  detFVCutAbsMaxZ: 5.0 #4.8163 # cm
   # FV cut for Mx2 exiting track requirement -- matching CC numu inclusive (Richie) for now
   detFVCutAbsMaxZExiting: 2.3163 # cm
   # Mx2 hand-matching cuts
   minMx2TrackLength: 10.0 # cm
   mx2EnterDownstreamAllowance: 10.0 # cm -- distance into downstream Mx2 track is allowed to start (Z) and still be considered for match to 2x2
-  mx2DistFromEndDownstreamZ: 80.0 # cm -- distance into downstream Mx2 track is allowed to end (Z) and still be considered as muon match in 2x2
+  mx2DistFromEndDownstreamZ: 30.0 # cm -- distance into downstream Mx2 track is allowed to end (Z) and still be considered as muon match in 2x2
   # Mx2 Match Tracks Dot Product Threshold
   mx2TrackMatchDotProdThreshold: 0.99
 beam:
@@ -54,5 +72,3 @@ flux_syst: # file paths must be changed for each analyzer
   nThrows: 1000 # number of universes
   seed: 0 # random seed for generating universes
   isRHC: True # whether to use RHC or FHC flux
-  signalNuPDG: 14 # PDG code of signal neutrino (14 = numu, -14 = numubar)
-  nuSignMatters: False # whether to consider neutrino sign when applying flux systematics

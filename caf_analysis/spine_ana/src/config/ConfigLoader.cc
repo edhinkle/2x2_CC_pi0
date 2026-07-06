@@ -9,7 +9,31 @@ namespace config {
     
         // Load config yaml
         YAML::Node config = YAML::LoadFile(path);
-    
+
+        // Load selection cuts from config yaml
+        cfg.enableArgonTargetCutTruth = config["selection"]["enableArgonTargetCutTruth"].as<bool>(); // truth-only
+        cfg.enableNuFlavorCutTruth = config["selection"]["enableNuFlavorCutTruth"].as<bool>(); // truth-only
+        cfg.enableCCorNCCutTruth = config["selection"]["enableCCorNCCutTruth"].as<bool>(); // truth-only
+
+        cfg.enableAVCutTruth = config["selection"]["enableAVCutTruth"].as<bool>(); 
+        cfg.enableAVCutReco = config["selection"]["enableAVCutReco"].as<bool>();
+
+        cfg.enableFVCutTruth = config["selection"]["enableFVCutTruth"].as<bool>();
+        cfg.enableFVCutReco = config["selection"]["enableFVCutReco"].as<bool>();
+
+        cfg.enableMx2MatchCutTruth = config["selection"]["enableMx2MatchCutTruth"].as<bool>(); // approximate for truth
+        cfg.enableMx2MatchCutReco = config["selection"]["enableMx2MatchCutReco"].as<bool>();
+        
+        cfg.enable1pi0CutTruth = config["selection"]["enable1pi0CutTruth"].as<bool>();
+        cfg.enable1pi0CutReco = config["selection"]["enable1pi0CutReco"].as<bool>();
+
+        // Truth-related signal cuts
+        cfg.signalNuPDG = config["selection"]["signalNuPDG"].as<int>(); // PDG code of signal neutrino (14 = numu, -14 = numubar)
+        cfg.nuSignMatters = config["selection"]["nuSignMatters"].as<bool>();
+        cfg.signalIsCC = config["selection"]["signalIsCC"].as<bool>(); // select CC ixns?
+        cfg.signalIsNC = config["selection"]["signalIsNC"].as<bool>(); // select NC ixns?
+
+        // Mx2 Matching-Related Cuts
         cfg.cosThetaCut = config["selection"]["cosThetaCut"].as<double>();
         cfg.muonEnergyCut = config["selection"]["muonEnergyCut"].as<double>();
 
@@ -134,8 +158,8 @@ namespace config {
 
         // Flux Systematics info/settings
         cfg.isRHC = config["flux_syst"]["isRHC"].as<bool>();
-        cfg.signalNuPDG = config["flux_syst"]["signalNuPDG"].as<int>();
-        cfg.nuSignMatters = config["flux_syst"]["nuSignMatters"].as<bool>();
+        cfg.signalNuPDG = config["selection"]["signalNuPDG"].as<int>();
+        cfg.nuSignMatters = config["selection"]["nuSignMatters"].as<bool>();
 
         return cfg;
 

@@ -3,6 +3,29 @@
 
 struct SelectionConfig {
     
+    // Enable cuts? 
+    bool enableArgonTargetCutTruth; // truth-only
+    bool enableNuFlavorCutTruth; // truth-only
+    bool enableCCorNCCutTruth; // truth-only
+
+    bool enableAVCutTruth; 
+    bool enableAVCutReco;
+
+    bool enableFVCutTruth;
+    bool enableFVCutReco;
+
+    bool enableMx2MatchCutTruth; // approximate for truth
+    bool enableMx2MatchCutReco;
+
+    bool enable1pi0CutTruth;
+    bool enable1pi0CutReco;
+
+    // Truth-related signal cuts
+    int signalNuPDG; // PDG code of signal neutrino (14 = numu, -14 = numubar)
+    bool nuSignMatters; // whether to consider neutrino sign for signal definition
+    bool signalIsCC; // select CC ixns?
+    bool signalIsNC; // select NC ixns?
+
     // Truth Cuts to select muons passing through Mx2
     double cosThetaCut;
     double muonEnergyCut;

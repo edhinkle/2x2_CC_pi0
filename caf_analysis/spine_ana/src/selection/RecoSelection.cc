@@ -42,29 +42,46 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "All");
 
     // Active Volume Cut
-    if (!DetectorCuts::InModuleVolumes(reco_vtx, fDetector))
-      continue;
-    hist.cuts.Count("Reco", "Active Volume");
-    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Active Volume");
+    if (fSelCuts.enableAVCutReco)
+    {
+        if (!DetectorCuts::InModuleVolumes(reco_vtx, fDetector))
+          continue;
+        hist.cuts.Count("Reco", "Active Volume");
+        if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Active Volume");
+    }
 
     // Fiducial Volume Cut
-    if (!DetectorCuts::InFiducialVolume(reco_vtx, fDetector))
-      continue;
-    hist.cuts.Count("Reco", "Fiducial Volume");
-    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Fiducial Volume");
+    if (fSelCuts.enableFVCutReco)
+    {
+      if (!DetectorCuts::InFiducialVolume(reco_vtx, fDetector))
+        continue;
+      hist.cuts.Count("Reco", "Fiducial Volume");
+      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Fiducial Volume");
+    }
 
     // Mx2 Matching Muon Cut
     Mx2MatchResult mx2RecoMatch = mx2Matcher.MatchInteraction(nixn, dlpixn, sr);
-    if (!mx2RecoMatch.isGoodMatch)
-        continue;
-    hist.cuts.Count("Reco", "Mx2 Muon Match");
-    if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Mx2 Muon Match");
+    if (fSelCuts.enableMx2MatchCutReco)
+    {
+      if (!mx2RecoMatch.isGoodMatch)
+          continue;
+      hist.cuts.Count("Reco", "Mx2 Muon Match");
+      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "No Mx2 Muon Match");
+    }
 
     //--------------------------------------------------------------------
     // Event-level reco summary quantities
     //--------------------------------------------------------------------
 
     RecoInteractionSummary recoSummary = BuildRecoSummary(dlpixn, mx2RecoMatch);
+
+    if (fSelCuts.enable1pi0CutReco)
+    {
+      if (recoSummary.nPrimElectrons+recoSummary.nPrimPhotons+recoSummary.nSecElectrons+recoSummary.nSecPhotons != 2)
+          continue;
+      hist.cuts.Count("Reco", "Two Showers");
+      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Two Showers");
+    }
 
     // Updated MatchedInteractionSummary with Particle Truth Matching from Mx2, etc.
     if (fMCOnly) {
