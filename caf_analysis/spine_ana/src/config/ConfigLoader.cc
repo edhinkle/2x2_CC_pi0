@@ -109,6 +109,7 @@ namespace config {
         cfg.absModuleYMax = config["detector"]["absModuleMaxY"].as<double>();
         cfg.absModuleZMin = config["detector"]["absModuleMinZ"].as<double>();
         cfg.absModuleZMax = config["detector"]["absModuleMaxZ"].as<double>();
+        cfg.absCathodeLocX = config["detector"]["absCathodeLocX"].as<double>();
 
         // Then, get FV cuts
         double detFVCutAbsMinX = config["selection"]["detFVCutAbsMinX"].as<double>();
@@ -118,6 +119,7 @@ namespace config {
         double detFVCutAbsMinZ = config["selection"]["detFVCutAbsMinZ"].as<double>();
         double detFVCutAbsMaxZ = config["selection"]["detFVCutAbsMaxZ"].as<double>();
         double detFVCutAbsMaxZExiting = config["selection"]["detFVCutAbsMaxZExiting"].as<double>(); // Mx2 exiting track requirement
+        double detFVCutCathodeBuffer = config["selection"]["detFVCutCathodeBuffer"].as<double>(); // buffer for cathode plane in modules
 
         // Apply FV cuts
         cfg.absFiducialXMin = cfg.absModuleXMin + detFVCutAbsMinX;
@@ -126,6 +128,10 @@ namespace config {
         cfg.absFiducialYMax = cfg.absModuleYMax - detFVCutAbsMaxY; // symmetry in y (+ no gaps)
         cfg.absFiducialZMin = cfg.absModuleZMin + detFVCutAbsMinZ;
         cfg.absFiducialZMax = cfg.absModuleZMax - detFVCutAbsMaxZ;
+
+        // Cathode Buffer min/max x
+        cfg.absCathodeBufferXMin = cfg.absCathodeLocX - detFVCutCathodeBuffer;
+        cfg.absCathodeBufferXMax = cfg.absCathodeLocX + detFVCutCathodeBuffer;
 
         // Mx2 exiting track requirement:
         cfg.absFiducialZMaxExiting = cfg.absModuleZMax - detFVCutAbsMaxZExiting;

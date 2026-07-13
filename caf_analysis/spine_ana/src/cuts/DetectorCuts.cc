@@ -39,6 +39,10 @@ bool DetectorCuts::InFiducialVolume(
   if (abs(pt.y) > cfg.absFiducialYMax)
     return false;
 
+  if (abs(pt.x) > cfg.absCathodeBufferXMin &&
+      abs(pt.x) < cfg.absCathodeBufferXMax)
+    return false;
+
   return true;
 }
 

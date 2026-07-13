@@ -33,7 +33,6 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
     for (size_t j = 0; j < mx2Ixn.ntracks; ++j) {
 
       const auto& mx2Track = mx2Ixn.tracks[j];
-      result.mx2TrackEndZ = mx2Track.end.z;
 
       // Check if track passes Mx2 NDCAFMaker matching criteria (necessary due to offsets between Mx2 and 2x2 in data)
       caf::SRVector3D LArTrackStart;
@@ -48,17 +47,18 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
         LArTrackEnd = part.start;
       }
       double NDCAFMatchDispl = 0; // only used as placeholder ptr for following method
+      double NDCAFMatchDotProd = 0; // only used as placeholder ptr for following method
       bool PassesMx2LArTrackMatch = PassesMx2NDCAFMakerCut(mx2Track, 
                                                            LArIxnIdx, 
                                                            LArTrackStart, 
                                                            LArTrackEnd, 
-                                                           result.NDCAFMatchDotProd, 
+                                                           NDCAFMatchDotProd, 
                                                            NDCAFMatchDispl);
       if (!PassesMx2LArTrackMatch) continue;
       // Set Mx2LArTrackMatchDispl to abs. value to protect vs. direction differences w/ trkmatch
-      result.NDCAFMatchDotProd = abs(result.NDCAFMatchDotProd);
+      NDCAFMatchDotProd = abs(NDCAFMatchDotProd);
       // TODO: Update when not MC only (because track match cuts)
-      if (fMCOnly && abs(result.NDCAFMatchDotProd - result.trkMatchDotProdCAF)>fSelCuts.maxTrkMatchMx2MatchDiff)
+      if (fMCOnly && abs(NDCAFMatchDotProd - result.trkMatchDotProdCAF)>fSelCuts.maxTrkMatchMx2MatchDiff)
         continue;
 
       // Require forward-going track into Mx2
@@ -68,11 +68,14 @@ Mx2MatchResult Mx2Matcher::MatchTrack(
       if (!Mx2TrackIsEnteringDownstream(mx2Track)) continue;
       if (!Mx2TrackIsMuonCandidate(mx2Track)) continue; // check that it goes far enough in Mx2 DS in Z
 
-      if (result.NDCAFMatchDotProd > bestMatchDotProd) {
-        bestMatchDotProd = result.NDCAFMatchDotProd;
+      if (NDCAFMatchDotProd > bestMatchDotProd) {
+        bestMatchDotProd = NDCAFMatchDotProd;
+        result.NDCAFMatchDotProd = NDCAFMatchDotProd;
 
         result.mx2IxnIdx = i;
         result.mx2TrackIdx = j;
+        result.mx2TrackEndZ = mx2Track.end.z;
+        result.isGoodMatch = (result.NDCAFMatchDotProd > fSelCuts.mx2TrackMatchDotProdThreshold);
 
         // Optional truth
         if (fMCOnly) {
@@ -311,6 +314,5 @@ Mx2MatchResult Mx2Matcher::MatchInteraction(
     }
   }
 
-  bestMatch.isGoodMatch = (bestMatch.NDCAFMatchDotProd > fSelCuts.mx2TrackMatchDotProdThreshold);
   return bestMatch;
 }

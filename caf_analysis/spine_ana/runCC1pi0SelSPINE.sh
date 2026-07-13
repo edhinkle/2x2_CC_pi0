@@ -11,10 +11,10 @@ RUN_ANALYSIS=1
 RUN_PLOTTING=1
 
 # Set parameters for running analysis
-RUN_NAME="testCC1pi0SelSPINE_SelCutsinConfig"
-INPUTFILELIST="$(pwd)/include/config_data/MiniRun65FileList.txt"
+RUN_NAME="CC1pi0_TwoPrimShowers_Sandboxv11Test"
+INPUTFILELIST="$(pwd)/include/config_data/Sandboxv11FileList.txt"
 OUTPUTFILE="${RUN_NAME}.root"
-MCONLYSTRING="1"
+MCONLYSTRING="0"
 CONFIGFILEPATH="$(pwd)/include/config_data/CC1pi0.yaml"
 OUTPUTDIR="$(pwd)/outputs/${RUN_NAME}/"
 

@@ -31,17 +31,18 @@ selection:
   maxMx2MatchArctanDiffXZ: 0.08 # rad, allowance for differnce in arctangent in X/Z plane for LAr and Mx2 tracks
   maxMx2MatchArctanDiffYZ: 0.09 # rad, allowance for differnce in arctangent in Y/Z plane for LAr and Mx2 tracks
   # FV cuts -- matching CC numu inclusive (Richie) for now
-  detFVCutAbsMinX: 5.0 #1.931 # cm
-  detFVCutAbsMaxX: 5.0 #4.931 # cm
-  detFVCutAbsMinY: 5.0 #4.8543 # cm
-  detFVCutAbsMaxY: 5.0 #4.8543 # cm
-  detFVCutAbsMinZ: 5.0 #2.3163 # cm
-  detFVCutAbsMaxZ: 5.0 #4.8163 # cm
+  detFVCutAbsMinX: 2.0 #1.931 # cm
+  detFVCutAbsMaxX: 2.0 #4.931 # cm
+  detFVCutAbsMinY: 2.0 #4.8543 # cm
+  detFVCutAbsMaxY: 2.0 #4.8543 # cm
+  detFVCutAbsMinZ: 3.0 #2.3163 # cm
+  detFVCutAbsMaxZ: 3.0 #4.8163 # cm
+  detFVCutCathodeBuffer: 2.0 # cm
   # FV cut for Mx2 exiting track requirement -- matching CC numu inclusive (Richie) for now
   detFVCutAbsMaxZExiting: 2.3163 # cm
   # Mx2 hand-matching cuts
   minMx2TrackLength: 10.0 # cm
-  mx2EnterDownstreamAllowance: 10.0 # cm -- distance into downstream Mx2 track is allowed to start (Z) and still be considered for match to 2x2
+  mx2EnterDownstreamAllowance: 6.0 # cm -- distance into downstream Mx2 track is allowed to start (Z) and still be considered for match to 2x2
   mx2DistFromEndDownstreamZ: 30.0 # cm -- distance into downstream Mx2 track is allowed to end (Z) and still be considered as muon match in 2x2
   # Mx2 Match Tracks Dot Product Threshold
   mx2TrackMatchDotProdThreshold: 0.99
@@ -60,6 +61,7 @@ detector:
   absModuleMaxY: 61.8543 # cm, maximum absolute value Y position of modules
   absModuleMinZ: 2.6837 # cm, minimum absolute value Z position of modules
   absModuleMaxZ: 64.3163 # cm, maximum absolute value Z position of modules 
+  absCathodeLocX: 33.5 # cm, absolute X position of cathode planes in modules
   # Mx2 boundaries from DUNE DocDB 32440
   mx2DownstreamZMin: 164.0 # cm
   mx2DownstreamZMax: 310.0 # cm

@@ -109,6 +109,9 @@ void TruthSelection::SelectTruthInteractions(const caf::StandardRecord& sr,
       if (summary.nPrimPi0 != 1)
         continue;
       hist.cuts.Count("Truth", "1 Pi0");
+      //if (summary.nPrimPions != 0)
+      //  continue;
+      //hist.cuts.Count("Truth", "0 Pions");
     }
 
     // Fill histograms for muon kinematics and secondary pi0 multiplicity before Mx2 cuts
@@ -209,6 +212,10 @@ TruthInteractionSummary TruthSelection::BuildTruthSummary(
     if (abs(pdg) == 22)
       ++summary.nPrimPhotons;
 
+    if (abs(pdg) == 211)
+      ++summary.nPrimPions;
+
+
   }
 
   //--------------------------------------------------
@@ -272,7 +279,7 @@ bool TruthSelection::IxnPassesTruthLArCuts(const TruthInteractionSummary& summar
     return false;
 
   // Only one pi0
-  if (fSelCuts.enable1pi0CutTruth && summary.nPrimPi0 != 1)
+  if (fSelCuts.enable1pi0CutTruth && summary.nPrimPi0 != 1) //(summary.nPrimPi0 != 0 || summary.nPrimPions != 0 ))
     return false;
 
   // Passes Mx2 signal definition

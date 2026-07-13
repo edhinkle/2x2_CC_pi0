@@ -63,10 +63,20 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
     Mx2MatchResult mx2RecoMatch = mx2Matcher.MatchInteraction(nixn, dlpixn, sr);
     if (fSelCuts.enableMx2MatchCutReco)
     {
+      //if (mx2RecoMatch.trkMatchDotProdCAF != -999)
+      //{
+        //std::cout << "-------------------------------" << std::endl;
+        //std::cout << "mx2Track End Z: " << mx2RecoMatch.mx2TrackEndZ << std::endl;
+        //std::cout << "Track match dot product CAF: " << mx2RecoMatch.trkMatchDotProdCAF << std::endl;
+        //std::cout << "Track match dot product NDCAF: " << mx2RecoMatch.NDCAFMatchDotProd << std::endl;
+        //std::cout << "Mx2 Track match dot product threshold: " << fSelCuts.mx2TrackMatchDotProdThreshold << std::endl;
+      //}
       if (!mx2RecoMatch.isGoodMatch)
           continue;
+      //std::cout << "Is good match?" << mx2RecoMatch.isGoodMatch << std::endl;
+      //std::cout << "*****Mx2 Match Found for Reco Interaction " << nixn << std::endl;
       hist.cuts.Count("Reco", "Mx2 Muon Match");
-      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "No Mx2 Muon Match");
+      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Mx2 Muon Match");
     }
 
     //--------------------------------------------------------------------
@@ -77,10 +87,10 @@ void RecoSelection::SelectRecoInteractions(const caf::StandardRecord& sr,
 
     if (fSelCuts.enable1pi0CutReco)
     {
-      if (recoSummary.nPrimElectrons+recoSummary.nPrimPhotons+recoSummary.nSecElectrons+recoSummary.nSecPhotons != 2)
+      if (recoSummary.nPrimElectrons+recoSummary.nPrimPhotons != 2)
           continue;
-      hist.cuts.Count("Reco", "Two Showers");
-      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Two Showers");
+      hist.cuts.Count("Reco", "Two Primary Showers");
+      if (fMCOnly) FillTruthMatchedCuts(matchSummary, hist.cuts, "Two Primary Showers");
     }
 
     // Updated MatchedInteractionSummary with Particle Truth Matching from Mx2, etc.
@@ -219,7 +229,7 @@ MatchedInteractionSummary RecoSelection::BuildMatchedIxnSummary(
     }
 
     // Check if truth match is a rock interaction by looking at truth id
-    if(sr.mc.nu[summary.bestMatchIndex].id > fSelCuts.minRockIxnTruthId) {
+    if(sr.mc.nu[summary.bestMatchIndex].genieIdx > fSelCuts.minRockIxnTruthId) {
       summary.isRockIxn = true;
     }
 

@@ -41,6 +41,7 @@ struct TruthInteractionSummary {
   int nSecElectrons = 0;
   int nSecPhotons = 0;
 
+  int nPrimPions = 0;
 
   // -----------------------------
   // Signal flags

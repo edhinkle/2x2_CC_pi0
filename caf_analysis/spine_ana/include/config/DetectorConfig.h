@@ -14,6 +14,7 @@ struct DetectorConfig {
     double absModuleYMax; // cm
     double absModuleZMin; // cm
     double absModuleZMax; // cm
+    double absCathodeLocX; // cm, absolute X position of cathode planes in modules
 
     // Module boundaries for FV cuts
     double absFiducialXMin; // cm
@@ -22,6 +23,10 @@ struct DetectorConfig {
     double absFiducialYMax; // cm
     double absFiducialZMin; // cm
     double absFiducialZMax; // cm
+
+    // Cathode Buffer min/max x
+    double absCathodeBufferXMin; // cm, minimum X position of cathode buffer region
+    double absCathodeBufferXMax; // cm, maximum X position of cathode buffer region
 
     // FV cut for Mx2 exiting track requirement
     double absFiducialZMaxExiting; // cm, max Z for vertex for Mx2 exiting track requirement
