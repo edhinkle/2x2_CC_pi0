@@ -1,0 +1,239 @@
+from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Tuple, Any
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import uproot
+import pandas as pd
+
+
+class HistogramPlotter(ABC):
+    """
+    Abstract base class for histogram plotting for DQM analysis.
+    
+    Provides common functionality for 1D and 2D histogram visualization
+    with consistent styling and layout management.
+    
+    Attributes:
+        hist_dict (Dict): Dictionary mapping histogram names to histogram objects
+        style_config (Dict): Configuration for plot styling
+    """
+    
+    def __init__(self, hist_dict: Optional[Dict[str, Any]] = None, 
+                 style_config: Optional[Dict[str, Any]] = None):
+        """
+        Initialize the plotter.
+        
+        Args:
+            hist_dict: Dictionary of histograms (name -> histogram object)
+            style_config: Configuration dictionary for styling options
+
+        """
+        self.hist_dict = hist_dict or {}
+        self.style_config = style_config or {}
+
+    
+    def load_histograms(self, hist_dict: Dict[str, Any]) -> None:
+        """
+        Load histograms into the plotter.
+        
+        Args:
+            hist_dict: Dictionary mapping histogram names to histogram objects
+        """
+        self.hist_dict.update(hist_dict)
+    
+    def add_histogram(self, name: str, hist: Any) -> None:
+        """
+        Add a single histogram to the plotter.
+        
+        Args:
+            name: Histogram name/identifier
+            hist: Histogram object
+        """
+        self.hist_dict[name] = hist
+    
+    def get_histogram(self, name: str) -> Any:
+        """
+        Retrieve a histogram by name.
+        
+        Args:
+            name: Histogram name
+            
+        Returns:
+            The histogram object, or None if not found
+            
+        Raises:
+            KeyError: If histogram not found
+        """
+        if name not in self.hist_dict:
+            raise KeyError(f"Histogram '{name}' not found. Available: {list(self.hist_dict.keys())}")
+        return self.hist_dict[name]
+
+    def get_ttree(self, tree_name: str) -> pd.DataFrame:
+        """
+        Retrieve a TTree by name from the histograms.
+        
+        Args:
+            tree_name: Name of the TTree    
+
+        Returns:
+            A pandas DataFrame containing the TTree data
+
+        Raises:
+            KeyError: If TTree not found
+        """
+        if tree_name not in self.hist_dict:
+            raise KeyError(f"TTree '{tree_name}' not found. Available: {list(self.hist_dict.keys())}")
+        tree = self.hist_dict[tree_name]
+        if not isinstance(tree, uproot.models.TTree.Model_TTree_v20):
+            raise TypeError(f"Object '{tree_name}' is not a TTree. Found type: {type(tree)}")
+        return tree.arrays(library="pd")
+    
+    def plot_scatter(self, x_data: np.ndarray, y_data: np.ndarray,
+                     ax: Optional[plt.Axes] = None,
+                     xlabel: Optional[str] = None, ylabel: Optional[str] = None,
+                     title: Optional[str] = None,
+                     color: Optional[str] = None, alpha: float = 0.7,
+                     **kwargs) -> plt.Figure:
+        
+        """
+        Plot a scatter plot of x_data vs y_data.    
+
+        Args:
+            x_data: Array of x values
+            y_data: Array of y values
+            ax: Matplotlib axes to plot on (creates new if None)
+            xlabel: Label for x-axis
+            ylabel: Label for y-axis
+            title: Plot title
+            color: Color of points
+            alpha: Transparency of points
+            **kwargs: Additional arguments passed to matplotlib scatter
+
+        Returns:
+            The matplotlib Figure object
+        """
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(10, 6))
+        else:
+            fig = ax.get_figure()
+        ax.scatter(x_data, y_data, c=color, alpha=alpha, **kwargs)
+        if xlabel:
+            ax.set_xlabel(xlabel)
+        if ylabel:
+            ax.set_ylabel(ylabel)
+        if title:
+            ax.set_title(title)
+        return fig
+
+
+    def plot_1d(self, hist_name: str, normalized: bool = True, 
+                ax: Optional[plt.Axes] = None,
+                label: Optional[str] = None, color: Optional[str] = None,
+                linestyle: str = '-', linewidth: float = 1.5,
+                alpha: float = 0.7, **kwargs) -> int:
+        """
+        Plot a 1D histogram.
+        
+        Args:
+            hist_name: Name of the histogram to plot
+            normalized: Whether to normalize the histogram to unit area
+            ax: Matplotlib axes to plot on (creates new if None)
+            label: Label for the histogram (uses hist_name if None)
+            color: Line/fill color
+            linestyle: Line style
+            linewidth: Line width
+            alpha: Transparency (0-1)
+            **kwargs: Additional arguments passed to matplotlib
+            
+        Returns:
+            Number of entries in the histogram
+        """
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(10, 6))
+        else:
+            fig = ax.get_figure()
+        
+        ax = ax
+        hist = self.get_histogram(hist_name)
+        
+        # Extract histogram data (handles both TH1D and numpy arrays)
+        if hasattr(hist, 'to_numpy'):  # ROOT TH1D (loaded with uproot)
+            data, bin_edges = hist.to_numpy()
+            bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+        else:  # numpy array or similar
+            data = np.asarray(hist)
+            bin_edges = np.arange(len(data) + 1)
+            bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+        
+        # Plot as histogram or line
+        if 'drawstyle' not in kwargs:
+            ax.hist(bin_centers, bins=bin_edges, 
+                    weights=data/data.sum() if normalized else data, 
+                    label=label or hist_name, color=color, 
+                    alpha=alpha, linewidth=linewidth, **kwargs)
+        else:
+            normalized = False  # Line plots should not be normalized
+            ax.scatter(bin_centers, data, label=label or hist_name, 
+                    color=color, linestyle=linestyle, linewidth=linewidth, 
+                    alpha=alpha, **kwargs)
+        
+        return data.sum()
+    
+
+
+    def plot_2d(self, hist_name: str = None, normalized: bool = True, 
+                ax: Optional[plt.Axes] = None,
+                cmap: str = 'cividis', **kwargs) -> Tuple[mpl.collections.QuadMesh, int]:
+        """
+        Plot a 2D histogram as a heatmap.
+        
+        Args:
+            hist_name: Name of the 2D histogram to plot
+            normalized: Whether to normalize the histogram to unit area
+            ax: Matplotlib axes to plot on (creates new if None)
+            cmap: Colormap name
+            **kwargs: Additional arguments passed to matplotlib imshow
+            
+        Returns:
+            Tuple of (mesh, number of hist entries)
+        """
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(10, 8))
+        else:
+            fig = ax.get_figure()
+        
+        hist = self.get_histogram(hist_name)
+        
+        # Extract 2D histogram data
+        if hasattr(hist, 'to_numpy'):  # ROOT TH1D (loaded with uproot)
+            data, x_edges, y_edges = hist.to_numpy()
+        else:
+            data = np.asarray(hist)
+        
+        # Plot heatmap
+        mesh = ax.pcolormesh(
+            x_edges,
+            y_edges,
+            (data / np.sum(data) if normalized else data).T, # data = (x,y) but pcolormesh wants (y,x), so transpose
+            cmap=cmap,
+            **kwargs,
+        )
+        #ax.set_title(hist_name)
+        #plt.colorbar(mesh, ax=ax)
+        
+        return mesh, np.sum(data)
+    
+    
+    @abstractmethod
+    def plot_all(self, output_dir: str) -> None:
+        """
+        Generate all plots for this histogram set.
+        
+        Subclasses should implement this to create all relevant plots
+        and save them to output_dir.
+        
+        Args:
+            output_dir: Directory to save plots to
+        """
+        pass

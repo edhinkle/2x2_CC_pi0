@@ -1,0 +1,9 @@
+Metadata-Version: 2.2
+Name: dqm_analyzer_plotting
+Version: 0.1.0
+Requires-Python: >=3.8
+Requires-Dist: matplotlib>=3.5.0
+Requires-Dist: numpy>=1.23.0
+Requires-Dist: uproot>=4.0.0
+Dynamic: requires-dist
+Dynamic: requires-python
